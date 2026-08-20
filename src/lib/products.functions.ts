@@ -91,8 +91,9 @@ export const updateProduct = createServerFn({ method: "POST" })
   });
 
 export const getCategories = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data: categories, error } = await supabase
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: categories, error } = await context.supabase
       .from("categories")
       .select("*")
       .order("name");
