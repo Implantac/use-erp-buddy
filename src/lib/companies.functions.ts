@@ -4,9 +4,9 @@ import { z } from "zod";
 
 const companySchema = z.object({
   name: z.string().min(2),
-  legal_name: z.string().optional(),
-  tax_id: z.string().optional(),
-  group_id: z.string().uuid().optional(),
+  legal_name: z.string().nullable().optional(),
+  tax_id: z.string().nullable().optional(),
+  group_id: z.string().uuid().nullable().optional(),
   tenant_id: z.string().uuid(),
 });
 
@@ -36,7 +36,7 @@ export const createCompany = createServerFn({ method: "POST" })
     return company;
   });
 
-export const updateCompany = createServerFn({ method: "PATCH" })
+export const updateCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data) => z.object({
     id: z.string().uuid(),

@@ -27,7 +27,7 @@ function CompaniesList() {
             Gerencie as empresas e entidades legais da sua organização.
           </p>
         </div>
-        <Button onClick={() => navigate({ to: "/companies/new" })}>
+        <Button onClick={() => navigate({ to: "/companies" })}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Empresa
         </Button>
