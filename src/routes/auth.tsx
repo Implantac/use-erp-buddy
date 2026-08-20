@@ -194,13 +194,36 @@ function AuthPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Não tem uma conta?" : "Já possui uma conta?"}{" "}
-            <button 
-              onClick={() => setIsLogin(!isLogin)}
-              className="font-medium text-primary hover:underline underline-offset-4"
-            >
-              {isLogin ? "Cadastre-se" : "Entre agora"}
-            </button>
+            {mode === 'login' && (
+              <>
+                Não tem uma conta?{" "}
+                <button 
+                  onClick={() => setMode('signup')}
+                  className="font-medium text-primary hover:underline underline-offset-4"
+                >
+                  Cadastre-se
+                </button>
+              </>
+            )}
+            {mode === 'signup' && (
+              <>
+                Já possui uma conta?{" "}
+                <button 
+                  onClick={() => setMode('login')}
+                  className="font-medium text-primary hover:underline underline-offset-4"
+                >
+                  Entre agora
+                </button>
+              </>
+            )}
+            {mode === 'forgot' && (
+              <button 
+                onClick={() => setMode('login')}
+                className="font-medium text-primary hover:underline underline-offset-4"
+              >
+                Voltar para o login
+              </button>
+            )}
           </div>
         </CardFooter>
       </Card>
