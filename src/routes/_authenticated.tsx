@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
 import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,26 +48,26 @@ function AuthenticatedLayout() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button onClick={() => navigate({ to: "/dashboard" })}>
+                      <Link to="/dashboard" className="flex w-full items-center gap-2">
                         <LayoutDashboard className="h-4 w-4" />
                         <span>Dashboard</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button onClick={() => navigate({ to: "/companies" })}>
+                      <Link to="/companies" className="flex w-full items-center gap-2">
                         <Building2 className="h-4 w-4" />
                         <span>Empresas</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button onClick={() => navigate({ to: "/units" })}>
+                      <Link to="/units" className="flex w-full items-center gap-2">
                         <MapPin className="h-4 w-4" />
                         <span>Unidades</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
