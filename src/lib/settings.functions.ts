@@ -7,7 +7,7 @@ export const getProfile = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data: profile, error } = await context.supabase
       .from("profiles")
-      .select("*")
+      .select("*, user_roles(tenant_id)")
       .eq("id", context.userId)
       .single();
 

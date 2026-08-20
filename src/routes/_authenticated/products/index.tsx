@@ -31,6 +31,8 @@ function ProductsPage() {
     queryFn: () => getProfile(undefined),
   });
 
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -40,8 +42,9 @@ function ProductsPage() {
             Gerencie seu catálogo de produtos e estoque.
           </p>
         </div>
-        {profile?.tenant_id && <CreateProductDialog tenantId={profile.tenant_id} />}
+        {tenantId && <CreateProductDialog tenantId={tenantId} />}
       </div>
+
 
 
       <Card>

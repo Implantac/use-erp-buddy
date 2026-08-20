@@ -37,6 +37,8 @@ function FinancePage() {
     queryFn: () => getProfile(undefined),
   });
 
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
@@ -51,14 +53,15 @@ function FinancePage() {
           </p>
         </div>
         <div className="flex gap-2">
-          {profile?.tenant_id && (
+          {tenantId && (
             <>
-              <CreateTransactionDialog tenantId={profile.tenant_id} defaultType="expense" />
-              <CreateTransactionDialog tenantId={profile.tenant_id} defaultType="income" />
+              <CreateTransactionDialog tenantId={tenantId} defaultType="expense" />
+              <CreateTransactionDialog tenantId={tenantId} defaultType="income" />
             </>
           )}
         </div>
       </div>
+
 
 
       <div className="grid gap-4 md:grid-cols-3">
