@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, KeyRound, Loader2 } from "lucide-react";
+import { Building2, KeyRound, Loader2, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 
 export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPasswordPage,
@@ -44,12 +44,21 @@ function ResetPasswordPage() {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("As senhas não coincidem");
+    
+    // Password validation logic
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+    if (!(hasLength && hasUpper && hasLower && hasNumber && hasSpecial)) {
+      toast.error("A senha não atende aos requisitos de segurança");
       return;
     }
-    if (password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres");
+
+    if (password !== confirmPassword) {
+      toast.error("As senhas não coincidem");
       return;
     }
 
@@ -119,6 +128,7 @@ function ResetPasswordPage() {
                   required
                   className="bg-background border-border"
                 />
+                <PasswordStrengthMeter password={password} />
                 <Input
                   type="password"
                   placeholder="Confirme a nova senha"
