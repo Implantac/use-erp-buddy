@@ -3,12 +3,12 @@ import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { getMyUnits, toggleUnitStatus } from "@/lib/units.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search as SearchIcon, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { CreateUnitDialog } from "@/components/units/create-unit-dialog";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -21,8 +21,19 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { z } from "zod";
+
+const unitsSearchSchema = z.object({
+  page: z.number().int().min(1).catch(1),
+  pageSize: z.number().int().min(1).catch(10),
+  search: z.string().optional().catch(""),
+  status: z.enum(["all", "active", "inactive"]).catch("all"),
+  orderBy: z.string().catch("name"),
+  orderDirection: z.enum(["asc", "desc"]).catch("asc"),
+});
 
 export const Route = createFileRoute("/_authenticated/units/")({
+  validateSearch: (search) => unitsSearchSchema.parse(search),
   component: UnitsList,
 });
 
