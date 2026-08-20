@@ -56,7 +56,7 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button>
+                      <button onClick={() => navigate({ to: "/companies" })}>
                         <Building2 className="h-4 w-4" />
                         <span>Empresas</span>
                       </button>

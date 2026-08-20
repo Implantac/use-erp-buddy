@@ -28,7 +28,13 @@ export const createCompany = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: company, error } = await context.supabase
       .from("companies")
-      .insert(data)
+      .insert({
+        name: data.name,
+        legal_name: data.legal_name ?? null,
+        tax_id: data.tax_id ?? null,
+        group_id: data.group_id ?? null,
+        tenant_id: data.tenant_id,
+      })
       .select()
       .single();
 
@@ -43,9 +49,14 @@ export const updateCompany = createServerFn({ method: "POST" })
     updates: companySchema.partial(),
   }).parse(data))
   .handler(async ({ data, context }) => {
+    const updates: any = { ...data.updates };
+    if ('legal_name' in updates && updates.legal_name === undefined) updates.legal_name = null;
+    if ('tax_id' in updates && updates.tax_id === undefined) updates.tax_id = null;
+    if ('group_id' in updates && updates.group_id === undefined) updates.group_id = null;
+
     const { data: company, error } = await context.supabase
       .from("companies")
-      .update(data.updates)
+      .update(updates)
       .eq("id", data.id)
       .select()
       .single();
