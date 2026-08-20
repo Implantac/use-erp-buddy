@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useMemo, useEffect } from "react";
+import { CreateUnitDialog } from "@/components/units/create-unit-dialog";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -81,12 +82,7 @@ function UnitsList() {
             Gerencie as unidades físicas e filiais da sua organização.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/units/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Unidade
-          </Link>
-        </Button>
+        <CreateUnitDialog />
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
