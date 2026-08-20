@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, KeyRound, Loader2, AlertCircle } from "lucide-react";
+import { Building2, KeyRound, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,7 +21,10 @@ function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(true);
   const [errorState, setErrorState] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = Route.useNavigate();
+
 
   useEffect(() => {
     const checkSession = async () => {
