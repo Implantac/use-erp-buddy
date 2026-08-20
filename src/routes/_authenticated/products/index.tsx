@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/products.functions";
 import { CreateProductDialog } from "@/components/products/create-product-dialog";
+import { ProductActions } from "@/components/products/product-actions";
 import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/lib/settings.functions";
+import { Badge } from "@/components/ui/badge";
 import { 
 
   Table, 
@@ -60,6 +62,7 @@ function ProductsPage() {
                 <TableHead>Preço</TableHead>
                 <TableHead>Estoque</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -72,17 +75,18 @@ function ProductsPage() {
                   </TableCell>
                   <TableCell>{product.stock_quantity}</TableCell>
                   <TableCell>
-                    {product.active ? (
-                      <span className="text-green-600">Ativo</span>
-                    ) : (
-                      <span className="text-red-600">Inativo</span>
-                    )}
+                    <Badge variant={product.active ? "default" : "secondary"} className={product.active ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
+                      {product.active ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <ProductActions product={product} />
                   </TableCell>
                 </TableRow>
               ))}
               {data.products?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     Nenhum produto cadastrado.
                   </TableCell>
                 </TableRow>
