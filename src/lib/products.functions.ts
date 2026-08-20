@@ -41,17 +41,17 @@ export const getProducts = createServerFn({ method: "GET" })
 export const createProduct = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
     name: z.string().min(2),
-    description: z.string().optional(),
-    sku: z.string().optional(),
-    price: z.number().default(0),
-    cost_price: z.number().default(0),
-    stock_quantity: z.number().default(0),
-    category_id: z.string().optional(),
-    image_url: z.string().optional(),
+    description: z.string().nullable().optional(),
+    sku: z.string().nullable().optional(),
+    price: z.number().nullable().optional(),
+    cost_price: z.number().nullable().optional(),
+    stock_quantity: z.number().nullable().optional(),
+    category_id: z.string().nullable().optional(),
+    image_url: z.string().nullable().optional(),
     tenant_id: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
-    const { error } = await supabase.from("products").insert(data);
+    const { error } = await supabase.from("products").insert(data as any);
     if (error) throw error;
     return { success: true };
   });
@@ -60,15 +60,15 @@ export const updateProduct = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
     id: z.string(),
     name: z.string().optional(),
-    description: z.string().optional(),
-    sku: z.string().optional(),
-    price: z.number().optional(),
-    stock_quantity: z.number().optional(),
-    active: z.boolean().optional(),
+    description: z.string().nullable().optional(),
+    sku: z.string().nullable().optional(),
+    price: z.number().nullable().optional(),
+    stock_quantity: z.number().nullable().optional(),
+    active: z.boolean().nullable().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
     const { id, ...updates } = data;
-    const { error } = await supabase.from("products").update(updates).eq("id", id);
+    const { error } = await supabase.from("products").update(updates as any).eq("id", id);
     if (error) throw error;
     return { success: true };
   });
