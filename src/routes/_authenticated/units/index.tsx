@@ -39,44 +39,45 @@ export const Route = createFileRoute("/_authenticated/units/")({
 
 function UnitsList() {
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [orderBy, setOrderBy] = useState<string>("name");
-  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { page, pageSize, search, status, orderBy, orderDirection } = Route.useSearch();
+  const [searchTerm, setSearchTerm] = useState(search || "");
 
-  // Debounce search
+  // Sync searchTerm with search param when it changes externally
+  useEffect(() => {
+    setSearchTerm(search || "");
+  }, [search]);
+
+  // Debounce search update to URL
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
+      if (searchTerm !== search) {
+        navigate({
+          search: (prev) => ({ ...prev, search: searchTerm, page: 1 }),
+          replace: true,
+        });
+      }
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, search, navigate]);
 
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize, orderBy, orderDirection, debouncedSearch, statusFilter],
+    queryKey: ["units", page, pageSize, orderBy, orderDirection, search, status],
     queryFn: () => getMyUnits({ 
       data: { 
         page, 
         pageSize, 
         orderBy, 
         orderDirection,
-        search: debouncedSearch || undefined,
-        isActive: statusFilter === "all" ? null : statusFilter === "active"
+        search: search || undefined,
+        isActive: status === "all" ? null : status === "active"
       } 
     }),
   });
 
   const units = data?.units || [];
   const totalCount = data?.count || 0;
-  const totalPages = Math.ceil(totalCount / pageSize);
-
-  // Reset page when filtering
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, statusFilter]);
+  const totalPages = Math.ceil(totalCount / (pageSize || 10));
 
   const toggleMutation = useMutation({
     mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus({ data: vars }),
