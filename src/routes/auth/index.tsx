@@ -83,7 +83,17 @@ function AuthPage() {
         setMode('login');
       }
     } catch (error: any) {
-      toast.error(error.message || "Ocorreu um erro na autenticação");
+      // Generic error message to prevent user enumeration
+      const message = error.message || "";
+      if (message.includes("Invalid login credentials") || message.includes("Email not found")) {
+        toast.error("E-mail ou senha incorretos");
+      } else if (message.includes("User already registered")) {
+        // Still show success-like message for signup to prevent enumeration
+        toast.success("Cadastro realizado! Você já pode entrar.");
+        setMode('login');
+      } else {
+        toast.error("Ocorreu um erro na autenticação. Tente novamente.");
+      }
     } finally {
       setLoading(false);
     }
