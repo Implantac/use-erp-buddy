@@ -268,14 +268,13 @@ function UnitsList() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.max(1, (page || 1) - 1) }) })}
-                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.max(1, currentPage - 1) }) })}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                   
                   {[...Array(totalPages)].map((_, i) => {
                     const pageNum = i + 1;
-                    const currentPage = page || 1;
                     // Show current page, first, last, and one around current
                     if (
                       pageNum === 1 || 
@@ -306,8 +305,8 @@ function UnitsList() {
 
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.min(totalPages, (page || 1) + 1) }) })}
-                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.min(totalPages, currentPage + 1) }) })}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                 </PaginationContent>
