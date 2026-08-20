@@ -12,6 +12,7 @@ function Index() {
   const navigate = Route.useNavigate();
 
   return (
+
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b bg-card px-6 py-4">
@@ -76,6 +77,8 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
+
+
         </div>
       </footer>
     </div>
