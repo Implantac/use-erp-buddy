@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -60,6 +60,17 @@ function AuthenticatedLayout() {
                         <Building2 className="h-4 w-4" />
                         <span>Empresas</span>
                       </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/groups" className="flex w-full items-center gap-2">
+                        <FolderTree className="h-4 w-4" />
+                        <span>Grupos</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
