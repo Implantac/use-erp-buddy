@@ -3,7 +3,7 @@ import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { getMyUnits, toggleUnitStatus } from "@/lib/units.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search, Filter } from "lucide-react";
+import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -31,10 +31,12 @@ function UnitsList() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [orderBy, setOrderBy] = useState<string>("name");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
 
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize],
-    queryFn: () => getMyUnits({ data: { page, pageSize } }),
+    queryKey: ["units", page, pageSize, orderBy, orderDirection],
+    queryFn: () => getMyUnits({ data: { page, pageSize, orderBy, orderDirection } }),
   });
 
   const units = data?.units || [];
@@ -145,9 +147,49 @@ function UnitsList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      if (orderBy === "name") {
+                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                      } else {
+                        setOrderBy("name");
+                        setOrderDirection("asc");
+                      }
+                    }}
+                    className="-ml-4 h-8 data-[state=open]:bg-accent"
+                  >
+                    <span>Nome</span>
+                    {orderBy === "name" ? (
+                      orderDirection === "asc" ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronsUpDown className="ml-2 h-4 w-4" />
+                    )}
+                  </Button>
+                </TableHead>
                 <TableHead>Empresa</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      if (orderBy === "is_active") {
+                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                      } else {
+                        setOrderBy("is_active");
+                        setOrderDirection("asc");
+                      }
+                    }}
+                    className="-ml-4 h-8 data-[state=open]:bg-accent"
+                  >
+                    <span>Status</span>
+                    {orderBy === "is_active" ? (
+                      orderDirection === "asc" ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronsUpDown className="ml-2 h-4 w-4" />
+                    )}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
