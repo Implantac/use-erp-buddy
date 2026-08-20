@@ -38,7 +38,7 @@ function UnitEdit() {
     queryFn: () => getMyTenants(),
   });
 
-  const unit = units.find((u) => u.id === unitId);
+  const unit = units.find((u: any) => u.id === unitId);
   
   const [formData, setFormData] = useState({
     name: "",
