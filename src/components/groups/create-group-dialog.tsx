@@ -52,8 +52,9 @@ export function CreateGroupDialog() {
       return;
     }
 
-    mutation.mutate({ name, tenant_id: tenants[0].id });
+    mutation.mutate({ name, tenant_id: tenants[0]?.id });
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
