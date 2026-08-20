@@ -106,7 +106,7 @@ function UnitsList() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome ou empresa..."
             className="pl-8"
@@ -117,7 +117,10 @@ function UnitsList() {
         
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+          <Select 
+            value={status || "all"} 
+            onValueChange={(value: any) => navigate({ search: (prev) => ({ ...prev, status: value, page: 1 }) })}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -131,10 +134,9 @@ function UnitsList() {
           <div className="flex items-center gap-2 ml-4">
             <span className="text-sm text-muted-foreground whitespace-nowrap">Itens por página:</span>
             <Select 
-              value={pageSize.toString()} 
+              value={(pageSize || 10).toString()} 
               onValueChange={(value) => {
-                setPageSize(Number(value));
-                setPage(1);
+                navigate({ search: (prev) => ({ ...prev, pageSize: Number(value), page: 1 }) });
               }}
             >
               <SelectTrigger className="w-[80px]">
