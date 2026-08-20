@@ -11,6 +11,24 @@ export const Route = createFileRoute("/")({
 function Index() {
   const navigate = Route.useNavigate();
 
+  const handleSetup = async () => {
+    try {
+      const { createUserAdmin } = await import("@/lib/setup.functions");
+      const result = await createUserAdmin({
+        data: {
+          email: "etcsuporte889@gmail.com",
+          password: "use1235use"
+        }
+      });
+      if (result.success) {
+        alert("Usuário administrador cadastrado com sucesso!");
+      }
+    } catch (error: any) {
+      alert("Erro ao cadastrar admin: " + error.message);
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -76,6 +94,13 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
+          <button 
+            onClick={handleSetup}
+            className="mt-4 text-[8px] text-muted-foreground/10 hover:text-muted-foreground"
+          >
+            Setup Admin
+          </button>
+
         </div>
       </footer>
     </div>

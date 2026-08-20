@@ -7,7 +7,7 @@ const authSchema = z.object({
 });
 
 export const createUserAdmin = createServerFn({ method: "POST" })
-  .input(authSchema)
+  .validator((data: z.infer<typeof authSchema>) => authSchema.parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
