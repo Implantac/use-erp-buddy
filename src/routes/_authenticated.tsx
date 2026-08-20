@@ -64,6 +64,14 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
+                      <button onClick={() => navigate({ to: "/units" })}>
+                        <MapPin className="h-4 w-4" />
+                        <span>Unidades</span>
+                      </button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
                       <button>
                         <Users className="h-4 w-4" />
                         <span>Equipe</span>
