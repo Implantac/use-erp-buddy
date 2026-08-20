@@ -23,15 +23,15 @@ function AuthPage() {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/dashboard" }); // Redireciona para o dashboard após login sucessful
-      } else {
+        navigate({ to: "/dashboard" });
+      } else if (mode === 'signup') {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -40,10 +40,16 @@ function AuthPage() {
           }
         });
         if (error) throw error;
-        setIsLogin(true);
+        setMode('login');
         toast.success("Cadastro realizado! Você já pode entrar.");
+      } else if (mode === 'forgot') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("E-mail de recuperação enviado!");
+        setMode('login');
       }
-
     } catch (error: any) {
       toast.error(error.message || "Ocorreu um erro na autenticação");
     } finally {
