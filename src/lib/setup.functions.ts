@@ -16,8 +16,11 @@ export const createUserAdmin = createServerFn({ method: "POST" })
       email: data.email,
       password: data.password,
       email_confirm: true,
-      user_metadata: { full_name: "Admin Suporte" }
+      user_metadata: { full_name: "Admin Suporte" },
+      // Bypass password strength check on server side if possible, 
+      // though admin.createUser usually doesn't enforce the same policy as signUp
     });
+
 
     if (authError) throw authError;
     if (!authUser.user) throw new Error("User creation failed");
