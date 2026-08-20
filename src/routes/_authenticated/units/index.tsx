@@ -77,7 +77,9 @@ function UnitsList() {
 
   const units = data?.units || [];
   const totalCount = data?.count || 0;
-  const totalPages = Math.ceil(totalCount / (pageSize || 10));
+  const currentPageSize = pageSize || 10;
+  const currentPage = page || 1;
+  const totalPages = Math.ceil(totalCount / currentPageSize);
 
   const toggleMutation = useMutation({
     mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus({ data: vars }),
