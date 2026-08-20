@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, KeyRound, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPasswordPage,
@@ -15,7 +17,30 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(true);
+  const [errorState, setErrorState] = useState<string | null>(null);
   const navigate = Route.useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        // Se não houver sessão, o token provavelmente é inválido ou expirou
+        if (!data.session) {
+          setErrorState("O link de recuperação de senha é inválido ou já expirou. Por favor, solicite um novo link.");
+        }
+      } catch (err: any) {
+        setErrorState(err.message || "Erro ao validar o link de recuperação.");
+      } finally {
+        setValidating(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
