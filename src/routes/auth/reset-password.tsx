@@ -87,34 +87,57 @@ function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleReset} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Nova senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
-              <Input
-                type="password"
-                placeholder="Confirme a nova senha"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
+          {validating ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Validando link de recuperação...</p>
             </div>
-            <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <KeyRound className="mr-2 h-4 w-4" />
-              )}
-              Redefinir Senha
-            </Button>
-          </form>
+          ) : errorState ? (
+            <div className="space-y-4">
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Link Inválido</AlertTitle>
+                <AlertDescription>
+                  {errorState}
+                </AlertDescription>
+              </Alert>
+              <Button 
+                className="w-full" 
+                onClick={() => navigate({ to: "/auth" })}
+              >
+                Voltar para o Login
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleReset} className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Nova senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+                <Input
+                  type="password"
+                  placeholder="Confirme a nova senha"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+              </div>
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <KeyRound className="mr-2 h-4 w-4" />
+                )}
+                Redefinir Senha
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
