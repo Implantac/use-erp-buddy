@@ -1,14 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export const getProfile = createServerFn({ method: "GET" })
-  .inputValidator((id: string) => z.string().uuid().parse(id))
-  .handler(async ({ data: userId }) => {
-    const { data, error } = await supabase
+export const getMyProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
       .from("profiles")
       .select("*")
-      .eq("id", userId)
+      .eq("id", context.userId)
       .single();
 
     if (error) throw error;
