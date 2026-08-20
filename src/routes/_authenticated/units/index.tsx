@@ -82,12 +82,7 @@ function UnitsList() {
             Gerencie as unidades físicas e filiais da sua organização.
           </p>
         </div>
-        <Button asChild>
-          <Link to="/units/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Unidade
-          </Link>
-        </Button>
+        <CreateUnitDialog />
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
