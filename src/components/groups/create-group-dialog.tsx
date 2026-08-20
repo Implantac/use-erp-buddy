@@ -47,13 +47,15 @@ export function CreateGroupDialog() {
       toast.error("O nome do grupo é obrigatório.");
       return;
     }
-    if (!tenants || tenants.length === 0) {
+    const tenantId = tenants?.[0]?.id;
+    if (!tenantId) {
       toast.error("Nenhum tenant encontrado.");
       return;
     }
 
-    mutation.mutate({ name, tenant_id: tenants[0]?.id });
+    mutation.mutate({ name, tenant_id: tenantId });
   };
+
 
 
   return (
