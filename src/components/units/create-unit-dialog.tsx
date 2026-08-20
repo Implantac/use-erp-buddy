@@ -60,8 +60,8 @@ export function CreateUnitDialog() {
       setOpen(false);
       setFormData({
         name: "",
-        company_id: companies[0]?.id || "",
-        tenant_id: tenants[0]?.id || "",
+        company_id: companies?.[0]?.id || "",
+        tenant_id: tenants?.[0]?.id || "",
         type: "Matriz",
         is_active: true,
       });
