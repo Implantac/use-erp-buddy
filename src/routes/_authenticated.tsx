@@ -71,8 +71,6 @@ function AuthenticatedLayout() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <Link to="/units" search={{}} className="flex w-full items-center gap-2">
