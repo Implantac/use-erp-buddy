@@ -15,7 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
@@ -51,6 +52,11 @@ const AuthenticatedUnitsRoute = AuthenticatedUnitsRouteImport.update({
   id: '/units',
   path: '/units',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/units': typeof AuthenticatedUnitsRouteWithChildren
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
@@ -108,9 +115,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
@@ -127,6 +134,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/units': typeof AuthenticatedUnitsRouteWithChildren
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/': typeof AuthIndexRoute
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
@@ -143,6 +151,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/units'
     | '/auth/reset-password'
+    | '/auth/'
     | '/companies/$companyId'
     | '/companies/new'
     | '/units/$unitId'
@@ -152,9 +161,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/dashboard'
     | '/auth/reset-password'
+    | '/auth'
     | '/companies/$companyId'
     | '/companies/new'
     | '/units/$unitId'
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/units'
     | '/auth/reset-password'
+    | '/auth/'
     | '/_authenticated/companies/$companyId'
     | '/_authenticated/companies/new'
     | '/_authenticated/units/$unitId'
@@ -227,6 +237,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/units'
       preLoaderRoute: typeof AuthenticatedUnitsRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/auth/': {
+      id: '/auth/'
+      path: '/'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/auth/reset-password': {
       id: '/auth/reset-password'
@@ -331,10 +348,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface AuthRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthIndexRoute: AuthIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

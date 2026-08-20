@@ -1,19 +1,15 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, LogIn, Mail, ArrowLeft, Loader2 } from "lucide-react";
+import { Building2, LogIn, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/auth")({
-  component: AuthLayout,
+export const Route = createFileRoute("/auth/")({
+  component: AuthPage,
 });
-
-function AuthLayout() {
-  return <Outlet />;
-}
 
 function AuthPage() {
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
