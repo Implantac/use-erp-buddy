@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  component: AuthPage,
+  component: AuthLayout,
 });
+
+function AuthLayout() {
+  return <Outlet />;
+}
 
 function AuthPage() {
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
