@@ -1,5 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,7 +20,7 @@ function Index() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Building2 className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Use Business OS</span>
+            <span className="text-xl font-bold tracking-tight text-foreground">Use Business OS</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm">Documentação</Button>
@@ -38,7 +37,7 @@ function Index() {
       <main className="mx-auto max-w-7xl px-6 py-20">
         <div className="text-center">
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-            O Sistema Operacional para a sua <span className="text-primary">Empresa Moderna</span>
+            O Sistema Operacional para a sua <span className="text-primary text-foreground">Empresa Moderna</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
             Uma plataforma robusta, modular e escalável projetada para atender desde o comércio local até complexas operações industriais e logísticas.
@@ -85,13 +84,13 @@ function Index() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <Card className="transition-all hover:shadow-md">
+    <Card className="transition-all hover:shadow-md border-border bg-card">
       <CardHeader>
         <div className="mb-2 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
           {icon}
         </div>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-foreground">{title}</CardTitle>
+        <CardDescription className="text-muted-foreground">{description}</CardDescription>
       </CardHeader>
     </Card>
   );
