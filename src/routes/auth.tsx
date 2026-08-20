@@ -88,12 +88,14 @@ function AuthPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-            {isLogin ? "Bem-vindo de volta" : "Criar sua conta"}
+            {mode === 'login' && "Bem-vindo de volta"}
+            {mode === 'signup' && "Criar sua conta"}
+            {mode === 'forgot' && "Recuperar senha"}
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            {isLogin 
-              ? "Entre com suas credenciais para acessar o Use Business OS" 
-              : "Preencha os dados abaixo para começar sua jornada"}
+            {mode === 'login' && "Entre com suas credenciais para acessar o Use Business OS"}
+            {mode === 'signup' && "Preencha os dados abaixo para começar sua jornada"}
+            {mode === 'forgot' && "Enviaremos um link para você redefinir sua senha"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
