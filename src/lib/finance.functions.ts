@@ -1,21 +1,28 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 
 export const getTransactions = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: {
+    page?: number;
+    pageSize?: number;
+    startDate?: string;
+    endDate?: string;
+    type?: 'income' | 'expense';
+  } | undefined) => z.object({
     page: z.number().default(1),
     pageSize: z.number().default(10),
     startDate: z.string().optional(),
     endDate: z.string().optional(),
     type: z.enum(['income', 'expense']).optional(),
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { page, pageSize, startDate, endDate, type } = data;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    let query = supabase
+    let query = context.supabase
       .from("transactions")
       .select("*, companies(name)", { count: "exact" });
 
@@ -36,31 +43,33 @@ export const getTransactions = createServerFn({ method: "GET" })
   });
 
 export const createTransaction = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
-    tenant_id: z.string(),
-    company_id: z.string().nullable().optional(),
+  .middleware([requireSupabaseAuth])
+  .validator((data) => z.object({
+    tenant_id: z.string().uuid(),
+    company_id: z.string().uuid().nullable().optional(),
     type: z.enum(['income', 'expense']),
-    amount: z.number(),
-    description: z.string().nullable().optional(),
+    amount: z.number().positive(),
+    description: z.string().min(1),
     date: z.string().optional(),
     status: z.string().default('completed'),
     category: z.string().nullable().optional(),
   }).parse(data))
-  .handler(async ({ data }) => {
-    const { error } = await supabase.from("transactions").insert(data as any);
-    if (error) throw error;
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("transactions").insert(data as any);
+    if (error) throw new Error(error.message);
     return { success: true };
   });
 
 export const getFinanceSummary = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data: transactions, error } = await supabase
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: transactions, error } = await context.supabase
       .from("transactions")
       .select("type, amount");
 
     if (error) throw error;
 
-    const summary = (transactions || []).reduce((acc, curr) => {
+    const summary = (transactions || []).reduce((acc: { income: number; expense: number }, curr: { type: 'income' | 'expense'; amount: number }) => {
       if (curr.type === 'income') acc.income += Number(curr.amount);
       else acc.expense += Number(curr.amount);
       return acc;

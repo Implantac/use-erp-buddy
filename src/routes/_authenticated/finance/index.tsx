@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getTransactions, getFinanceSummary } from "@/lib/finance.functions";
-import { Button } from "@/components/ui/button";
+import { CreateTransactionDialog } from "@/components/finance/create-transaction-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "@/lib/settings.functions";
 import { Plus, TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { 
+
   Table, 
+
   TableBody, 
   TableCell, 
   TableHead, 
@@ -28,6 +32,13 @@ function FinancePage() {
     queryFn: () => getTransactions({ data: { page: 1, pageSize: 10 } }),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfile(undefined),
+  });
+
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
@@ -42,16 +53,16 @@ function FinancePage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Despesa
-          </Button>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Receita
-          </Button>
+          {tenantId && (
+            <>
+              <CreateTransactionDialog tenantId={tenantId} defaultType="expense" />
+              <CreateTransactionDialog tenantId={tenantId} defaultType="income" />
+            </>
+          )}
         </div>
       </div>
+
+
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
