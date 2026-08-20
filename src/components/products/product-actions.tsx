@@ -43,7 +43,7 @@ export function ProductActions({ product }: ProductActionsProps) {
           },
         },
       });
-      toast.success(`Produto ${!product.active ? "ativado" : "desativado"} com sucesso!`);
+      toast.success(`Produto ${product.active ? "desativado" : "ativado"} com sucesso!`);
       queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
       toast.error(error.message || "Erro ao alterar status");

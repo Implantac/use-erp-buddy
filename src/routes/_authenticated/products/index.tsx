@@ -75,8 +75,8 @@ function ProductsPage() {
                   </TableCell>
                   <TableCell>{product.stock_quantity}</TableCell>
                   <TableCell>
-                    <Badge variant={product.active ? "default" : "secondary"} className={product.active ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
-                      {product.active ? "Ativo" : "Inativo"}
+                    <Badge variant={product.active !== false ? "default" : "secondary"} className={product.active !== false ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
+                      {product.active !== false ? "Ativo" : "Inativo"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
