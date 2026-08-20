@@ -24,7 +24,7 @@ export async function recordAuthAttempt(identifier: string, type: string, ip?: s
     .insert({
       identifier,
       type,
-      ip_address: ip
+      ip_address: ip || null
     });
     
   if (error) {
