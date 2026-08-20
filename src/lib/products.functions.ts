@@ -39,37 +39,48 @@ export const getProducts = createServerFn({ method: "GET" })
   });
 
 export const createProduct = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
-    name: z.string().min(2),
+  .middleware([requireSupabaseAuth])
+  .validator((data) => z.object({
+    name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
     description: z.string().nullable().optional(),
     sku: z.string().nullable().optional(),
-    price: z.number().nullable().optional(),
-    cost_price: z.number().nullable().optional(),
-    stock_quantity: z.number().nullable().optional(),
-    category_id: z.string().nullable().optional(),
-    image_url: z.string().nullable().optional(),
-    tenant_id: z.string(),
+    price: z.number().min(0, "Preço não pode ser negativo").nullable().optional(),
+    cost_price: z.number().min(0, "Preço de custo não pode ser negativo").nullable().optional(),
+    stock_quantity: z.number().int().min(0, "Estoque não pode ser negativo").nullable().optional(),
+    category_id: z.string().uuid().nullable().optional(),
+    image_url: z.string().url("URL de imagem inválida").nullable().optional().or(z.literal("")),
+    tenant_id: z.string().uuid(),
   }).parse(data))
-  .handler(async ({ data }) => {
-    const { error } = await supabase.from("products").insert(data as any);
-    if (error) throw error;
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("products").insert(data as any);
+    if (error) {
+      console.error("Error creating product:", error);
+      throw new Error(error.message);
+    }
     return { success: true };
   });
 
 export const updateProduct = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({
-    id: z.string(),
-    name: z.string().optional(),
-    description: z.string().nullable().optional(),
-    sku: z.string().nullable().optional(),
-    price: z.number().nullable().optional(),
-    stock_quantity: z.number().nullable().optional(),
-    active: z.boolean().nullable().optional(),
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    id: z.string().uuid(),
+    updates: z.object({
+      name: z.string().min(2).optional(),
+      description: z.string().nullable().optional(),
+      sku: z.string().nullable().optional(),
+      price: z.number().min(0).nullable().optional(),
+      stock_quantity: z.number().int().min(0).nullable().optional(),
+      active: z.boolean().optional(),
+      category_id: z.string().uuid().nullable().optional(),
+    }),
   }).parse(data))
-  .handler(async ({ data }) => {
-    const { id, ...updates } = data;
-    const { error } = await supabase.from("products").update(updates as any).eq("id", id);
-    if (error) throw error;
+  .handler(async ({ data, context }) => {
+    const { id, updates } = data;
+    const { error } = await context.supabase.from("products").update(updates as any).eq("id", id);
+    if (error) {
+      console.error("Error updating product:", error);
+      throw new Error(error.message);
+    }
     return { success: true };
   });
 
