@@ -266,24 +266,25 @@ function UnitsList() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.max(1, (page || 1) - 1) }) })}
                       className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                   
                   {[...Array(totalPages)].map((_, i) => {
                     const pageNum = i + 1;
+                    const currentPage = page || 1;
                     // Show current page, first, last, and one around current
                     if (
                       pageNum === 1 || 
                       pageNum === totalPages || 
-                      (pageNum >= page - 1 && pageNum <= page + 1)
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
                     ) {
                       return (
                         <PaginationItem key={pageNum}>
                           <PaginationLink 
-                            isActive={page === pageNum}
-                            onClick={() => setPage(pageNum)}
+                            isActive={currentPage === pageNum}
+                            onClick={() => navigate({ search: (prev) => ({ ...prev, page: pageNum }) })}
                             className="cursor-pointer"
                           >
                             {pageNum}
@@ -291,7 +292,7 @@ function UnitsList() {
                         </PaginationItem>
                       );
                     }
-                    if (pageNum === page - 2 || pageNum === page + 2) {
+                    if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
                       return (
                         <PaginationItem key={pageNum}>
                           <PaginationEllipsis />
@@ -303,7 +304,7 @@ function UnitsList() {
 
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.min(totalPages, (page || 1) + 1) }) })}
                       className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
