@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getMyCompanies } from "@/lib/companies.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Building2, MoreHorizontal } from "lucide-react";
+import { Plus, Building2, MoreHorizontal, Pencil, PowerOff } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -74,10 +74,14 @@ function CompaniesList() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigate({ to: `/companies/${company.id}` })}>
-                          Editar
+                        <DropdownMenuItem asChild>
+                          <Link to="/companies/$companyId" params={{ companyId: company.id }} className="flex w-full items-center">
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
+                          <PowerOff className="mr-2 h-4 w-4" />
                           Desativar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
