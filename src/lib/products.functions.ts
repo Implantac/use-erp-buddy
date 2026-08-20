@@ -3,18 +3,24 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 export const getProducts = createServerFn({ method: "GET" })
-  .inputValidator((data) => z.object({
+  .middleware([requireSupabaseAuth])
+  .validator((data: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    categoryId?: string;
+  } | undefined) => z.object({
     page: z.number().default(1),
     pageSize: z.number().default(10),
     search: z.string().optional(),
     categoryId: z.string().optional(),
   }).parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { page, pageSize, search, categoryId } = data;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    let query = supabase
+    let query = context.supabase
       .from("products")
       .select("*, categories(name)", { count: "exact" });
 
