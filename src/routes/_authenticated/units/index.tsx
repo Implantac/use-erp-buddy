@@ -33,7 +33,7 @@ function UnitsList() {
   const [pageSize, setPageSize] = useState(10);
 
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page],
+    queryKey: ["units", page, pageSize],
     queryFn: () => getMyUnits({ data: { page, pageSize } }),
   });
 
