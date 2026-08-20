@@ -118,7 +118,11 @@ export const createCategory = createServerFn({ method: "POST" })
     tenant_id: z.string().uuid(),
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("categories").insert(data as any);
+    const insertData = {
+      ...data,
+      active: true,
+    };
+    const { error } = await context.supabase.from("categories").insert(insertData as any);
     if (error) {
       console.error("Error creating category:", error);
       throw new Error(error.message);
