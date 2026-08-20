@@ -12,15 +12,19 @@ const unitSchema = z.object({
 
 export const getMyUnits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { page?: number; pageSize?: number } | undefined) => 
+  .validator((data: { page?: number; pageSize?: number; orderBy?: string; orderDirection?: 'asc' | 'desc' } | undefined) => 
     z.object({
       page: z.number().int().min(1).optional(),
       pageSize: z.number().int().min(1).max(100).optional(),
+      orderBy: z.string().optional(),
+      orderDirection: z.enum(['asc', 'desc']).optional(),
     }).optional().parse(data)
   )
   .handler(async ({ data, context }) => {
     const page = data?.page || 1;
     const pageSize = data?.pageSize || 10;
+    const orderBy = data?.orderBy || "created_at";
+    const orderDirection = data?.orderDirection || "desc";
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
