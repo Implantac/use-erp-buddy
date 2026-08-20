@@ -28,7 +28,7 @@ function UnitsList() {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus(vars),
+    mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus({ data: vars }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
       toast.success("Status da unidade atualizado.");
@@ -41,7 +41,7 @@ function UnitsList() {
   const filteredUnits = useMemo(() => {
     return units.filter((unit: any) => {
       const matchesSearch = unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          unit.companies?.name.toLowerCase().includes(searchTerm.toLowerCase());
+                          unit.companies?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === "all" || 
                           (statusFilter === "active" && unit.is_active) ||
