@@ -58,6 +58,30 @@ export type Database = {
           },
         ]
       }
+      auth_attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          identifier: string
+          ip_address: string | null
+          type: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          identifier: string
+          ip_address?: string | null
+          type: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          identifier?: string
+          ip_address?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string
