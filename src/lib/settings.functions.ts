@@ -38,19 +38,20 @@ export const updateProfile = createServerFn({ method: "POST" })
 export const getTenantSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    // Busca o tenant do perfil do usuário para garantir isolamento
-    const { data: profile } = await context.supabase
-      .from("profiles")
+    // Busca o tenant_id do user_roles se não estiver no profile
+    const { data: roleData } = await context.supabase
+      .from("user_roles")
       .select("tenant_id")
-      .eq("id", context.userId)
+      .eq("user_id", context.userId)
+      .limit(1)
       .single();
 
-    if (!profile?.tenant_id) throw new Error("Tenant não encontrado");
+    if (!roleData?.tenant_id) throw new Error("Tenant não encontrado");
 
     const { data: tenant, error } = await context.supabase
       .from("tenants")
       .select("*")
-      .eq("id", profile.tenant_id)
+      .eq("id", roleData.tenant_id)
       .single();
 
     if (error) throw error;
@@ -66,18 +67,19 @@ export const updateTenantSettings = createServerFn({ method: "POST" })
     }).parse(data)
   )
   .handler(async ({ data, context }) => {
-    const { data: profile } = await context.supabase
-      .from("profiles")
+    const { data: roleData } = await context.supabase
+      .from("user_roles")
       .select("tenant_id")
-      .eq("id", context.userId)
+      .eq("user_id", context.userId)
+      .limit(1)
       .single();
 
-    if (!profile?.tenant_id) throw new Error("Tenant não encontrado");
+    if (!roleData?.tenant_id) throw new Error("Tenant não encontrado");
 
     const { data: tenant, error } = await context.supabase
       .from("tenants")
       .update(data as any)
-      .eq("id", profile.tenant_id)
+      .eq("id", roleData.tenant_id)
       .select()
       .single();
 
