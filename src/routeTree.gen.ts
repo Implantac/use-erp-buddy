@@ -14,9 +14,11 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
+import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,6 +44,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedUnitsRoute = AuthenticatedUnitsRouteImport.update({
+  id: '/units',
+  path: '/units',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCompaniesIndexRoute =
   AuthenticatedCompaniesIndexRouteImport.update({
     id: '/',
@@ -60,15 +67,22 @@ const AuthenticatedCompaniesNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedCompaniesRoute,
   } as any)
+const AuthenticatedUnitsIndexRoute = AuthenticatedUnitsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedUnitsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/units': typeof AuthenticatedUnitsRouteWithChildren
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,6 +91,7 @@ export interface FileRoutesByTo {
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
+  '/units': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,9 +100,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/units': typeof AuthenticatedUnitsRouteWithChildren
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/_authenticated/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,9 +113,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/companies'
     | '/dashboard'
+    | '/units'
     | '/companies/$companyId'
     | '/companies/new'
     | '/companies/'
+    | '/units/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -107,6 +126,7 @@ export interface FileRouteTypes {
     | '/companies/$companyId'
     | '/companies/new'
     | '/companies'
+    | '/units'
   id:
     | '__root__'
     | '/'
@@ -114,9 +134,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/companies'
     | '/_authenticated/dashboard'
+    | '/_authenticated/units'
     | '/_authenticated/companies/$companyId'
     | '/_authenticated/companies/new'
     | '/_authenticated/companies/'
+    | '/_authenticated/units/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -162,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/units': {
+      id: '/_authenticated/units'
+      path: '/units'
+      fullPath: '/units'
+      preLoaderRoute: typeof AuthenticatedUnitsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/companies/': {
       id: '/_authenticated/companies/'
       path: '/'
@@ -182,6 +211,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/companies/new'
       preLoaderRoute: typeof AuthenticatedCompaniesNewRouteImport
       parentRoute: typeof AuthenticatedCompaniesRoute
+    }
+    '/_authenticated/units/': {
+      id: '/_authenticated/units/'
+      path: '/'
+      fullPath: '/units/'
+      preLoaderRoute: typeof AuthenticatedUnitsIndexRouteImport
+      parentRoute: typeof AuthenticatedUnitsRoute
     }
   }
 }
@@ -204,14 +240,27 @@ const AuthenticatedCompaniesRouteWithChildren =
     AuthenticatedCompaniesRouteChildren,
   )
 
+interface AuthenticatedUnitsRouteChildren {
+  AuthenticatedUnitsIndexRoute: typeof AuthenticatedUnitsIndexRoute
+}
+
+const AuthenticatedUnitsRouteChildren: AuthenticatedUnitsRouteChildren = {
+  AuthenticatedUnitsIndexRoute: AuthenticatedUnitsIndexRoute,
+}
+
+const AuthenticatedUnitsRouteWithChildren =
+  AuthenticatedUnitsRoute._addFileChildren(AuthenticatedUnitsRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
