@@ -78,9 +78,10 @@ function AuthPage() {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         });
-        if (error) throw error;
-        toast.success("E-mail de recuperação enviado!");
+        // Always show success to prevent email enumeration
+        toast.success("Se o e-mail estiver cadastrado, você receberá um link de recuperação.");
         setMode('login');
+        if (error) console.error("Reset password error:", error.message);
       }
     } catch (error: any) {
       // Generic error message to prevent user enumeration
