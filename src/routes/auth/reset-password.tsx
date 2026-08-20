@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, KeyRound, Loader2 } from "lucide-react";
+import { Building2, KeyRound, Loader2, AlertCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
 
 export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPasswordPage,
