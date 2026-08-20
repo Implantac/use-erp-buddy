@@ -25,7 +25,7 @@ function FinancePage() {
 
   const { data: transactionsData } = useSuspenseQuery({
     queryKey: ["transactions", { page: 1, pageSize: 10 }],
-    queryFn: () => getTransactions({ page: 1, pageSize: 10 }),
+    queryFn: () => getTransactions({ data: { page: 1, pageSize: 10 } }),
   });
 
   const formatCurrency = (value: number) => {
