@@ -169,10 +169,9 @@ function UnitsList() {
                     variant="ghost" 
                     onClick={() => {
                       if (orderBy === "name") {
-                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                        navigate({ search: (prev) => ({ ...prev, orderDirection: orderDirection === "asc" ? "desc" : "asc" }) });
                       } else {
-                        setOrderBy("name");
-                        setOrderDirection("asc");
+                        navigate({ search: (prev) => ({ ...prev, orderBy: "name", orderDirection: "asc" }) });
                       }
                     }}
                     className="-ml-4 h-8 data-[state=open]:bg-accent"
@@ -191,10 +190,9 @@ function UnitsList() {
                     variant="ghost" 
                     onClick={() => {
                       if (orderBy === "is_active") {
-                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                        navigate({ search: (prev) => ({ ...prev, orderDirection: orderDirection === "asc" ? "desc" : "asc" }) });
                       } else {
-                        setOrderBy("is_active");
-                        setOrderDirection("asc");
+                        navigate({ search: (prev) => ({ ...prev, orderBy: "is_active", orderDirection: "asc" }) });
                       }
                     }}
                     className="-ml-4 h-8 data-[state=open]:bg-accent"
