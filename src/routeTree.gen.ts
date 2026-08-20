@@ -16,6 +16,7 @@ import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
+import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,6 +54,12 @@ const AuthenticatedCompaniesCompanyIdRoute =
     path: '/$companyId',
     getParentRoute: () => AuthenticatedCompaniesRoute,
   } as any)
+const AuthenticatedCompaniesNewRoute =
+  AuthenticatedCompaniesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedCompaniesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
+  '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -67,6 +75,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
+  '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
 }
 export interface FileRoutesById {
@@ -77,6 +86,7 @@ export interface FileRoutesById {
   '/_authenticated/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
+  '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
 }
 export interface FileRouteTypes {
@@ -87,9 +97,16 @@ export interface FileRouteTypes {
     | '/companies'
     | '/dashboard'
     | '/companies/$companyId'
+    | '/companies/new'
     | '/companies/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/companies/$companyId' | '/companies'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/companies/$companyId'
+    | '/companies/new'
+    | '/companies'
   id:
     | '__root__'
     | '/'
@@ -98,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/companies'
     | '/_authenticated/dashboard'
     | '/_authenticated/companies/$companyId'
+    | '/_authenticated/companies/new'
     | '/_authenticated/companies/'
   fileRoutesById: FileRoutesById
 }
@@ -158,17 +176,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompaniesCompanyIdRouteImport
       parentRoute: typeof AuthenticatedCompaniesRoute
     }
+    '/_authenticated/companies/new': {
+      id: '/_authenticated/companies/new'
+      path: '/new'
+      fullPath: '/companies/new'
+      preLoaderRoute: typeof AuthenticatedCompaniesNewRouteImport
+      parentRoute: typeof AuthenticatedCompaniesRoute
+    }
   }
 }
 
 interface AuthenticatedCompaniesRouteChildren {
   AuthenticatedCompaniesCompanyIdRoute: typeof AuthenticatedCompaniesCompanyIdRoute
+  AuthenticatedCompaniesNewRoute: typeof AuthenticatedCompaniesNewRoute
   AuthenticatedCompaniesIndexRoute: typeof AuthenticatedCompaniesIndexRoute
 }
 
 const AuthenticatedCompaniesRouteChildren: AuthenticatedCompaniesRouteChildren =
   {
     AuthenticatedCompaniesCompanyIdRoute: AuthenticatedCompaniesCompanyIdRoute,
+    AuthenticatedCompaniesNewRoute: AuthenticatedCompaniesNewRoute,
     AuthenticatedCompaniesIndexRoute: AuthenticatedCompaniesIndexRoute,
   }
 
