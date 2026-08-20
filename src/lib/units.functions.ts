@@ -31,7 +31,7 @@ export const getMyUnits = createServerFn({ method: "GET" })
     const { data: units, error, count } = await context.supabase
       .from("units")
       .select("*, companies(name)", { count: "exact" })
-      .order("created_at", { ascending: false })
+      .order(orderBy, { ascending: orderDirection === 'asc' })
       .range(from, to);
 
     if (error) throw error;
