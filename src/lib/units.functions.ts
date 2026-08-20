@@ -6,6 +6,7 @@ const unitSchema = z.object({
   name: z.string().min(2),
   company_id: z.string().uuid(),
   tenant_id: z.string().uuid(),
+  type: z.string().min(1),
   is_active: z.boolean().optional(),
 }) as z.ZodType<any>;
 
@@ -31,6 +32,7 @@ export const createUnit = createServerFn({ method: "POST" })
         name: data.name,
         company_id: data.company_id,
         tenant_id: data.tenant_id,
+        type: data.type,
         is_active: data.is_active ?? true,
       })
       .select()
