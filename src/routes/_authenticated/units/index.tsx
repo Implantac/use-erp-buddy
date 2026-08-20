@@ -147,9 +147,49 @@ function UnitsList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      if (orderBy === "name") {
+                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                      } else {
+                        setOrderBy("name");
+                        setOrderDirection("asc");
+                      }
+                    }}
+                    className="-ml-4 h-8 data-[state=open]:bg-accent"
+                  >
+                    <span>Nome</span>
+                    {orderBy === "name" ? (
+                      orderDirection === "asc" ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronsUpDown className="ml-2 h-4 w-4" />
+                    )}
+                  </Button>
+                </TableHead>
                 <TableHead>Empresa</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => {
+                      if (orderBy === "is_active") {
+                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                      } else {
+                        setOrderBy("is_active");
+                        setOrderDirection("asc");
+                      }
+                    }}
+                    className="-ml-4 h-8 data-[state=open]:bg-accent"
+                  >
+                    <span>Status</span>
+                    {orderBy === "is_active" ? (
+                      orderDirection === "asc" ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />
+                    ) : (
+                      <ChevronsUpDown className="ml-2 h-4 w-4" />
+                    )}
+                  </Button>
+                </TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
