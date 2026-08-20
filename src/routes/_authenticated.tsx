@@ -93,6 +93,30 @@ function AuthenticatedLayout() {
             </SidebarGroup>
 
             <SidebarGroup>
+              <SidebarGroupLabel>Operacional</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/products" className="flex w-full items-center gap-2">
+                        <Package className="h-4 w-4" />
+                        <span>Produtos</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/finance" className="flex w-full items-center gap-2">
+                        <Receipt className="h-4 w-4" />
+                        <span>Financeiro</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
               <SidebarGroupLabel>Configurações</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
