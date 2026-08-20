@@ -1,73 +1,116 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getDashboardStats } from "@/lib/dashboard.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Users, LayoutDashboard, History } from "lucide-react";
+import { Building2, MapPin, Users, FolderTree, ArrowUpRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  component: DashboardPage,
+  component: Dashboard,
 });
 
-function DashboardPage() {
+function Dashboard() {
+  const { data: stats } = useSuspenseQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: () => getDashboardStats(),
+  });
+
+  const cards = [
+    {
+      title: "Empresas",
+      value: stats.companies.toString(),
+      description: "Empresas ativas no sistema",
+      icon: Building2,
+      color: "text-blue-600",
+      bgColor: "bg-blue-600/10",
+    },
+    {
+      title: "Unidades",
+      value: stats.units.toString(),
+      description: "Unidades operacionais",
+      icon: MapPin,
+      color: "text-green-600",
+      bgColor: "bg-green-600/10",
+    },
+    {
+      title: "Grupos",
+      value: stats.groups.toString(),
+      description: "Segmentação organizacional",
+      icon: FolderTree,
+      color: "text-purple-600",
+      bgColor: "bg-purple-600/10",
+    },
+    {
+      title: "Equipe",
+      value: stats.team.toString(),
+      description: "Membros com acesso",
+      icon: Users,
+      color: "text-orange-600",
+      bgColor: "bg-orange-600/10",
+    },
+  ];
+
   return (
     <div className="p-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Bem-vindo ao Use Business OS. Gerencie sua operação aqui.
+          Visão geral da sua organização e operações.
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="Empresas" 
-          value="0" 
-          icon={<Building2 className="h-4 w-4" />}
-          description="Total de empresas ativas"
-        />
-        <StatCard 
-          title="Usuários" 
-          value="0" 
-          icon={<Users className="h-4 w-4" />}
-          description="Usuários na organização"
-        />
-        <StatCard 
-          title="Unidades" 
-          value="0" 
-          icon={<LayoutDashboard className="h-4 w-4" />}
-          description="Unidades operacionais"
-        />
-        <StatCard 
-          title="Atividades" 
-          value="0" 
-          icon={<History className="h-4 w-4" />}
-          description="Logs de auditoria"
-        />
+        {cards.map((card) => (
+          <Card key={card.title} className="relative overflow-hidden transition-all hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+              <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                <card.icon className={`h-4 w-4 ${card.color}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{card.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {card.description}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Visão Geral</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[200px] flex items-center justify-center border-2 border-dashed rounded-lg">
-            <p className="text-muted-foreground">Conteúdo do dashboard em breve...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Atividade Recente</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-lg">
+              <ArrowUpRight className="h-8 w-8 mb-2 opacity-20" />
+              <p>Nenhuma atividade registrada hoje.</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Próximos Passos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-4 p-3 border rounded-lg bg-primary/5 border-primary/10">
+              <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">1</div>
+              <div>
+                <p className="text-sm font-medium">Complete seu perfil</p>
+                <p className="text-xs text-muted-foreground">Adicione seu nome e avatar nas configurações.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-3 border rounded-lg opacity-60">
+              <div className="h-6 w-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-bold">2</div>
+              <div>
+                <p className="text-sm font-medium">Cadastre uma unidade</p>
+                <p className="text-xs text-muted-foreground">Defina o local de operação da sua empresa.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  );
-}
-
-function StatCard({ title, value, icon, description }: { title: string, value: string, icon: React.ReactNode, description: string }) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <div className="text-muted-foreground">{icon}</div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
   );
 }

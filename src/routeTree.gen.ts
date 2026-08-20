@@ -20,6 +20,9 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-passw
 import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
+import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups/index'
+import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authenticated/team/index'
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
 import { Route as AuthenticatedUnitsNewRouteImport } from './routes/_authenticated/units/new'
@@ -81,6 +84,23 @@ const AuthenticatedCompaniesNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedCompaniesRoute,
   } as any)
+const AuthenticatedGroupsIndexRoute =
+  AuthenticatedGroupsIndexRouteImport.update({
+    id: '/groups/',
+    path: '/groups/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsIndexRoute =
+  AuthenticatedSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
+  id: '/team/',
+  path: '/team/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedUnitsIndexRoute = AuthenticatedUnitsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -111,6 +131,9 @@ export interface FileRoutesByFullPath {
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/groups/': typeof AuthenticatedGroupsIndexRoute
+  '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/team/': typeof AuthenticatedTeamIndexRoute
   '/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -123,6 +146,9 @@ export interface FileRoutesByTo {
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
+  '/groups': typeof AuthenticatedGroupsIndexRoute
+  '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/team': typeof AuthenticatedTeamIndexRoute
   '/units': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesById {
@@ -140,6 +166,9 @@ export interface FileRoutesById {
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
+  '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
   '/_authenticated/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRouteTypes {
@@ -157,6 +186,9 @@ export interface FileRouteTypes {
     | '/units/$unitId'
     | '/units/new'
     | '/companies/'
+    | '/groups/'
+    | '/settings/'
+    | '/team/'
     | '/units/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -169,6 +201,9 @@ export interface FileRouteTypes {
     | '/units/$unitId'
     | '/units/new'
     | '/companies'
+    | '/groups'
+    | '/settings'
+    | '/team'
     | '/units'
   id:
     | '__root__'
@@ -185,6 +220,9 @@ export interface FileRouteTypes {
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
     | '/_authenticated/companies/'
+    | '/_authenticated/groups/'
+    | '/_authenticated/settings/'
+    | '/_authenticated/team/'
     | '/_authenticated/units/'
   fileRoutesById: FileRoutesById
 }
@@ -273,6 +311,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompaniesNewRouteImport
       parentRoute: typeof AuthenticatedCompaniesRoute
     }
+    '/_authenticated/groups/': {
+      id: '/_authenticated/groups/'
+      path: '/groups'
+      fullPath: '/groups/'
+      preLoaderRoute: typeof AuthenticatedGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings/': {
+      id: '/_authenticated/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/team/': {
+      id: '/_authenticated/team/'
+      path: '/team'
+      fullPath: '/team/'
+      preLoaderRoute: typeof AuthenticatedTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/units/': {
       id: '/_authenticated/units/'
       path: '/'
@@ -334,12 +393,18 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
+  AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
+  AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
+  AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
+  AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
+  AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
+  AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

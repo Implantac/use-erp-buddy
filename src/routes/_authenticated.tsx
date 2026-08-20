@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -64,6 +64,15 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
+                      <Link to="/groups" className="flex w-full items-center gap-2">
+                        <FolderTree className="h-4 w-4" />
+                        <span>Grupos</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
                       <Link to="/units" search={{}} className="flex w-full items-center gap-2">
                         <MapPin className="h-4 w-4" />
                         <span>Unidades</span>
@@ -72,12 +81,13 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button>
+                      <Link to="/team" className="flex w-full items-center gap-2">
                         <Users className="h-4 w-4" />
                         <span>Equipe</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -88,12 +98,13 @@ function AuthenticatedLayout() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button>
+                      <Link to="/settings" className="flex w-full items-center gap-2">
                         <Settings className="h-4 w-4" />
                         <span>Sistema</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
