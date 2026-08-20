@@ -40,21 +40,38 @@ function AuthPage() {
 
       if (!(hasLength && hasUpper && hasLower && hasNumber && hasSpecial)) {
         toast.error("A senha não atende aos requisitos de segurança");
-        setLoading(false);
         return;
       }
     }
 
     setLoading(true);
 
-
     try {
+      const { checkRateLimit, logFailedAttempt, resetAuthAttempts } = await import("@/lib/auth.functions");
+
+      if (mode === 'login' || mode === 'forgot') {
+        const type = mode === 'login' ? 'login' : 'reset_password';
+        const rateLimit = await checkRateLimit({ data: { identifier: email, type } });
+        
+        if (rateLimit.blocked) {
+          toast.error(`Muitas tentativas. Bloqueio temporário por ${rateLimit.remainingMinutes} minutos.`);
+          setLoading(false);
+          return;
+        }
+      }
+
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        
+        if (error) {
+          await logFailedAttempt({ data: { identifier: email, type: 'login' } });
+          throw error;
+        }
+
+        await resetAuthAttempts({ data: { identifier: email, type: 'login' } });
         toast.success("Bem-vindo de volta!");
         navigate({ to: "/dashboard" });
       } else if (mode === 'signup') {
@@ -78,18 +95,22 @@ function AuthPage() {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         });
-        // Always show success to prevent email enumeration
+        
+        if (error) {
+          await logFailedAttempt({ data: { identifier: email, type: 'reset_password' } });
+          // Even on error, we log but still show success to prevent enumeration if necessary, 
+          // but here we might want to handle real rate limit errors differently.
+          // For reset password, generic success is safer against enumeration.
+        }
+        
         toast.success("Se o e-mail estiver cadastrado, você receberá um link de recuperação.");
         setMode('login');
-        if (error) console.error("Reset password error:", error.message);
       }
     } catch (error: any) {
-      // Generic error message to prevent user enumeration
       const message = error.message || "";
       if (message.includes("Invalid login credentials") || message.includes("Email not found")) {
         toast.error("E-mail ou senha incorretos");
       } else if (message.includes("User already registered")) {
-        // Still show success-like message for signup to prevent enumeration
         toast.success("Cadastro realizado! Você já pode entrar.");
         setMode('login');
       } else {

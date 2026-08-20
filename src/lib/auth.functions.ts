@@ -8,7 +8,7 @@ export const checkRateLimit = createServerFn({ method: "POST" })
     identifier: z.string(),
     type: z.enum(['login', 'reset_password'])
   }).parse(data))
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data }) => {
     // Check 15m window (5 attempts)
     const count15m = await getAuthAttempts(data.identifier, data.type, 15);
     if (count15m >= 5) {
@@ -29,7 +29,7 @@ export const logFailedAttempt = createServerFn({ method: "POST" })
     identifier: z.string(),
     type: z.enum(['login', 'reset_password'])
   }).parse(data))
-  .handler(async ({ data, request }) => {
+  .handler(async ({ data }) => {
     const ip = request.headers.get('x-forwarded-for') || undefined;
     await recordAuthAttempt(data.identifier, data.type, ip);
     return { success: true };
