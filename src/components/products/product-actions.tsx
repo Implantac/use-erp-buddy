@@ -24,7 +24,7 @@ interface ProductActionsProps {
     stock_quantity: number | null;
     category_id: string | null;
     description: string | null;
-    active: boolean;
+    active: boolean | null;
   };
 }
 
