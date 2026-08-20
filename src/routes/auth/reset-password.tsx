@@ -44,12 +44,21 @@ function ResetPasswordPage() {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error("As senhas não coincidem");
+    
+    // Password validation logic
+    const hasLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+    if (!(hasLength && hasUpper && hasLower && hasNumber && hasSpecial)) {
+      toast.error("A senha não atende aos requisitos de segurança");
       return;
     }
-    if (password.length < 6) {
-      toast.error("A senha deve ter pelo menos 6 caracteres");
+
+    if (password !== confirmPassword) {
+      toast.error("As senhas não coincidem");
       return;
     }
 
@@ -119,6 +128,7 @@ function ResetPasswordPage() {
                   required
                   className="bg-background border-border"
                 />
+                <PasswordStrengthMeter password={password} />
                 <Input
                   type="password"
                   placeholder="Confirme a nova senha"
