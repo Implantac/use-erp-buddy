@@ -31,10 +31,12 @@ function UnitsList() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [orderBy, setOrderBy] = useState<string>("name");
+  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
 
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize],
-    queryFn: () => getMyUnits({ data: { page, pageSize } }),
+    queryKey: ["units", page, pageSize, orderBy, orderDirection],
+    queryFn: () => getMyUnits({ data: { page, pageSize, orderBy, orderDirection } }),
   });
 
   const units = data?.units || [];
