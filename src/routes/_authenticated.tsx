@@ -81,12 +81,13 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button>
+                      <Link to="/team" className="flex w-full items-center gap-2">
                         <Users className="h-4 w-4" />
                         <span>Equipe</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
