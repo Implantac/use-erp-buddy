@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, LogIn, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
@@ -17,6 +19,8 @@ function AuthPage() {
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
   const navigate = Route.useNavigate();
 
@@ -50,6 +54,12 @@ function AuthPage() {
         toast.success("Bem-vindo de volta!");
         navigate({ to: "/dashboard" });
       } else if (mode === 'signup') {
+        if (password !== confirmPassword) {
+          toast.error("As senhas não coincidem");
+          setLoading(false);
+          return;
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -187,8 +197,27 @@ function AuthPage() {
                 />
               )}
               {mode === 'signup' && (
-                <PasswordStrengthMeter password={password} />
+                <>
+                  <PasswordStrengthMeter password={password} />
+                  <div className="space-y-1 mt-2">
+                    <Input 
+                      type="password" 
+                      placeholder="Confirme a senha" 
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className={cn(
+                        "bg-background border-border",
+                        confirmPassword && password !== confirmPassword && "border-destructive focus-visible:ring-destructive"
+                      )}
+                    />
+                    {confirmPassword && password !== confirmPassword && (
+                      <p className="text-[10px] font-medium text-destructive">As senhas não coincidem</p>
+                    )}
+                  </div>
+                </>
               )}
+
             </div>
 
             {mode === 'login' && (

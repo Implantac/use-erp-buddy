@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
+import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPasswordPage,
@@ -129,14 +131,23 @@ function ResetPasswordPage() {
                   className="bg-background border-border"
                 />
                 <PasswordStrengthMeter password={password} />
-                <Input
-                  type="password"
-                  placeholder="Confirme a nova senha"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="bg-background border-border"
-                />
+                <div className="space-y-1">
+                  <Input
+                    type="password"
+                    placeholder="Confirme a nova senha"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    className={cn(
+                      "bg-background border-border",
+                      confirmPassword && password !== confirmPassword && "border-destructive focus-visible:ring-destructive"
+                    )}
+                  />
+                  {confirmPassword && password !== confirmPassword && (
+                    <p className="text-[10px] font-medium text-destructive">As senhas não coincidem</p>
+                  )}
+                </div>
+
               </div>
               <Button className="w-full" type="submit" disabled={loading}>
                 {loading ? (
