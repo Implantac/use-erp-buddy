@@ -158,22 +158,37 @@ function AuthPage() {
                 required
                 className="bg-background border-border"
               />
-              <Input 
-                type="password" 
-                placeholder="Senha" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
+              {mode !== 'forgot' && (
+                <Input 
+                  type="password" 
+                  placeholder="Senha" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+              )}
             </div>
+            {mode === 'login' && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setMode('forgot')}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Esqueceu sua senha?
+                </button>
+              </div>
+            )}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <LogIn className="mr-2 h-4 w-4" />
               )}
-              {isLogin ? "Entrar" : "Criar conta"}
+              {mode === 'login' && "Entrar"}
+              {mode === 'signup' && "Criar conta"}
+              {mode === 'forgot' && "Enviar e-mail"}
             </Button>
           </form>
         </CardContent>
