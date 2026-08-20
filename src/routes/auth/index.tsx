@@ -6,6 +6,8 @@ import { Building2, LogIn, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PasswordStrengthMeter } from "@/components/auth/password-strength-meter";
+
 
 export const Route = createFileRoute("/auth/")({
   component: AuthPage,
@@ -20,7 +22,23 @@ function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (mode === 'signup') {
+      const hasLength = password.length >= 8;
+      const hasUpper = /[A-Z]/.test(password);
+      const hasLower = /[a-z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+      if (!(hasLength && hasUpper && hasLower && hasNumber && hasSpecial)) {
+        toast.error("A senha não atende aos requisitos de segurança");
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
+
 
     try {
       if (mode === 'login') {
@@ -168,7 +186,11 @@ function AuthPage() {
                   className="bg-background border-border"
                 />
               )}
+              {mode === 'signup' && (
+                <PasswordStrengthMeter password={password} />
+              )}
             </div>
+
             {mode === 'login' && (
               <div className="flex justify-end">
                 <button
