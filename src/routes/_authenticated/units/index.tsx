@@ -24,12 +24,12 @@ import {
 import { z } from "zod";
 
 const unitsSearchSchema = z.object({
-  page: z.number().int().min(1).optional().catch(1),
-  pageSize: z.number().int().min(1).optional().catch(10),
-  search: z.string().optional().catch(""),
-  status: z.enum(["all", "active", "inactive"]).optional().catch("all"),
-  orderBy: z.string().optional().catch("name"),
-  orderDirection: z.enum(["asc", "desc"]).optional().catch("asc"),
+  page: z.number().int().min(1).optional(),
+  pageSize: z.number().int().min(1).optional(),
+  search: z.string().optional(),
+  status: z.enum(["all", "active", "inactive"]).optional(),
+  orderBy: z.string().optional(),
+  orderDirection: z.enum(["asc", "desc"]).optional(),
 });
 
 export const Route = createFileRoute("/_authenticated/units/")({
