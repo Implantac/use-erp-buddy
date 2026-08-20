@@ -18,6 +18,7 @@ export const getMyUnits = createServerFn({ method: "GET" })
     orderBy?: string; 
     orderDirection?: 'asc' | 'desc';
     search?: string;
+    isActive?: boolean | null;
   } | undefined) => 
     z.object({
       page: z.number().int().min(1).optional(),
@@ -25,6 +26,7 @@ export const getMyUnits = createServerFn({ method: "GET" })
       orderBy: z.string().optional(),
       orderDirection: z.enum(['asc', 'desc']).optional(),
       search: z.string().optional(),
+      isActive: z.boolean().nullable().optional(),
     }).optional().parse(data)
   )
   .handler(async ({ data, context }) => {
@@ -33,6 +35,7 @@ export const getMyUnits = createServerFn({ method: "GET" })
     const orderBy = data?.orderBy || "created_at";
     const orderDirection = data?.orderDirection || "desc";
     const search = data?.search;
+    const isActive = data?.isActive;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
@@ -42,6 +45,10 @@ export const getMyUnits = createServerFn({ method: "GET" })
 
     if (search) {
       query = query.ilike("name", `%${search}%`);
+    }
+
+    if (isActive !== undefined && isActive !== null) {
+      query = query.eq("is_active", isActive);
     }
 
     const { data: units, error, count } = await query
