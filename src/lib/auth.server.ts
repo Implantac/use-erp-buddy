@@ -3,6 +3,8 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export async function getAuthAttempts(identifier: string, type: string, minutes: number = 15) {
   const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
   
+  console.log(`Checking attempts for ${identifier} (${type}) since ${since}`);
+  
   const { count, error } = await supabaseAdmin
     .from('auth_attempts')
     .select('*', { count: 'exact', head: true })
@@ -15,10 +17,12 @@ export async function getAuthAttempts(identifier: string, type: string, minutes:
     return 0;
   }
   
+  console.log(`Found ${count} attempts`);
   return count || 0;
 }
 
 export async function recordAuthAttempt(identifier: string, type: string, ip?: string) {
+  console.log(`Recording failed attempt for ${identifier} (${type})`);
   const { error } = await supabaseAdmin
     .from('auth_attempts')
     .insert({
@@ -33,6 +37,7 @@ export async function recordAuthAttempt(identifier: string, type: string, ip?: s
 }
 
 export async function clearAuthAttempts(identifier: string, type: string) {
+  console.log(`Clearing attempts for ${identifier} (${type})`);
   const { error } = await supabaseAdmin
     .from('auth_attempts')
     .delete()
