@@ -30,7 +30,7 @@ function AuthPage() {
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/" }); // Will redirect to dashboard once implemented
+        navigate({ to: "/dashboard" }); // Redireciona para o dashboard após login sucessful
       } else {
         const { error } = await supabase.auth.signUp({
           email,

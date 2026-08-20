@@ -37,13 +37,13 @@ function Index() {
       <main className="mx-auto max-w-7xl px-6 py-20">
         <div className="text-center">
           <h1 className="text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-            O Sistema Operacional para a sua <span className="text-primary text-foreground">Empresa Moderna</span>
+            O Sistema Operacional para a sua <span className="text-primary">Empresa Moderna</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
             Uma plataforma robusta, modular e escalável projetada para atender desde o comércio local até complexas operações industriais e logísticas.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <Button size="lg" className="h-12 px-8 text-base" onClick={() => navigate({ to: "/auth" })}>
+            <Button size="lg" className="h-12 px-8 text-base" onClick={() => navigate({ to: "/dashboard" })}>
               Começar Agora
             </Button>
             <Button size="lg" variant="outline" className="h-12 px-8 text-base">
