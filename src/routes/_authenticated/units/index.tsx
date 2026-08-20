@@ -29,15 +29,33 @@ export const Route = createFileRoute("/_authenticated/units/")({
 function UnitsList() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [orderBy, setOrderBy] = useState<string>("name");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize, orderBy, orderDirection],
-    queryFn: () => getMyUnits({ data: { page, pageSize, orderBy, orderDirection } }),
+    queryKey: ["units", page, pageSize, orderBy, orderDirection, debouncedSearch, statusFilter],
+    queryFn: () => getMyUnits({ 
+      data: { 
+        page, 
+        pageSize, 
+        orderBy, 
+        orderDirection,
+        search: debouncedSearch || undefined,
+        isActive: statusFilter === "all" ? null : statusFilter === "active"
+      } 
+    }),
   });
 
   const units = data?.units || [];
@@ -60,18 +78,7 @@ function UnitsList() {
     }
   });
 
-  const filteredUnits = useMemo(() => {
-    return units.filter((unit: any) => {
-      const matchesSearch = unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          unit.companies?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === "all" || 
-                          (statusFilter === "active" && unit.is_active) ||
-                          (statusFilter === "inactive" && !unit.is_active);
-      
-      return matchesSearch && matchesStatus;
-    });
-  }, [units, searchTerm, statusFilter]);
+  const filteredUnits = units;
 
   return (
     <div className="space-y-6">

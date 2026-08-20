@@ -12,12 +12,21 @@ const unitSchema = z.object({
 
 export const getMyUnits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { page?: number; pageSize?: number; orderBy?: string; orderDirection?: 'asc' | 'desc' } | undefined) => 
+  .validator((data: { 
+    page?: number; 
+    pageSize?: number; 
+    orderBy?: string; 
+    orderDirection?: 'asc' | 'desc';
+    search?: string | undefined;
+    isActive?: boolean | null | undefined;
+  } | undefined) => 
     z.object({
       page: z.number().int().min(1).optional(),
       pageSize: z.number().int().min(1).max(100).optional(),
       orderBy: z.string().optional(),
       orderDirection: z.enum(['asc', 'desc']).optional(),
+      search: z.string().optional().nullable(),
+      isActive: z.boolean().nullable().optional(),
     }).optional().parse(data)
   )
   .handler(async ({ data, context }) => {
@@ -25,12 +34,24 @@ export const getMyUnits = createServerFn({ method: "GET" })
     const pageSize = data?.pageSize || 10;
     const orderBy = data?.orderBy || "created_at";
     const orderDirection = data?.orderDirection || "desc";
+    const search = data?.search;
+    const isActive = data?.isActive;
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
-    const { data: units, error, count } = await context.supabase
+    let query = context.supabase
       .from("units")
-      .select("*, companies(name)", { count: "exact" })
+      .select("*, companies(name)", { count: "exact" });
+
+    if (search) {
+      query = query.ilike("name", `%${search}%`);
+    }
+
+    if (isActive !== undefined && isActive !== null) {
+      query = query.eq("is_active", isActive);
+    }
+
+    const { data: units, error, count } = await query
       .order(orderBy, { ascending: orderDirection === 'asc' })
       .range(from, to);
 
