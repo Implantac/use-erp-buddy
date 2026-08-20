@@ -41,7 +41,7 @@ function NewUnit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
       toast.success("Unidade criada com sucesso!");
-      navigate({ to: "/units" });
+      navigate({ to: "/units", search: {} });
     },
     onError: (error: any) => {
       toast.error(`Erro ao criar: ${error.message}`);
