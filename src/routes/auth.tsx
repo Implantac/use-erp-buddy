@@ -188,7 +188,7 @@ function AuthPage() {
               )}
               {mode === 'login' && "Entrar"}
               {mode === 'signup' && "Criar conta"}
-              {mode === 'forgot' && "Enviar e-mail"}
+              {mode === 'forgot' && "Enviar e-mail de recuperação"}
             </Button>
           </form>
         </CardContent>
