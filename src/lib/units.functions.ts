@@ -16,7 +16,7 @@ export const getMyUnits = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("units")
       .select("*, companies(name)")
-      .eq("is_active", true);
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
     return data;
@@ -35,6 +35,24 @@ export const createUnit = createServerFn({ method: "POST" })
         type: data.type,
         is_active: data.is_active ?? true,
       })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return unit;
+  });
+
+export const toggleUnitStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { id: string; is_active: boolean }) => z.object({
+    id: z.string().uuid(),
+    is_active: z.boolean(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: unit, error } = await context.supabase
+      .from("units")
+      .update({ is_active: data.is_active })
+      .eq("id", data.id)
       .select()
       .single();
 
