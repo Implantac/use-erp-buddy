@@ -12,7 +12,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,15 +23,15 @@ function AuthPage() {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
-        navigate({ to: "/dashboard" }); // Redireciona para o dashboard após login sucessful
-      } else {
+        navigate({ to: "/dashboard" });
+      } else if (mode === 'signup') {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -40,10 +40,16 @@ function AuthPage() {
           }
         });
         if (error) throw error;
-        setIsLogin(true);
+        setMode('login');
         toast.success("Cadastro realizado! Você já pode entrar.");
+      } else if (mode === 'forgot') {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("E-mail de recuperação enviado!");
+        setMode('login');
       }
-
     } catch (error: any) {
       toast.error(error.message || "Ocorreu um erro na autenticação");
     } finally {
@@ -82,12 +88,14 @@ function AuthPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-            {isLogin ? "Bem-vindo de volta" : "Criar sua conta"}
+            {mode === 'login' && "Bem-vindo de volta"}
+            {mode === 'signup' && "Criar sua conta"}
+            {mode === 'forgot' && "Recuperar senha"}
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            {isLogin 
-              ? "Entre com suas credenciais para acessar o Use Business OS" 
-              : "Preencha os dados abaixo para começar sua jornada"}
+            {mode === 'login' && "Entre com suas credenciais para acessar o Use Business OS"}
+            {mode === 'signup' && "Preencha os dados abaixo para começar sua jornada"}
+            {mode === 'forgot' && "Enviaremos um link para você redefinir sua senha"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -150,34 +158,72 @@ function AuthPage() {
                 required
                 className="bg-background border-border"
               />
-              <Input 
-                type="password" 
-                placeholder="Senha" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
+              {mode !== 'forgot' && (
+                <Input 
+                  type="password" 
+                  placeholder="Senha" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+              )}
             </div>
+            {mode === 'login' && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setMode('forgot')}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Esqueceu sua senha?
+                </button>
+              </div>
+            )}
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <LogIn className="mr-2 h-4 w-4" />
               )}
-              {isLogin ? "Entrar" : "Criar conta"}
+              {mode === 'login' && "Entrar"}
+              {mode === 'signup' && "Criar conta"}
+              {mode === 'forgot' && "Enviar e-mail"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Não tem uma conta?" : "Já possui uma conta?"}{" "}
-            <button 
-              onClick={() => setIsLogin(!isLogin)}
-              className="font-medium text-primary hover:underline underline-offset-4"
-            >
-              {isLogin ? "Cadastre-se" : "Entre agora"}
-            </button>
+            {mode === 'login' && (
+              <>
+                Não tem uma conta?{" "}
+                <button 
+                  onClick={() => setMode('signup')}
+                  className="font-medium text-primary hover:underline underline-offset-4"
+                >
+                  Cadastre-se
+                </button>
+              </>
+            )}
+            {mode === 'signup' && (
+              <>
+                Já possui uma conta?{" "}
+                <button 
+                  onClick={() => setMode('login')}
+                  className="font-medium text-primary hover:underline underline-offset-4"
+                >
+                  Entre agora
+                </button>
+              </>
+            )}
+            {mode === 'forgot' && (
+              <button 
+                onClick={() => setMode('login')}
+                className="font-medium text-primary hover:underline underline-offset-4"
+              >
+                Voltar para o login
+              </button>
+            )}
           </div>
         </CardFooter>
       </Card>
