@@ -3,8 +3,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/products.functions";
 import { CreateProductDialog } from "@/components/products/create-product-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/lib/auth.functions";
+import { getProfile } from "@/lib/settings.functions";
 import { 
+
   Table, 
 
   TableBody, 

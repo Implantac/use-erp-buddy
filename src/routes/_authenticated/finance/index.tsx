@@ -3,8 +3,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getTransactions, getFinanceSummary } from "@/lib/finance.functions";
 import { CreateTransactionDialog } from "@/components/finance/create-transaction-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { getProfile } from "@/lib/auth.functions";
+import { getProfile } from "@/lib/settings.functions";
+import { Plus, TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { 
+
   Table, 
 
   TableBody, 
