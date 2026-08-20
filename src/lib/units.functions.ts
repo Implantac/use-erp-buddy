@@ -17,15 +17,15 @@ export const getMyUnits = createServerFn({ method: "GET" })
     pageSize?: number; 
     orderBy?: string; 
     orderDirection?: 'asc' | 'desc';
-    search?: string;
-    isActive?: boolean | null;
+    search?: string | undefined;
+    isActive?: boolean | null | undefined;
   } | undefined) => 
     z.object({
       page: z.number().int().min(1).optional(),
       pageSize: z.number().int().min(1).max(100).optional(),
       orderBy: z.string().optional(),
       orderDirection: z.enum(['asc', 'desc']).optional(),
-      search: z.string().optional(),
+      search: z.string().optional().nullable(),
       isActive: z.boolean().nullable().optional(),
     }).optional().parse(data)
   )

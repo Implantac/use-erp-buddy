@@ -78,18 +78,7 @@ function UnitsList() {
     }
   });
 
-  const filteredUnits = useMemo(() => {
-    return units.filter((unit: any) => {
-      const matchesSearch = unit.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          unit.companies?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === "all" || 
-                          (statusFilter === "active" && unit.is_active) ||
-                          (statusFilter === "inactive" && !unit.is_active);
-      
-      return matchesSearch && matchesStatus;
-    });
-  }, [units, searchTerm, statusFilter]);
+  const filteredUnits = units;
 
   return (
     <div className="space-y-6">
