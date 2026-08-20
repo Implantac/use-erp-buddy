@@ -92,11 +92,20 @@ export const updateProduct = createServerFn({ method: "POST" })
 
 export const getCategories = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data: categories, error } = await context.supabase
+  .validator((data: { onlyActive?: boolean } | undefined) => z.object({
+    onlyActive: z.boolean().default(false),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    let query = context.supabase
       .from("categories")
       .select("*")
       .order("name");
+
+    if (data.onlyActive) {
+      query = query.eq("active", true);
+    }
+
+    const { data: categories, error } = await query;
 
     if (error) throw error;
     return categories;
@@ -109,7 +118,11 @@ export const createCategory = createServerFn({ method: "POST" })
     tenant_id: z.string().uuid(),
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("categories").insert(data as any);
+    const insertData = {
+      ...data,
+      active: true,
+    };
+    const { error } = await context.supabase.from("categories").insert(insertData as any);
     if (error) {
       console.error("Error creating category:", error);
       throw new Error(error.message);

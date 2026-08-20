@@ -52,8 +52,8 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
   const queryClient = useQueryClient();
 
   const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getCategories(undefined),
+    queryKey: ["categories", { onlyActive: true }],
+    queryFn: () => getCategories({ data: { onlyActive: true } }),
   });
 
   const form = useForm<ProductFormValues>({
