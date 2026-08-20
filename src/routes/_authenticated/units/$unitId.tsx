@@ -69,7 +69,7 @@ function UnitEdit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
       toast.success("Unidade atualizada com sucesso!");
-      navigate({ to: "/units" });
+      navigate({ to: "/units", search: {} });
     },
     onError: (error: any) => {
       toast.error(`Erro ao atualizar: ${error.message}`);
@@ -80,7 +80,7 @@ function UnitEdit() {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
         <h2 className="text-xl font-semibold">Unidade não encontrada</h2>
-        <Button onClick={() => navigate({ to: "/units" })}>
+        <Button onClick={() => navigate({ to: "/units", search: {} })}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar para listagem
         </Button>
@@ -96,7 +96,7 @@ function UnitEdit() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/units" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/units", search: {} })}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -180,7 +180,7 @@ function UnitEdit() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate({ to: "/units" })}>
+              <Button type="button" variant="outline" onClick={() => navigate({ to: "/units", search: {} })}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={updateMutation.isPending}>

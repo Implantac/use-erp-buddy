@@ -3,12 +3,12 @@ import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { getMyUnits, toggleUnitStatus } from "@/lib/units.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { Plus, MapPin, MoreHorizontal, Pencil, Power, Search as SearchIcon, Filter, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { CreateUnitDialog } from "@/components/units/create-unit-dialog";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -21,51 +21,65 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { z } from "zod";
+
+const unitsSearchSchema = z.object({
+  page: z.number().int().min(1).optional(),
+  pageSize: z.number().int().min(1).optional(),
+  search: z.string().optional(),
+  status: z.enum(["all", "active", "inactive"]).optional(),
+  orderBy: z.string().optional(),
+  orderDirection: z.enum(["asc", "desc"]).optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/units/")({
+  validateSearch: (search) => unitsSearchSchema.parse(search),
   component: UnitsList,
 });
 
 function UnitsList() {
   const queryClient = useQueryClient();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [orderBy, setOrderBy] = useState<string>("name");
-  const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { page, pageSize, search, status, orderBy, orderDirection } = Route.useSearch();
+  const [searchTerm, setSearchTerm] = useState(search || "");
 
-  // Debounce search
+  // Sync searchTerm with search param when it changes externally
+  useEffect(() => {
+    setSearchTerm(search || "");
+  }, [search]);
+
+  // Debounce search update to URL
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
+      if (searchTerm !== search) {
+        navigate({
+          search: (prev) => ({ ...prev, search: searchTerm, page: 1 }),
+          replace: true,
+        });
+      }
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, search, navigate]);
 
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize, orderBy, orderDirection, debouncedSearch, statusFilter],
+    queryKey: ["units", page, pageSize, orderBy, orderDirection, search, status],
     queryFn: () => getMyUnits({ 
       data: { 
         page, 
         pageSize, 
         orderBy, 
         orderDirection,
-        search: debouncedSearch || undefined,
-        isActive: statusFilter === "all" ? null : statusFilter === "active"
+        search: search || undefined,
+        isActive: status === "all" ? null : status === "active"
       } 
     }),
   });
 
   const units = data?.units || [];
   const totalCount = data?.count || 0;
-  const totalPages = Math.ceil(totalCount / pageSize);
-
-  // Reset page when filtering
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, statusFilter]);
+  const currentPageSize = pageSize || 10;
+  const currentPage = page || 1;
+  const totalPages = Math.ceil(totalCount / currentPageSize);
 
   const toggleMutation = useMutation({
     mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus({ data: vars }),
@@ -94,7 +108,7 @@ function UnitsList() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome ou empresa..."
             className="pl-8"
@@ -105,7 +119,10 @@ function UnitsList() {
         
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+          <Select 
+            value={status || "all"} 
+            onValueChange={(value: any) => navigate({ search: (prev) => ({ ...prev, status: value, page: 1 }) })}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -119,10 +136,9 @@ function UnitsList() {
           <div className="flex items-center gap-2 ml-4">
             <span className="text-sm text-muted-foreground whitespace-nowrap">Itens por página:</span>
             <Select 
-              value={pageSize.toString()} 
+              value={(pageSize || 10).toString()} 
               onValueChange={(value) => {
-                setPageSize(Number(value));
-                setPage(1);
+                navigate({ search: (prev) => ({ ...prev, pageSize: Number(value), page: 1 }) });
               }}
             >
               <SelectTrigger className="w-[80px]">
@@ -155,10 +171,9 @@ function UnitsList() {
                     variant="ghost" 
                     onClick={() => {
                       if (orderBy === "name") {
-                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                        navigate({ search: (prev) => ({ ...prev, orderDirection: orderDirection === "asc" ? "desc" : "asc" }) });
                       } else {
-                        setOrderBy("name");
-                        setOrderDirection("asc");
+                        navigate({ search: (prev) => ({ ...prev, orderBy: "name", orderDirection: "asc" }) });
                       }
                     }}
                     className="-ml-4 h-8 data-[state=open]:bg-accent"
@@ -177,10 +192,9 @@ function UnitsList() {
                     variant="ghost" 
                     onClick={() => {
                       if (orderBy === "is_active") {
-                        setOrderDirection(orderDirection === "asc" ? "desc" : "asc");
+                        navigate({ search: (prev) => ({ ...prev, orderDirection: orderDirection === "asc" ? "desc" : "asc" }) });
                       } else {
-                        setOrderBy("is_active");
-                        setOrderDirection("asc");
+                        navigate({ search: (prev) => ({ ...prev, orderBy: "is_active", orderDirection: "asc" }) });
                       }
                     }}
                     className="-ml-4 h-8 data-[state=open]:bg-accent"
@@ -254,8 +268,8 @@ function UnitsList() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
-                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.max(1, currentPage - 1) }) })}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                   
@@ -265,13 +279,13 @@ function UnitsList() {
                     if (
                       pageNum === 1 || 
                       pageNum === totalPages || 
-                      (pageNum >= page - 1 && pageNum <= page + 1)
+                      (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
                     ) {
                       return (
                         <PaginationItem key={pageNum}>
                           <PaginationLink 
-                            isActive={page === pageNum}
-                            onClick={() => setPage(pageNum)}
+                            isActive={currentPage === pageNum}
+                            onClick={() => navigate({ search: (prev) => ({ ...prev, page: pageNum }) })}
                             className="cursor-pointer"
                           >
                             {pageNum}
@@ -279,7 +293,7 @@ function UnitsList() {
                         </PaginationItem>
                       );
                     }
-                    if (pageNum === page - 2 || pageNum === page + 2) {
+                    if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
                       return (
                         <PaginationItem key={pageNum}>
                           <PaginationEllipsis />
@@ -291,8 +305,8 @@ function UnitsList() {
 
                   <PaginationItem>
                     <PaginationNext 
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.min(totalPages, currentPage + 1) }) })}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                 </PaginationContent>

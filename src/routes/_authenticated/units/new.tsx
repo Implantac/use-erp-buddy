@@ -41,7 +41,7 @@ function NewUnit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
       toast.success("Unidade criada com sucesso!");
-      navigate({ to: "/units" });
+      navigate({ to: "/units", search: {} });
     },
     onError: (error: any) => {
       toast.error(`Erro ao criar: ${error.message}`);
@@ -56,7 +56,7 @@ function NewUnit() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/units" })}>
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: "/units", search: {} })}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -140,7 +140,7 @@ function NewUnit() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={() => navigate({ to: "/units" })}>
+              <Button type="button" variant="outline" onClick={() => navigate({ to: "/units", search: {} })}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={createMutation.isPending}>

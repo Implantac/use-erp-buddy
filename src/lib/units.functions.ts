@@ -13,18 +13,18 @@ const unitSchema = z.object({
 export const getMyUnits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((data: { 
-    page?: number; 
-    pageSize?: number; 
-    orderBy?: string; 
-    orderDirection?: 'asc' | 'desc';
+    page?: number | undefined; 
+    pageSize?: number | undefined; 
+    orderBy?: string | undefined; 
+    orderDirection?: 'asc' | 'desc' | undefined;
     search?: string | undefined;
     isActive?: boolean | null | undefined;
   } | undefined) => 
     z.object({
-      page: z.number().int().min(1).optional(),
-      pageSize: z.number().int().min(1).max(100).optional(),
-      orderBy: z.string().optional(),
-      orderDirection: z.enum(['asc', 'desc']).optional(),
+      page: z.number().int().min(1).optional().nullable(),
+      pageSize: z.number().int().min(1).max(100).optional().nullable(),
+      orderBy: z.string().optional().nullable(),
+      orderDirection: z.enum(['asc', 'desc']).optional().nullable(),
       search: z.string().optional().nullable(),
       isActive: z.boolean().nullable().optional(),
     }).optional().parse(data)
