@@ -24,12 +24,17 @@ export const updateProfile = createServerFn({ method: "POST" })
     }).parse(data)
   )
   .handler(async ({ data, context }) => {
+    const updateData: any = {};
+    if (data.full_name !== undefined) updateData.full_name = data.full_name;
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
+
     const { data: profile, error } = await context.supabase
       .from("profiles")
-      .update(data)
+      .update(updateData)
       .eq("id", context.userId)
       .select()
       .single();
+
 
     if (error) throw error;
     return profile;

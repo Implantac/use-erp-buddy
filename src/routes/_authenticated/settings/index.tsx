@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Building, Shield, Bell } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { User, Building, Shield } from "lucide-react";
 import { toast } from "sonner";
+
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/settings/")({
@@ -76,11 +78,12 @@ function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile?.avatar_url} />
+                  <AvatarImage src={profile?.avatar_url ?? undefined} />
                   <AvatarFallback className="text-xl">
                     {profile?.full_name?.substring(0, 2).toUpperCase() || "US"}
                   </AvatarFallback>
                 </Avatar>
+
                 <Button variant="outline" onClick={() => toast.info("Upload de imagem em breve!")}>
                   Alterar Avatar
                 </Button>
@@ -99,10 +102,11 @@ function SettingsPage() {
                   <Label htmlFor="email">E-mail</Label>
                   <Input 
                     id="email" 
-                    value={profile?.email || ""} 
+                    value="E-mail gerido pelo sistema" 
                     disabled 
                     className="bg-muted"
                   />
+
                   <p className="text-xs text-muted-foreground">
                     O e-mail não pode ser alterado por aqui.
                   </p>
