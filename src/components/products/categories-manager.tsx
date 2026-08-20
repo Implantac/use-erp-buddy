@@ -108,7 +108,7 @@ export function CategoriesManager({ tenantId }: CategoriesManagerProps) {
     }
   }
 
-  async function toggleStatus(id: string, currentStatus: boolean | null) {
+  async function toggleStatus(id: string, currentStatus: boolean | null | undefined) {
     try {
       setLoadingId(id);
       await updateCategory({
@@ -186,7 +186,7 @@ export function CategoriesManager({ tenantId }: CategoriesManagerProps) {
                   <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
                 </TableCell>
               </TableRow>
-            ) : categories?.map((category) => (
+            ) : categories?.map((category: any) => (
               <TableRow key={category.id}>
                 <TableCell className="font-medium">{category.name}</TableCell>
                 <TableCell>
@@ -226,7 +226,7 @@ export function CategoriesManager({ tenantId }: CategoriesManagerProps) {
                 </TableCell>
               </TableRow>
             ))}
-            {!isLoading && categories?.length === 0 && (
+            {!isLoading && (categories?.length === 0 || !categories) && (
               <TableRow>
                 <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                   Nenhuma categoria cadastrada.

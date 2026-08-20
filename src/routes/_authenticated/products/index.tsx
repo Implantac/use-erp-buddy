@@ -7,9 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/lib/settings.functions";
 import { Badge } from "@/components/ui/badge";
 import { 
-
   Table, 
-
   TableBody, 
   TableCell, 
   TableHead, 
@@ -17,6 +15,8 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CategoriesManager } from "@/components/products/categories-manager";
 
 export const Route = createFileRoute("/_authenticated/products/")({
   component: ProductsPage,
@@ -46,8 +46,6 @@ function ProductsPage() {
         </div>
         {tenantId && <CreateProductDialog tenantId={tenantId} />}
       </div>
-
-
 
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="mb-4">
