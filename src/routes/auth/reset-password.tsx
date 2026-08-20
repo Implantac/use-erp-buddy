@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, KeyRound, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export const Route = createFileRoute("/auth/reset-password")({
   component: ResetPasswordPage,
@@ -15,7 +17,30 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(true);
+  const [errorState, setErrorState] = useState<string | null>(null);
   const navigate = Route.useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        // Se não houver sessão, o token provavelmente é inválido ou expirou
+        if (!data.session) {
+          setErrorState("O link de recuperação de senha é inválido ou já expirou. Por favor, solicite um novo link.");
+        }
+      } catch (err: any) {
+        setErrorState(err.message || "Erro ao validar o link de recuperação.");
+      } finally {
+        setValidating(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,34 +87,57 @@ function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleReset} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Nova senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
-              <Input
-                type="password"
-                placeholder="Confirme a nova senha"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="bg-background border-border"
-              />
+          {validating ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Validando link de recuperação...</p>
             </div>
-            <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <KeyRound className="mr-2 h-4 w-4" />
-              )}
-              Redefinir Senha
-            </Button>
-          </form>
+          ) : errorState ? (
+            <div className="space-y-4">
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Link Inválido</AlertTitle>
+                <AlertDescription>
+                  {errorState}
+                </AlertDescription>
+              </Alert>
+              <Button 
+                className="w-full" 
+                onClick={() => navigate({ to: "/auth" })}
+              >
+                Voltar para o Login
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleReset} className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Nova senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+                <Input
+                  type="password"
+                  placeholder="Confirme a nova senha"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="bg-background border-border"
+                />
+              </div>
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <KeyRound className="mr-2 h-4 w-4" />
+                )}
+                Redefinir Senha
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
