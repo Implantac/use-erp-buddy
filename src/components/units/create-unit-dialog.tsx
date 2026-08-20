@@ -43,14 +43,14 @@ export function CreateUnitDialog() {
   });
 
   // Update defaults when data arrives
-  useState(() => {
+  useEffect(() => {
     if (companies.length > 0 && !formData.company_id) {
         setFormData(prev => ({ ...prev, company_id: companies[0].id }));
     }
     if (tenants.length > 0 && !formData.tenant_id) {
         setFormData(prev => ({ ...prev, tenant_id: tenants[0].id }));
     }
-  });
+  }, [companies, tenants, formData.company_id, formData.tenant_id]);
 
   const createMutation = useMutation({
     mutationFn: (data: any) => createUnit({ data }),
