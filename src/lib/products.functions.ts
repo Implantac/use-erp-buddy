@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 
 export const getProducts = createServerFn({ method: "GET" })
   .inputValidator((data) => z.object({
