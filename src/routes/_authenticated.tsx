@@ -98,12 +98,13 @@ function AuthenticatedLayout() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <button>
+                      <Link to="/settings" className="flex w-full items-center gap-2">
                         <Settings className="h-4 w-4" />
                         <span>Sistema</span>
-                      </button>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

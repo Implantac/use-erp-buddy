@@ -21,6 +21,7 @@ import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
 import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups/index'
+import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authenticated/team/index'
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
 import { Route as AuthenticatedUnitsNewRouteImport } from './routes/_authenticated/units/new'
@@ -88,6 +89,11 @@ const AuthenticatedGroupsIndexRoute =
     path: '/groups/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
+  id: '/team/',
+  path: '/team/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedUnitsIndexRoute = AuthenticatedUnitsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
+  '/team/': typeof AuthenticatedTeamIndexRoute
   '/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
+  '/team': typeof AuthenticatedTeamIndexRoute
   '/units': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRoutesById {
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
+  '/_authenticated/team/': typeof AuthenticatedTeamIndexRoute
   '/_authenticated/units/': typeof AuthenticatedUnitsIndexRoute
 }
 export interface FileRouteTypes {
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/units/new'
     | '/companies/'
     | '/groups/'
+    | '/team/'
     | '/units/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/units/new'
     | '/companies'
     | '/groups'
+    | '/team'
     | '/units'
   id:
     | '__root__'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/_authenticated/units/new'
     | '/_authenticated/companies/'
     | '/_authenticated/groups/'
+    | '/_authenticated/team/'
     | '/_authenticated/units/'
   fileRoutesById: FileRoutesById
 }
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGroupsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/team/': {
+      id: '/_authenticated/team/'
+      path: '/team'
+      fullPath: '/team/'
+      preLoaderRoute: typeof AuthenticatedTeamIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/units/': {
       id: '/_authenticated/units/'
       path: '/'
@@ -355,6 +374,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
+  AuthenticatedTeamIndexRoute: typeof AuthenticatedTeamIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -362,6 +382,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
+  AuthenticatedTeamIndexRoute: AuthenticatedTeamIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
