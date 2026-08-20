@@ -78,7 +78,7 @@ function ResetPasswordPage() {
       toast.success("Senha redefinida com sucesso!");
       navigate({ to: "/auth" });
     } catch (error: any) {
-      toast.error(error.message || "Erro ao redefinir senha");
+      toast.error("Erro ao redefinir senha. O link pode ter expirado.");
     } finally {
       setLoading(false);
     }
