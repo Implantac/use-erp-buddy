@@ -30,8 +30,7 @@ export const logFailedAttempt = createServerFn({ method: "POST" })
     type: z.enum(['login', 'reset_password'])
   }).parse(data))
   .handler(async ({ data }) => {
-    const ip = request.headers.get('x-forwarded-for') || undefined;
-    await recordAuthAttempt(data.identifier, data.type, ip);
+    await recordAuthAttempt(data.identifier, data.type, undefined);
     return { success: true };
   });
 
