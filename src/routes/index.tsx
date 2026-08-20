@@ -21,11 +21,14 @@ function Index() {
         }
       });
       if (result.success) {
+        console.log("Usuário administrador cadastrado com sucesso!");
         alert("Usuário administrador cadastrado com sucesso!");
       }
     } catch (error: any) {
+      console.error("Erro ao cadastrar admin:", error);
       alert("Erro ao cadastrar admin: " + error.message);
     }
+
   };
 
 

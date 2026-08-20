@@ -37,7 +37,9 @@ function AuthPage() {
           password,
         });
         if (error) throw error;
-        toast.success("Cadastro realizado! Verifique seu e-mail.");
+        setIsLogin(true); // Alterna para login após cadastro
+        toast.success("Cadastro realizado! Você já pode entrar.");
+
       }
     } catch (error: any) {
       toast.error(error.message || "Ocorreu um erro na autenticação");
