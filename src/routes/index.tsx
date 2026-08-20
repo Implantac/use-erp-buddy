@@ -77,7 +77,7 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4">ok prossiga</p>
+          <p className="mt-4">ok prossiga com o plano e implemente as fases seguintes</p>
 
         </div>
       </footer>
