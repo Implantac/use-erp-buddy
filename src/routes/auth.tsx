@@ -35,12 +35,15 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: { full_name: "Administrador" }
+          }
         });
         if (error) throw error;
-        setIsLogin(true); // Alterna para login após cadastro
+        setIsLogin(true);
         toast.success("Cadastro realizado! Você já pode entrar.");
-
       }
+
     } catch (error: any) {
       toast.error(error.message || "Ocorreu um erro na autenticação");
     } finally {

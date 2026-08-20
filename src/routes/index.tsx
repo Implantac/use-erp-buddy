@@ -11,28 +11,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   const navigate = Route.useNavigate();
 
-  const handleSetup = async () => {
-    try {
-      const { createUserAdmin } = await import("@/lib/setup.functions");
-      const result = await createUserAdmin({
-        data: {
-          email: "etcsuporte889@gmail.com",
-          password: "use1235use"
-        }
-      });
-      if (result.success) {
-        console.log("Usuário administrador cadastrado com sucesso!");
-        alert("Usuário administrador cadastrado com sucesso!");
-      }
-    } catch (error: any) {
-      console.error("Erro ao cadastrar admin:", error);
-      alert("Erro ao cadastrar admin: " + error.message);
-    }
-
-  };
-
-
   return (
+
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b bg-card px-6 py-4">
