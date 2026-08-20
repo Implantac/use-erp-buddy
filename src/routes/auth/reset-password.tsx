@@ -69,12 +69,30 @@ function ResetPasswordPage() {
 
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const email = user?.email;
+      
+      const { checkRateLimit, logFailedAttempt, resetAuthAttempts } = await import("@/lib/auth.functions");
+
+      if (email) {
+        const rateLimit = await checkRateLimit({ data: { identifier: email, type: 'reset_password' } });
+        if (rateLimit.blocked) {
+          toast.error(`Muitas tentativas. Bloqueio temporário por ${rateLimit.remainingMinutes} minutos.`);
+          setLoading(false);
+          return;
+        }
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (email) await logFailedAttempt({ data: { identifier: email, type: 'reset_password' } });
+        throw error;
+      }
 
+      if (email) await resetAuthAttempts({ data: { identifier: email, type: 'reset_password' } });
       toast.success("Senha redefinida com sucesso!");
       navigate({ to: "/auth" });
     } catch (error: any) {
