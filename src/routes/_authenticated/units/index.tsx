@@ -29,15 +29,33 @@ export const Route = createFileRoute("/_authenticated/units/")({
 function UnitsList() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [orderBy, setOrderBy] = useState<string>("name");
   const [orderDirection, setOrderDirection] = useState<"asc" | "desc">("asc");
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const { data } = useSuspenseQuery({
-    queryKey: ["units", page, pageSize, orderBy, orderDirection],
-    queryFn: () => getMyUnits({ data: { page, pageSize, orderBy, orderDirection } }),
+    queryKey: ["units", page, pageSize, orderBy, orderDirection, debouncedSearch, statusFilter],
+    queryFn: () => getMyUnits({ 
+      data: { 
+        page, 
+        pageSize, 
+        orderBy, 
+        orderDirection,
+        search: debouncedSearch || undefined,
+        isActive: statusFilter === "all" ? null : statusFilter === "active"
+      } 
+    }),
   });
 
   const units = data?.units || [];
