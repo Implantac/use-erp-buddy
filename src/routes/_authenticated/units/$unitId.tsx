@@ -21,10 +21,12 @@ function UnitEdit() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  const { data: units } = useSuspenseQuery({
-    queryKey: ["units"],
-    queryFn: () => getMyUnits(),
+  const { data } = useSuspenseQuery({
+    queryKey: ["units", 1], // Fetch first page to find the unit if not already in cache
+    queryFn: () => getMyUnits({ data: { page: 1, pageSize: 100 } }),
   });
+
+  const units = data?.units || [];
 
   const { data: companies } = useSuspenseQuery({
     queryKey: ["companies"],
@@ -36,7 +38,7 @@ function UnitEdit() {
     queryFn: () => getMyTenants(),
   });
 
-  const unit = units.find((u) => u.id === unitId);
+  const unit = units.find((u: any) => u.id === unitId);
   
   const [formData, setFormData] = useState({
     name: "",

@@ -12,14 +12,26 @@ const unitSchema = z.object({
 
 export const getMyUnits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
+  .validator((data: { page?: number; pageSize?: number } | undefined) => 
+    z.object({
+      page: z.number().int().min(1).optional(),
+      pageSize: z.number().int().min(1).max(100).optional(),
+    }).optional().parse(data)
+  )
+  .handler(async ({ data, context }) => {
+    const page = data?.page || 1;
+    const pageSize = data?.pageSize || 10;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data: units, error, count } = await context.supabase
       .from("units")
-      .select("*, companies(name)")
-      .order("created_at", { ascending: false });
+      .select("*, companies(name)", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) throw error;
-    return data;
+    return { units, count: count || 0 };
   });
 
 export const createUnit = createServerFn({ method: "POST" })

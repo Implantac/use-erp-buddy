@@ -8,24 +8,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export const Route = createFileRoute("/_authenticated/units/")({
   component: UnitsList,
 });
 
 function UnitsList() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
-  const { data: units } = useSuspenseQuery({
-    queryKey: ["units"],
-    queryFn: () => getMyUnits(),
+  const { data } = useSuspenseQuery({
+    queryKey: ["units", page],
+    queryFn: () => getMyUnits({ data: { page, pageSize } }),
   });
+
+  const units = data?.units || [];
+  const totalCount = data?.count || 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  // Reset page when filtering
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter]);
 
   const toggleMutation = useMutation({
     mutationFn: (vars: { id: string; is_active: boolean }) => toggleUnitStatus({ data: vars }),
@@ -98,7 +117,7 @@ function UnitsList() {
         <CardHeader>
           <CardTitle>Listagem</CardTitle>
           <CardDescription>
-            Exibindo {filteredUnits.length} de {units.length} unidades.
+            Exibindo {filteredUnits.length} unidades nesta página (Total: {totalCount}).
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -156,12 +175,64 @@ function UnitsList() {
               {filteredUnits.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
-                    Nenhuma unidade encontrada.
+                    Nenhuma unidade encontrada nesta página.
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {[...Array(totalPages)].map((_, i) => {
+                    const pageNum = i + 1;
+                    // Show current page, first, last, and one around current
+                    if (
+                      pageNum === 1 || 
+                      pageNum === totalPages || 
+                      (pageNum >= page - 1 && pageNum <= page + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink 
+                            isActive={page === pageNum}
+                            onClick={() => setPage(pageNum)}
+                            className="cursor-pointer"
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    }
+                    if (pageNum === page - 2 || pageNum === page + 2) {
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
