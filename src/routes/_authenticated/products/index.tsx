@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/products.functions";
 import { Button } from "@/components/ui/button";
-import { Plus, Package } from "lucide-react";
+import { Plus } from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/products/")({
 function ProductsPage() {
   const { data } = useSuspenseQuery({
     queryKey: ["products", { page: 1, pageSize: 10 }],
-    queryFn: () => getProducts({ page: 1, pageSize: 10 }),
+    queryFn: () => getProducts({ data: { page: 1, pageSize: 10 } }),
   });
 
   return (
