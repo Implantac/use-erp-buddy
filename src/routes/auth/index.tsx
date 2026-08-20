@@ -51,9 +51,7 @@ function AuthPage() {
 
       if (mode === 'login' || mode === 'forgot') {
         const type = mode === 'login' ? 'login' : 'reset_password';
-        console.log(`Checking rate limit for ${email} type ${type}`);
         const rateLimit = await checkRateLimit({ data: { identifier: email, type } });
-        console.log(`Rate limit result:`, rateLimit);
         
         if (rateLimit.blocked) {
           toast.error(`Muitas tentativas. Bloqueio temporário por ${rateLimit.remainingMinutes} minutos.`);
