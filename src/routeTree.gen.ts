@@ -19,6 +19,8 @@ import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
+import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
+import { Route as AuthenticatedUnitsNewRouteImport } from './routes/_authenticated/units/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -72,6 +74,17 @@ const AuthenticatedUnitsIndexRoute = AuthenticatedUnitsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedUnitsRoute,
 } as any)
+const AuthenticatedUnitsUnitIdRoute =
+  AuthenticatedUnitsUnitIdRouteImport.update({
+    id: '/$unitId',
+    path: '/$unitId',
+    getParentRoute: () => AuthenticatedUnitsRoute,
+  } as any)
+const AuthenticatedUnitsNewRoute = AuthenticatedUnitsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedUnitsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +94,8 @@ export interface FileRoutesByFullPath {
   '/units': typeof AuthenticatedUnitsRouteWithChildren
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
+  '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/units/': typeof AuthenticatedUnitsIndexRoute
 }
@@ -90,6 +105,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
+  '/units/new': typeof AuthenticatedUnitsNewRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
   '/units': typeof AuthenticatedUnitsIndexRoute
 }
@@ -103,6 +120,8 @@ export interface FileRoutesById {
   '/_authenticated/units': typeof AuthenticatedUnitsRouteWithChildren
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
+  '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/_authenticated/units/': typeof AuthenticatedUnitsIndexRoute
 }
@@ -116,6 +135,8 @@ export interface FileRouteTypes {
     | '/units'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/units/$unitId'
+    | '/units/new'
     | '/companies/'
     | '/units/'
   fileRoutesByTo: FileRoutesByTo
@@ -125,6 +146,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/units/$unitId'
+    | '/units/new'
     | '/companies'
     | '/units'
   id:
@@ -137,6 +160,8 @@ export interface FileRouteTypes {
     | '/_authenticated/units'
     | '/_authenticated/companies/$companyId'
     | '/_authenticated/companies/new'
+    | '/_authenticated/units/$unitId'
+    | '/_authenticated/units/new'
     | '/_authenticated/companies/'
     | '/_authenticated/units/'
   fileRoutesById: FileRoutesById
@@ -219,6 +244,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUnitsIndexRouteImport
       parentRoute: typeof AuthenticatedUnitsRoute
     }
+    '/_authenticated/units/$unitId': {
+      id: '/_authenticated/units/$unitId'
+      path: '/$unitId'
+      fullPath: '/units/$unitId'
+      preLoaderRoute: typeof AuthenticatedUnitsUnitIdRouteImport
+      parentRoute: typeof AuthenticatedUnitsRoute
+    }
+    '/_authenticated/units/new': {
+      id: '/_authenticated/units/new'
+      path: '/new'
+      fullPath: '/units/new'
+      preLoaderRoute: typeof AuthenticatedUnitsNewRouteImport
+      parentRoute: typeof AuthenticatedUnitsRoute
+    }
   }
 }
 
@@ -241,10 +280,14 @@ const AuthenticatedCompaniesRouteWithChildren =
   )
 
 interface AuthenticatedUnitsRouteChildren {
+  AuthenticatedUnitsUnitIdRoute: typeof AuthenticatedUnitsUnitIdRoute
+  AuthenticatedUnitsNewRoute: typeof AuthenticatedUnitsNewRoute
   AuthenticatedUnitsIndexRoute: typeof AuthenticatedUnitsIndexRoute
 }
 
 const AuthenticatedUnitsRouteChildren: AuthenticatedUnitsRouteChildren = {
+  AuthenticatedUnitsUnitIdRoute: AuthenticatedUnitsUnitIdRoute,
+  AuthenticatedUnitsNewRoute: AuthenticatedUnitsNewRoute,
   AuthenticatedUnitsIndexRoute: AuthenticatedUnitsIndexRoute,
 }
 
