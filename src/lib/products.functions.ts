@@ -101,3 +101,37 @@ export const getCategories = createServerFn({ method: "GET" })
     if (error) throw error;
     return categories;
   });
+
+export const createCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data) => z.object({
+    name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
+    tenant_id: z.string().uuid(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("categories").insert(data as any);
+    if (error) {
+      console.error("Error creating category:", error);
+      throw new Error(error.message);
+    }
+    return { success: true };
+  });
+
+export const updateCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    id: z.string().uuid(),
+    updates: z.object({
+      name: z.string().min(2).optional(),
+      active: z.boolean().optional(),
+    }),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { id, updates } = data;
+    const { error } = await context.supabase.from("categories").update(updates as any).eq("id", id);
+    if (error) {
+      console.error("Error updating category:", error);
+      throw new Error(error.message);
+    }
+    return { success: true };
+  });
