@@ -78,7 +78,8 @@ function Index() {
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
           <p className="mt-4">Exibir uma mensagem de erro e um aviso contextual quando eu tentar selecionar uma categoria inativa ao criar ou editar um produto.</p>
-          <p className="mt-2">ok continue</p>
+          <p className="mt-2">ok continue com as implementações</p>
+          <p className="mt-2 text-xs text-primary font-medium">Fase 4: Gestão de Estoque e Inteligência Operacional em andamento.</p>
 
 
         </div>

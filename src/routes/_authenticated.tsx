@@ -106,6 +106,14 @@ function AuthenticatedLayout() {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
+                      <Link to="/inventory" className="flex w-full items-center gap-2">
+                        <Receipt className="h-4 w-4" />
+                        <span>Estoque</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
                       <Link to="/finance" className="flex w-full items-center gap-2">
                         <Receipt className="h-4 w-4" />
                         <span>Financeiro</span>
