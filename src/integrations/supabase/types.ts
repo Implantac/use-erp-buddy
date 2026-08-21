@@ -266,6 +266,7 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          destination_unit_id: string | null
           id: string
           notes: string | null
           product_id: string
@@ -277,6 +278,7 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by?: string | null
+          destination_unit_id?: string | null
           id?: string
           notes?: string | null
           product_id: string
@@ -288,6 +290,7 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string | null
+          destination_unit_id?: string | null
           id?: string
           notes?: string | null
           product_id?: string
@@ -297,6 +300,13 @@ export type Database = {
           unit_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_destination_unit_id_fkey"
+            columns: ["destination_unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inventory_transactions_product_id_fkey"
             columns: ["product_id"]

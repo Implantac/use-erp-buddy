@@ -30,19 +30,36 @@ export const getInventoryHistory = createServerFn({ method: "GET" })
 
 export const createInventoryTransaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data) => z.object({
+  .validator((data: any) => z.object({
     product_id: z.string().uuid(),
     unit_id: z.string().uuid(),
     type: z.enum(["in", "out", "adjustment", "transfer"]),
     quantity: z.number(),
     notes: z.string().optional(),
     tenant_id: z.string().uuid(),
+    destination_unit_id: z.string().uuid().optional(),
   }).parse(data))
   .handler(async ({ data, context }) => {
+    // If it's a transfer, we handle stock movement explicitly if needed
+    // For now, the transaction record is the source of truth
     const { error } = await context.supabase.from("inventory_transactions" as any).insert(data as any);
     if (error) throw new Error(error.message);
+
+    // If it's a transfer, we should ideally also create an 'in' transaction for the destination
+    if (data.type === 'transfer' && data.destination_unit_id) {
+       await context.supabase.from("inventory_transactions" as any).insert({
+         product_id: data.product_id,
+         unit_id: data.destination_unit_id,
+         type: 'in',
+         quantity: data.quantity,
+         notes: `Transferência recebida da unidade ${data.unit_id}. ${data.notes || ''}`,
+         tenant_id: data.tenant_id
+       } as any);
+    }
+
     return { success: true };
   });
+
 
 export const getStockAlerts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

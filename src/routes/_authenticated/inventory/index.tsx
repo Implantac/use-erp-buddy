@@ -59,7 +59,16 @@ const transactionSchema = z.object({
   type: z.enum(["in", "out", "adjustment", "transfer"]),
   quantity: z.coerce.number().min(0.01, "A quantidade deve ser maior que zero"),
   notes: z.string().optional(),
+  destination_unit_id: z.string().uuid("Selecione a unidade de destino").optional(),
+}).refine((data) => {
+  if (data.type === 'transfer' && !data.destination_unit_id) return false;
+  if (data.type === 'transfer' && data.unit_id === data.destination_unit_id) return false;
+  return true;
+}, {
+  message: "Para transferências, selecione uma unidade de destino diferente da origem",
+  path: ["destination_unit_id"]
 });
+
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
 
@@ -169,7 +178,8 @@ function InventoryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Produto</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || ""} value={field.value || ""}>
+
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o produto" />
@@ -191,16 +201,21 @@ function InventoryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unidade</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || ""} value={field.value || ""}>
+
+
+
+
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a unidade" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {unitsData?.units?.map((u) => (
-                            <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
-                          ))}
+                            {unitsData?.units?.map((u) => (
+                              <SelectItem key={u.id} value={u.id!}>{u.name}</SelectItem>
+                            ))}
+
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -214,7 +229,9 @@ function InventoryPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || ""} value={field.value || ""}>
+
+
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Tipo" />
@@ -245,6 +262,33 @@ function InventoryPage() {
                     )}
                   />
                 </div>
+                {form.watch("type") === "transfer" && (
+                  <FormField
+                    control={form.control}
+                    name="destination_unit_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unidade de Destino</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || ""} value={field.value || ""}>
+
+
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o destino" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {unitsData?.units?.filter(u => u.id !== form.watch("unit_id")).map((u) => (
+                              <SelectItem key={u.id} value={u.id!}>{u.name}</SelectItem>
+                            ))}
+
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="notes"
@@ -258,6 +302,7 @@ function InventoryPage() {
                     </FormItem>
                   )}
                 />
+
                 <DialogFooter>
                   <Button type="submit" disabled={loading}>
                     {loading ? "Processando..." : "Confirmar Movimentação"}
