@@ -77,13 +77,8 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4">Exibir uma mensagem de erro e um aviso contextual quando eu tentar selecionar uma categoria inativa ao criar ou editar um produto.</p>
-          <p className="mt-2">ok continue com as implementações</p>
-          <p className="mt-2">prossiga com a proxima fase</p>
-          <p className="mt-2 text-xs text-primary font-medium">Fase 4: Gestão de Estoque e Inteligência Operacional concluída. Iniciando Fase 5: CRM e Vendas.</p>
-          <p className="mt-2 text-xs text-primary font-medium">Fase 5: CRM e Gestão de Vendas concluída. Iniciando Fase 6: Auditoria e Automações.</p>
-          <p className="mt-2 text-xs text-primary font-medium">Fase 6: Auditoria e Automações concluída. Sistema operacional Use ERP está com sua base core completa.</p>
-          <p className="mt-2 text-xs text-primary font-medium">ok evolua</p>
+          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 7 Finalizada - Inteligência de Negócio & Colaboração</p>
+          <p className="mt-2 text-xs text-muted-foreground">Dashboards estratégicos, indicadores de BI e gestão avançada de equipe integrados.</p>
 
 
 
