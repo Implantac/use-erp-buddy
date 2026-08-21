@@ -1052,12 +1052,17 @@ export type Database = {
       products: {
         Row: {
           active: boolean | null
+          barcode: string | null
+          brand: string | null
           category_id: string | null
           cost_price: number | null
           created_at: string
+          custom_attributes: Json | null
           description: string | null
+          height: number | null
           id: string
           image_url: string | null
+          length: number | null
           min_stock: number | null
           name: string
           price: number | null
@@ -1065,15 +1070,22 @@ export type Database = {
           stock_quantity: number | null
           tenant_id: string
           unit_of_measure: string | null
+          weight: number | null
+          width: number | null
         }
         Insert: {
           active?: boolean | null
+          barcode?: string | null
+          brand?: string | null
           category_id?: string | null
           cost_price?: number | null
           created_at?: string
+          custom_attributes?: Json | null
           description?: string | null
+          height?: number | null
           id?: string
           image_url?: string | null
+          length?: number | null
           min_stock?: number | null
           name: string
           price?: number | null
@@ -1081,15 +1093,22 @@ export type Database = {
           stock_quantity?: number | null
           tenant_id: string
           unit_of_measure?: string | null
+          weight?: number | null
+          width?: number | null
         }
         Update: {
           active?: boolean | null
+          barcode?: string | null
+          brand?: string | null
           category_id?: string | null
           cost_price?: number | null
           created_at?: string
+          custom_attributes?: Json | null
           description?: string | null
+          height?: number | null
           id?: string
           image_url?: string | null
+          length?: number | null
           min_stock?: number | null
           name?: string
           price?: number | null
@@ -1097,6 +1116,8 @@ export type Database = {
           stock_quantity?: number | null
           tenant_id?: string
           unit_of_measure?: string | null
+          weight?: number | null
+          width?: number | null
         }
         Relationships: [
           {
