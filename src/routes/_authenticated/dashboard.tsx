@@ -8,8 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+import { getNotifications, markNotificationRead } from "@/lib/automations.functions";
 import { 
   BarChart, 
+
   Bar, 
   XAxis, 
   YAxis, 
@@ -232,16 +234,15 @@ function Dashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Notificações do Sistema</CardTitle>
+            <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-lg">
-              <ArrowUpRight className="h-8 w-8 mb-2 opacity-20" />
-              <p>Nenhuma atividade registrada hoje.</p>
-            </div>
+            <NotificationsPanel />
           </CardContent>
         </Card>
+
         <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Próximos Passos</CardTitle>
