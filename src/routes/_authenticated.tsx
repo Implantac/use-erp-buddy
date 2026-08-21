@@ -252,6 +252,14 @@ function AuthenticatedLayout() {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/settings" search={{ tab: 'automations' }} className="flex w-full items-center gap-2">
+                        <Webhook className="h-4 w-4" />
+                        <span>Automações</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
                 </SidebarMenu>
               </SidebarGroupContent>
