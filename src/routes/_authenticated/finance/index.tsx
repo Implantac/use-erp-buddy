@@ -110,7 +110,7 @@ function FinancePage() {
                 <XAxis dataKey="month" />
                 <YAxis tickFormatter={(value) => `R$ ${value}`} />
                 <Tooltip 
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: any) => formatCurrency(Number(value || 0))}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
                 <Legend />
