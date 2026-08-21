@@ -119,7 +119,8 @@ export const getFinanceChartData = createServerFn({ method: "GET" })
     return Object.values(monthlyData).sort((a, b) => {
       const [mA, yA] = a.month.split('/');
       const [mB, yB] = b.month.split('/');
-      return new Date(`20${yA}-${monthNames.indexOf(mA) + 1}-01`).getTime() - 
-             new Date(`20${yB}-${monthNames.indexOf(mB) + 1}-01`).getTime();
+      const dateA = new Date(`20${yA}-${String(monthNames.indexOf(mA) + 1).padStart(2, '0')}-01`);
+      const dateB = new Date(`20${yB}-${String(monthNames.indexOf(mB) + 1).padStart(2, '0')}-01`);
+      return dateA.getTime() - dateB.getTime();
     });
   });
