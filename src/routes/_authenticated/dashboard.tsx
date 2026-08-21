@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/dashboard.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag, Filter, X } from "lucide-react";
+import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag, Filter, X, Bell, BellOff } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
