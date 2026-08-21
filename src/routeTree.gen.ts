@@ -33,6 +33,7 @@ import { Route as AuthenticatedPurchasesIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedReportsIndexRouteImport } from './routes/_authenticated/reports/index'
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedSettingsAutomationsRouteImport } from './routes/_authenticated/settings/automations'
 import { Route as AuthenticatedSettingsDocsRouteImport } from './routes/_authenticated/settings/docs'
 import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authenticated/team/index'
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
@@ -171,6 +172,12 @@ const AuthenticatedSettingsIndexRoute =
     path: '/settings/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSettingsAutomationsRoute =
+  AuthenticatedSettingsAutomationsRouteImport.update({
+    id: '/settings/automations',
+    path: '/settings/automations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSettingsDocsRoute =
   AuthenticatedSettingsDocsRouteImport.update({
     id: '/settings/docs',
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/settings/automations': typeof AuthenticatedSettingsAutomationsRoute
   '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/settings/automations': typeof AuthenticatedSettingsAutomationsRoute
   '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/_authenticated/settings/automations': typeof AuthenticatedSettingsAutomationsRoute
   '/_authenticated/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/settings/automations'
     | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/settings/automations'
     | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_authenticated/companies/$companyId'
     | '/_authenticated/companies/new'
+    | '/_authenticated/settings/automations'
     | '/_authenticated/settings/docs'
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
@@ -579,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings/automations': {
+      id: '/_authenticated/settings/automations'
+      path: '/settings/automations'
+      fullPath: '/settings/automations'
+      preLoaderRoute: typeof AuthenticatedSettingsAutomationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings/docs': {
       id: '/_authenticated/settings/docs'
       path: '/settings/docs'
@@ -670,6 +690,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHrRoute: typeof AuthenticatedHrRoute
   AuthenticatedProductionRoute: typeof AuthenticatedProductionRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
+  AuthenticatedSettingsAutomationsRoute: typeof AuthenticatedSettingsAutomationsRoute
   AuthenticatedSettingsDocsRoute: typeof AuthenticatedSettingsDocsRoute
   AuthenticatedAuditIndexRoute: typeof AuthenticatedAuditIndexRoute
   AuthenticatedCrmIndexRoute: typeof AuthenticatedCrmIndexRoute
@@ -691,6 +712,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHrRoute: AuthenticatedHrRoute,
   AuthenticatedProductionRoute: AuthenticatedProductionRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
+  AuthenticatedSettingsAutomationsRoute: AuthenticatedSettingsAutomationsRoute,
   AuthenticatedSettingsDocsRoute: AuthenticatedSettingsDocsRoute,
   AuthenticatedAuditIndexRoute: AuthenticatedAuditIndexRoute,
   AuthenticatedCrmIndexRoute: AuthenticatedCrmIndexRoute,
