@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
 import { triggerWebhook } from "./webhooks.server";
+import { evaluateRules } from "./automations.server";
 
 
 const getSalesSchema = z.object({
