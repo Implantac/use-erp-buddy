@@ -49,10 +49,11 @@ export const createSale = createServerFn({ method: "POST" })
       .single();
 
     if (saleError) throw new Error(saleError.message);
+    const saleId = (sale as any).id;
 
     // 2. Create Sale Items
     const saleItems = data.items.map(item => ({
-      sale_id: sale.id,
+      sale_id: saleId,
       product_id: item.product_id,
       quantity: item.quantity,
       unit_price: item.unit_price,
@@ -68,20 +69,22 @@ export const createSale = createServerFn({ method: "POST" })
     // 3. Register Inventory Transactions & Update Stock
     for (const item of data.items) {
       // Record movement
+      const { data: unitData } = await context.supabase.from("units" as any).select("id").eq("tenant_id", data.tenant_id).limit(1).single();
+      
       await context.supabase.from("inventory_transactions" as any).insert({
         tenant_id: data.tenant_id,
         product_id: item.product_id,
         type: 'out',
         quantity: item.quantity,
-        notes: `Venda #${sale.id.slice(0, 8)}`,
-        unit_id: (await context.supabase.from("units" as any).select("id").eq("tenant_id", data.tenant_id).limit(1).single()).data?.id // Simplified: pick first unit
+        notes: `Venda #${saleId.slice(0, 8)}`,
+        unit_id: (unitData as any)?.id
       } as any);
 
-      // Update aggregate (in a real app, use a DB trigger, but for now manual update)
+      // Update aggregate
       const { data: product } = await context.supabase.from("products").select("stock_quantity").eq("id", item.product_id).single();
       if (product) {
         await context.supabase.from("products").update({ 
-          stock_quantity: (product.stock_quantity || 0) - item.quantity 
+          stock_quantity: ((product as any).stock_quantity || 0) - item.quantity 
         }).eq("id", item.product_id);
       }
     }
@@ -91,12 +94,12 @@ export const createSale = createServerFn({ method: "POST" })
       tenant_id: data.tenant_id,
       type: 'income',
       amount: final_amount,
-      description: `Venda #${sale.id.slice(0, 8)}`,
+      description: `Venda #${saleId.slice(0, 8)}`,
       status: 'completed',
       category: 'Vendas'
     } as any);
 
     if (financeError) console.error("Failed to create financial transaction:", financeError);
 
-    return { success: true, saleId: sale.id };
+    return { success: true, saleId };
   });
