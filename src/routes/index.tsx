@@ -79,7 +79,7 @@ function Index() {
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
           <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 7 Finalizada - Inteligência de Negócio & Colaboração</p>
           <p className="mt-2 text-xs text-muted-foreground">Dashboards estratégicos, indicadores de BI e gestão avançada de equipe integrados.</p>
-          <p className="mt-2 text-xs text-primary font-medium">ok avance para as proximas fases</p>
+
 
 
 
