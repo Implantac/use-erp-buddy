@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText, Truck as TruckIcon, Box, BarChart3, Target, Webhook } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText, Truck as TruckIcon, Box, BarChart3, Target, Webhook, BriefcaseBusiness } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -120,6 +120,14 @@ function AuthenticatedLayout() {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
++                  <SidebarMenuItem>
++                    <SidebarMenuButton asChild>
++                      <Link to="/hr" search={{ tab: 'recruitment' }} className="flex w-full items-center gap-2">
++                        <BriefcaseBusiness className="h-4 w-4" />
++                        <span>Recrutamento & Seleção</span>
++                      </Link>
++                    </SidebarMenuButton>
++                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
