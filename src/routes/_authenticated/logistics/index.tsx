@@ -45,8 +45,8 @@ function LogisticsDashboard() {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (data: { shipment_id: string; status: 'shipped' | 'delivered' | 'returned'; location?: string }) => 
-      updateShipmentStatus({ data }),
+    mutationFn: (data: { shipment_id: string; status: 'shipped' | 'delivered' | 'returned'; location?: string | null }) => 
+      updateShipmentStatus({ data: { ...data, location: data.location ?? undefined } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shipments"] });
       toast.success("Status de entrega atualizado!");
