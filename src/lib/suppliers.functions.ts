@@ -30,10 +30,10 @@ export const createSupplier = createServerFn({ method: "POST" })
   .validator((data: any) => z.object({
     tenant_id: z.string().uuid(),
     name: z.string().min(2, "Nome é obrigatório"),
-    tax_id: z.string().optional(),
-    email: z.string().email("E-mail inválido").optional().or(z.literal("")),
-    phone: z.string().optional(),
-    address: z.string().optional(),
+    tax_id: z.string().nullable().optional(),
+    email: z.string().email("E-mail inválido").nullable().optional().or(z.literal("")),
+    phone: z.string().nullable().optional(),
+    address: z.string().nullable().optional(),
   }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("suppliers").insert(data);
@@ -56,10 +56,10 @@ export const updateSupplier = createServerFn({ method: "POST" })
     id: z.string().uuid(),
     updates: z.object({
       name: z.string().min(2).optional(),
-      tax_id: z.string().optional(),
-      email: z.string().email().optional().or(z.literal("")),
-      phone: z.string().optional(),
-      address: z.string().optional(),
+      tax_id: z.string().nullable().optional(),
+      email: z.string().email().nullable().optional().or(z.literal("")),
+      phone: z.string().nullable().optional(),
+      address: z.string().nullable().optional(),
     }),
   }).parse(data))
   .handler(async ({ data, context }) => {
