@@ -3,27 +3,82 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
 
-// Schema Definitions
+// Customer Schemas
+const customerSchema = z.object({
+  name: z.string().min(2),
+  document: z.string().optional(),
+  email: z.string().email().optional().or(z.literal("")),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  tenant_id: z.string().uuid(),
+});
+
+// CRM Interaction & Opportunity Schemas
 const opportunitySchema = z.object({
   title: z.string().min(3),
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   customer_id: z.string().uuid(),
   company_id: z.string().uuid(),
   value: z.number().nonnegative(),
   stage: z.enum(['lead', 'qualification', 'proposal', 'negotiation', 'closed_won', 'closed_lost']),
   probability: z.number().min(0).max(100),
-  expected_closing_date: z.string().optional(),
-  assigned_to: z.string().uuid().optional(),
+  expected_closing_date: z.string().optional().nullable(),
+  assigned_to: z.string().uuid().optional().nullable(),
   tenant_id: z.string().uuid(),
 });
 
 const interactionSchema = z.object({
-  opportunity_id: z.string().uuid().optional(),
+  opportunity_id: z.string().uuid().optional().nullable(),
   customer_id: z.string().uuid(),
   type: z.enum(['call', 'email', 'meeting', 'note']),
   description: z.string().min(5),
   tenant_id: z.string().uuid(),
 });
+
+// Customer Functions
+export const getCustomers = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    search: z.string().optional(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    let query = context.supabase
+      .from("customers")
+      .select("*")
+      .order("name");
+
+    if (data.search) {
+      query = query.ilike("name", `%${data.search}%`);
+    }
+
+    const { data: customers, error } = await query;
+    if (error) throw error;
+    return customers;
+  });
+
+export const createCustomer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: unknown) => customerSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: customer, error } = await context.supabase
+      .from("customers")
+      .insert(data)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    await logAudit(context.supabase, {
+      tenant_id: data.tenant_id,
+      user_id: context.userId,
+      action: 'insert',
+      entity_name: 'customers',
+      entity_id: customer.id,
+      new_data: data
+    });
+
+    return customer;
+  });
 
 // Opportunities Functions
 export const getOpportunities = createServerFn({ method: "GET" })
@@ -44,7 +99,12 @@ export const createOpportunity = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: opportunity, error } = await context.supabase
       .from("crm_opportunities")
-      .insert(data)
+      .insert({
+        ...data,
+        description: data.description || null,
+        expected_closing_date: data.expected_closing_date || null,
+        assigned_to: data.assigned_to || null,
+      })
       .select()
       .single();
 
@@ -116,10 +176,12 @@ export const createInteraction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => interactionSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const typedData = interactionSchema.parse(data);
     const { data: interaction, error } = await context.supabase
       .from("crm_interactions")
       .insert({
-        ...data,
+        ...typedData,
+        opportunity_id: typedData.opportunity_id || null,
         performed_by: context.userId
       })
       .select()
