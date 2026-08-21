@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import React, { Suspense, useState, useEffect } from "react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getWebhookSubscriptions } from "@/lib/webhooks.functions";
-import { simulateWebhook, getWebhookLogs } from "@/lib/webhook-simulation.functions";
+import { simulateWebhook, getWebhookLogs, resendWebhook } from "@/lib/webhook-simulation.functions";
 
 const SwaggerUI = React.lazy(() => import("swagger-ui-react"));
 import "swagger-ui-react/swagger-ui.css";
@@ -307,6 +307,21 @@ function WebhookSimulator() {
     }
   });
 
+  const resendMutation = useMutation({
+    mutationFn: (logId: string) => resendWebhook({ data: { log_id: logId } }),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Webhook reenviado com sucesso!");
+      } else {
+        toast.error(`Falha no reenvio: Status ${data.status}`);
+      }
+      refetchLogs();
+    },
+    onError: (err: any) => {
+      toast.error("Erro ao reenviar: " + err.message);
+    }
+  });
+
   const handleSimulate = () => {
     if (!selectedSub) {
       toast.error("Selecione um endpoint");
@@ -411,9 +426,23 @@ function WebhookSimulator() {
                         )}
                         <span className="text-xs font-mono font-bold uppercase">{log.event_type}</span>
                       </div>
-                      <Badge variant={log.is_success ? "outline" : "destructive"} className="text-[10px]">
-                        HTTP {log.response_status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={log.is_success ? "outline" : "destructive"} className="text-[10px]">
+                          HTTP {log.response_status}
+                        </Badge>
+                        {!log.is_success && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 text-muted-foreground hover:text-primary"
+                            onClick={() => resendMutation.mutate(log.id)}
+                            disabled={resendMutation.isPending}
+                            title="Reenviar agora"
+                          >
+                            <RefreshCw className={`h-3 w-3 ${resendMutation.isPending ? 'animate-spin' : ''}`} />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="text-[10px] text-muted-foreground">
                       {new Date(log.created_at).toLocaleString()}

@@ -99,3 +99,93 @@ export const getWebhookLogs = createServerFn({ method: "GET" })
     if (error) throw error;
     return data;
   });
+
+export const resendWebhook = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({
+    log_id: z.string().uuid(),
+  }).parse(data))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data: input, context }) => {
+    const { log_id } = input;
+    const { supabase } = context;
+
+    // 1. Get the original log entry
+    const { data: log, error: logError } = await supabase
+      .from("webhook_logs")
+      .select("*")
+      .eq("id", log_id)
+      .single();
+
+    if (logError || !log) {
+      throw new Error("Log de webhook não encontrado");
+    }
+
+    if (!log.subscription_id) {
+      throw new Error("Log não possui um ID de assinatura válido");
+    }
+
+    // 2. Get the current subscription details
+    const { data: sub, error: subError } = await supabase
+      .from("webhook_subscriptions")
+      .select("target_url, secret")
+      .eq("id", log.subscription_id)
+      .single();
+
+    if (subError || !sub) {
+      throw new Error("Assinatura de webhook original não encontrada ou removida");
+    }
+
+    // 3. Perform the retry request
+    let status = 0;
+    let responseBody = "";
+    let success = false;
+
+    try {
+      const response = await fetch(sub.target_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-webhook-event": log.event_type,
+          "x-webhook-signature": sub.secret || "", // Use real secret if available, or HMAC logic
+          "x-webhook-retry": "true",
+          "x-original-log-id": log_id
+        },
+        body: JSON.stringify({
+          event: log.event_type,
+          payload: log.payload,
+          timestamp: new Date().toISOString(),
+          retry: true
+        }),
+      });
+
+      status = response.status;
+      responseBody = await response.text();
+      success = response.ok;
+    } catch (err: any) {
+      status = 500;
+      responseBody = err.message || "Falha na conexão ao reenviar";
+      success = false;
+    }
+
+    // 4. Create a NEW log entry for the retry
+    const { data: newLog } = await supabase
+      .from("webhook_logs")
+      .insert({
+        tenant_id: log.tenant_id,
+        subscription_id: log.subscription_id,
+        event_type: log.event_type,
+        target_url: sub.target_url,
+        payload: log.payload,
+        response_status: status,
+        response_body: responseBody.substring(0, 1000),
+        is_success: success
+      })
+      .select()
+      .single();
+
+    return {
+      success,
+      status,
+      log_id: newLog?.id
+    };
+  });
