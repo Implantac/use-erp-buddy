@@ -278,3 +278,55 @@ function Dashboard() {
     </div>
   );
 }
+
+function NotificationsPanel() {
+  const queryClient = useQueryClient();
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => getNotifications(),
+  });
+
+  const markRead = useMutation({
+    mutationFn: (id: string) => markNotificationRead({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  if (isLoading) return <div className="py-8 text-center text-muted-foreground">Carregando...</div>;
+  if (!notifications?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-lg">
+        <BellOff className="h-8 w-8 mb-2 opacity-20" />
+        <p>Sem notificações no momento.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-[400px] overflow-auto pr-2">
+      {notifications.map((n: any) => (
+        <div 
+          key={n.id} 
+          className={`p-3 rounded-lg border flex justify-between items-start gap-3 transition-colors ${n.is_read ? 'bg-background opacity-60' : 'bg-primary/5 border-primary/10'}`}
+        >
+          <div className="space-y-1">
+            <p className="text-sm font-semibold">{n.title}</p>
+            <p className="text-xs text-muted-foreground">{n.message}</p>
+            <p className="text-[10px] text-muted-foreground/60">{new Date(n.created_at).toLocaleString()}</p>
+          </div>
+          {!n.is_read && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7 text-xs"
+              onClick={() => markRead.mutate(n.id)}
+            >
+              Lida
+            </Button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
