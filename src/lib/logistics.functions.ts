@@ -16,7 +16,7 @@ const createShipmentSchema = z.object({
 const updateShipmentStatusSchema = z.object({
   shipment_id: z.string().uuid(),
   status: z.enum(['pending', 'shipped', 'delivered', 'returned']),
-  location: z.string().optional(),
+  location: z.string().optional().nullable(),
   notes: z.string().optional(),
 });
 
