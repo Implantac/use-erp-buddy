@@ -68,10 +68,11 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
   const form = useForm<SaleFormValues>({
     resolver: zodResolver(saleSchema),
     defaultValues: {
-      customer_id: "",
+      customer_id: "none",
       items: [{ product_id: "", quantity: 1, unit_price: 0 }],
       discount_amount: 0,
     },
+
   });
 
   const { watch, setValue } = form;
@@ -93,12 +94,13 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
     if (product) {
       const newItems = [...items];
       newItems[index] = {
-        ...newItems[index],
         product_id: productId,
+        quantity: newItems[index].quantity,
         unit_price: product.price || 0,
       };
       setValue("items", newItems);
     }
+
   };
 
   const total = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
@@ -111,11 +113,12 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
       await createSale({
         data: {
           tenant_id: tenantId,
-          customer_id: values.customer_id || undefined,
+          customer_id: values.customer_id === "none" ? undefined : (values.customer_id || undefined),
           items: values.items,
           discount_amount: values.discount_amount,
         },
       });
+
       toast.success("Venda registrada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["sales"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -153,7 +156,7 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Cliente</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || "none"}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o cliente (Opcional)" />
@@ -170,6 +173,7 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                 </FormItem>
               )}
             />
+
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
