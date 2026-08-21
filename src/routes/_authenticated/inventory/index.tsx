@@ -201,7 +201,8 @@ function InventoryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unidade</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value ?? undefined}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+
 
 
                         <FormControl>
@@ -227,7 +228,8 @@ function InventoryPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value ?? undefined}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Tipo" />
@@ -265,7 +267,8 @@ function InventoryPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Unidade de Destino</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value ?? undefined}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+
 
                           <FormControl>
                             <SelectTrigger>
