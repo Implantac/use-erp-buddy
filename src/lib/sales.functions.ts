@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
+import { triggerWebhook } from "./webhooks.server";
 
 
 const getSalesSchema = z.object({
@@ -128,6 +129,14 @@ export const createSale = createServerFn({ method: "POST" })
       entity_name: 'sales',
       entity_id: saleId,
       new_data: { total_amount, final_amount, items_count: data.items.length }
+    });
+    
+    // 6. Trigger Webhook
+    await triggerWebhook(context.supabase, data.tenant_id, "sale.created", {
+      saleId,
+      total_amount,
+      final_amount,
+      customer_id: data.customer_id
     });
 
 
