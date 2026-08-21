@@ -185,6 +185,12 @@ function SettingsPage() {
                 <CardTitle>Chaves de API</CardTitle>
                 <CardDescription>
                   Use estas chaves para integrar sistemas externos ao ERP.
+                  <Button variant="link" size="sm" className="p-0 h-auto flex items-center gap-1 mt-1 text-primary" asChild>
+                    <a href="/settings/docs">
+                      <ExternalLink className="h-3 w-3" />
+                      Ver documentação da API
+                    </a>
+                  </Button>
                 </CardDescription>
               </div>
               <CreateApiKeyDialog tenantId={tenant?.id} onCreated={() => queryClient.invalidateQueries({ queryKey: ["api-keys"] })} />
