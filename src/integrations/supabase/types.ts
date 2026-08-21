@@ -804,29 +804,49 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          company_id: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           tenant_id: string
+          unit_id: string | null
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           tenant_id: string
+          unit_id?: string | null
           user_id: string
         }
         Update: {
+          company_id?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           tenant_id?: string
+          unit_id?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_roles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_roles_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -937,6 +957,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_access: {
+        Args: { _company_id?: string; _unit_id?: string; _user_id: string }
+        Returns: boolean
+      }
       get_low_stock_count: { Args: { _tenant_id: string }; Returns: number }
       has_role: {
         Args: {
