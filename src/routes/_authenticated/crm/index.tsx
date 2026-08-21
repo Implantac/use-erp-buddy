@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus, Search, Edit } from "lucide-react";
+import { Search, Edit } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { CreateCustomerDialog } from "@/components/crm/create-customer-dialog";
+import { getProfile } from "@/lib/settings.functions";
+
 
 export const Route = createFileRoute("/_authenticated/crm/")({
   component: CRMPage,
@@ -21,6 +24,13 @@ function CRMPage() {
     queryFn: () => getCustomers({ data: { search } }),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfile(undefined),
+  });
+
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -28,11 +38,9 @@ function CRMPage() {
           <h1 className="text-3xl font-bold tracking-tight">Clientes (CRM)</h1>
           <p className="text-muted-foreground">Gestão de relacionamento e base de clientes.</p>
         </div>
-        <Button className="gap-2">
-          <UserPlus className="h-4 w-4" />
-          Novo Cliente
-        </Button>
+        {tenantId && <CreateCustomerDialog tenantId={tenantId} />}
       </div>
+
 
       <Card>
         <CardHeader>

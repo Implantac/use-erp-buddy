@@ -4,8 +4,11 @@ import { getSales } from "@/lib/sales.functions";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingCart, Plus, Receipt } from "lucide-react";
+import { ShoppingCart, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { CreateSaleDialog } from "@/components/sales/create-sale-dialog";
+import { getProfile } from "@/lib/settings.functions";
+
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -19,6 +22,13 @@ function SalesPage() {
     queryFn: () => getSales({ data: { limit: 50 } }),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfile(undefined),
+  });
+
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -26,11 +36,9 @@ function SalesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Vendas</h1>
           <p className="text-muted-foreground">Histórico de pedidos e faturamento comercial.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Venda
-        </Button>
+        {tenantId && <CreateSaleDialog tenantId={tenantId} />}
       </div>
+
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
