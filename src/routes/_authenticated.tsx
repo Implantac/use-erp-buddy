@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -88,6 +88,38 @@ function AuthenticatedLayout() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+              <SidebarGroupLabel>RH & Colaboradores</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/hr" className="flex w-full items-center gap-2">
+                        <Users2 className="h-4 w-4" />
+                        <span>Gestão de Colaboradores</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/hr" search={{ tab: 'payroll' }} className="flex w-full items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        <span>Folha de Pagamento</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/hr" search={{ tab: 'positions' }} className="flex w-full items-center gap-2">
+                        <Briefcase className="h-4 w-4" />
+                        <span>Cargos & Estrutura</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedHrRouteImport } from './routes/_authenticated/hr'
 import { Route as AuthenticatedProductionRouteImport } from './routes/_authenticated/production'
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
@@ -60,6 +61,11 @@ const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHrRoute = AuthenticatedHrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedProductionRoute = AuthenticatedProductionRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/hr': typeof AuthenticatedHrRoute
   '/production': typeof AuthenticatedProductionRoute
   '/units': typeof AuthenticatedUnitsRouteWithChildren
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/hr': typeof AuthenticatedHrRoute
   '/production': typeof AuthenticatedProductionRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth': typeof AuthIndexRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/_authenticated/companies': typeof AuthenticatedCompaniesRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/hr': typeof AuthenticatedHrRoute
   '/_authenticated/production': typeof AuthenticatedProductionRoute
   '/_authenticated/units': typeof AuthenticatedUnitsRouteWithChildren
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/companies'
     | '/dashboard'
+    | '/hr'
     | '/production'
     | '/units'
     | '/auth/reset-password'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/hr'
     | '/production'
     | '/auth/reset-password'
     | '/auth'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/companies'
     | '/_authenticated/dashboard'
+    | '/_authenticated/hr'
     | '/_authenticated/production'
     | '/_authenticated/units'
     | '/auth/reset-password'
@@ -406,6 +418,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/hr': {
+      id: '/_authenticated/hr'
+      path: '/hr'
+      fullPath: '/hr'
+      preLoaderRoute: typeof AuthenticatedHrRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/production': {
@@ -608,6 +627,7 @@ const AuthenticatedUnitsRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHrRoute: typeof AuthenticatedHrRoute
   AuthenticatedProductionRoute: typeof AuthenticatedProductionRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
   AuthenticatedSettingsDocsRoute: typeof AuthenticatedSettingsDocsRoute
@@ -626,6 +646,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHrRoute: AuthenticatedHrRoute,
   AuthenticatedProductionRoute: AuthenticatedProductionRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
   AuthenticatedSettingsDocsRoute: AuthenticatedSettingsDocsRoute,

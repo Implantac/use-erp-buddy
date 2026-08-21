@@ -282,6 +282,129 @@ export type Database = {
           },
         ]
       }
+      departments: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          department_id: string | null
+          document_number: string | null
+          email: string | null
+          full_name: string
+          hire_date: string
+          id: string
+          job_position_id: string | null
+          phone: string | null
+          profile_id: string | null
+          salary: number
+          status: string
+          tenant_id: string
+          termination_date: string | null
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          document_number?: string | null
+          email?: string | null
+          full_name: string
+          hire_date?: string
+          id?: string
+          job_position_id?: string | null
+          phone?: string | null
+          profile_id?: string | null
+          salary?: number
+          status?: string
+          tenant_id: string
+          termination_date?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          department_id?: string | null
+          document_number?: string | null
+          email?: string | null
+          full_name?: string
+          hire_date?: string
+          id?: string
+          job_position_id?: string | null
+          phone?: string | null
+          profile_id?: string | null
+          salary?: number
+          status?: string
+          tenant_id?: string
+          termination_date?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_job_position_id_fkey"
+            columns: ["job_position_id"]
+            isOneToOne: false
+            referencedRelation: "job_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formula_items: {
         Row: {
           component_product_id: string
@@ -389,6 +512,44 @@ export type Database = {
           },
         ]
       }
+      job_positions: {
+        Row: {
+          base_salary: number | null
+          created_at: string | null
+          department_id: string | null
+          id: string
+          tenant_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          base_salary?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          id?: string
+          tenant_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          base_salary?: number | null
+          created_at?: string | null
+          department_id?: string | null
+          id?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_positions_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_groups: {
         Row: {
           created_at: string
@@ -417,6 +578,69 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_records: {
+        Row: {
+          additions: number | null
+          base_salary: number
+          created_at: string | null
+          deductions: number | null
+          employee_id: string
+          id: string
+          net_salary: number
+          paid_at: string | null
+          period_month: number
+          period_year: number
+          status: string
+          tenant_id: string
+          transaction_id: string | null
+        }
+        Insert: {
+          additions?: number | null
+          base_salary: number
+          created_at?: string | null
+          deductions?: number | null
+          employee_id: string
+          id?: string
+          net_salary: number
+          paid_at?: string | null
+          period_month: number
+          period_year: number
+          status?: string
+          tenant_id: string
+          transaction_id?: string | null
+        }
+        Update: {
+          additions?: number | null
+          base_salary?: number
+          created_at?: string | null
+          deductions?: number | null
+          employee_id?: string
+          id?: string
+          net_salary?: number
+          paid_at?: string | null
+          period_month?: number
+          period_year?: number
+          status?: string
+          tenant_id?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payroll_records_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]
