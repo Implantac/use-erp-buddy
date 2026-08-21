@@ -35,7 +35,22 @@ export const createSale = createServerFn({ method: "POST" })
     discount_amount: z.number().default(0),
   }).parse(data))
   .handler(async ({ data, context }) => {
+    // 0. Validate Stock Availability
+    for (const item of data.items) {
+      const { data: product, error: stockError } = await context.supabase
+        .from("products")
+        .select("name, stock_quantity")
+        .eq("id", item.product_id)
+        .single();
+      
+      if (stockError || !product) throw new Error(`Produto não encontrado.`);
+      if ((product as any).stock_quantity < item.quantity) {
+        throw new Error(`Estoque insuficiente para o produto: ${product.name}. Disponível: ${(product as any).stock_quantity}`);
+      }
+    }
+
     const total_amount = data.items.reduce((sum: number, item: any) => sum + (item.quantity * item.unit_price), 0);
+
     const final_amount = total_amount - data.discount_amount;
 
     // 1. Create Sale Header
@@ -118,3 +133,17 @@ export const createSale = createServerFn({ method: "POST" })
 
     return { success: true, saleId };
   });
+
+export const getSaleItems = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { saleId: string }) => z.object({ saleId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: items, error } = await context.supabase
+      .from("sale_items" as any)
+      .select("*, products(name)")
+      .eq("sale_id", data.saleId);
+
+    if (error) throw error;
+    return items as any[];
+  });
+

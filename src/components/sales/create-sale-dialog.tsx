@@ -110,7 +110,17 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
   const finalTotal = total - discount;
 
   const onSubmit: SubmitHandler<SaleFormValues> = async (values) => {
+    // Client-side stock check
+    for (const item of values.items) {
+      const product = productsData?.products?.find(p => p.id === item.product_id);
+      if (product && (product.stock_quantity || 0) < item.quantity) {
+        toast.error(`Estoque insuficiente para ${product.name}. Disponível: ${product.stock_quantity || 0}`);
+        return;
+      }
+    }
+
     try {
+
       setLoading(true);
       await createSale({
         data: {
@@ -196,8 +206,11 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                       </SelectTrigger>
                       <SelectContent>
                         {productsData?.products?.map((p) => (
-                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          <SelectItem key={p.id} value={p.id} disabled={(p.stock_quantity || 0) <= 0}>
+                            {p.name} ({p.stock_quantity || 0} {p.unit_of_measure || 'un'}) - {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.price || 0)}
+                          </SelectItem>
                         ))}
+
                       </SelectContent>
                     </Select>
                   </div>
