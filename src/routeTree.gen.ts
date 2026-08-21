@@ -28,6 +28,7 @@ import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedSettingsDocsRouteImport } from './routes/_authenticated/settings/docs'
 import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authenticated/team/index'
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
@@ -136,6 +137,12 @@ const AuthenticatedSettingsIndexRoute =
     path: '/settings/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedSettingsDocsRoute =
+  AuthenticatedSettingsDocsRouteImport.update({
+    id: '/settings/docs',
+    path: '/settings/docs',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedTeamIndexRoute = AuthenticatedTeamIndexRouteImport.update({
   id: '/team/',
   path: '/team/',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/api/public/products': typeof ApiPublicProductsRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
   '/api/public/products': typeof ApiPublicProductsRoute
@@ -222,6 +231,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_authenticated/companies/$companyId': typeof AuthenticatedCompaniesCompanyIdRoute
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
+  '/_authenticated/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
   '/api/public/products': typeof ApiPublicProductsRoute
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
     | '/api/public/products'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/companies/$companyId'
     | '/companies/new'
+    | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
     | '/api/public/products'
@@ -297,6 +309,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_authenticated/companies/$companyId'
     | '/_authenticated/companies/new'
+    | '/_authenticated/settings/docs'
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
     | '/api/public/products'
@@ -455,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/settings/docs': {
+      id: '/_authenticated/settings/docs'
+      path: '/settings/docs'
+      fullPath: '/settings/docs'
+      preLoaderRoute: typeof AuthenticatedSettingsDocsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/team/': {
       id: '/_authenticated/team/'
       path: '/team'
@@ -530,6 +550,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
+  AuthenticatedSettingsDocsRoute: typeof AuthenticatedSettingsDocsRoute
   AuthenticatedAuditIndexRoute: typeof AuthenticatedAuditIndexRoute
   AuthenticatedCrmIndexRoute: typeof AuthenticatedCrmIndexRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
@@ -545,6 +566,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
+  AuthenticatedSettingsDocsRoute: AuthenticatedSettingsDocsRoute,
   AuthenticatedAuditIndexRoute: AuthenticatedAuditIndexRoute,
   AuthenticatedCrmIndexRoute: AuthenticatedCrmIndexRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,

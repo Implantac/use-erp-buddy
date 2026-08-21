@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus } from "lucide-react";
+import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus, ExternalLink } from "lucide-react";
 import { getApiKeys, createApiKey, revokeApiKey } from "@/lib/api-keys.functions";
 import { getWebhookSubscriptions, createWebhookSubscription, deleteWebhookSubscription } from "@/lib/webhooks.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
