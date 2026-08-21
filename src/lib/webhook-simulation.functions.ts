@@ -110,9 +110,9 @@ export const getWebhookLogs = createServerFn({ method: "GET" })
     }
     
     if (input.search) {
-      // Search in event_type, target_url, or response_body (which often contains parts of payload errors)
-      // For true JSONB payload search in Supabase we would need specific operators, 
-      // but for general text finding, this OR filter on text columns is highly effective.
+      // Search in event_type, target_url, and response_body.
+      // Searching inside JSONB 'payload' column via 'or' in PostgREST is complex 
+      // without computed columns or RPC, so we focus on the most relevant text fields.
       query = query.or(`event_type.ilike.%${input.search}%,target_url.ilike.%${input.search}%,response_body.ilike.%${input.search}%`);
     }
 
