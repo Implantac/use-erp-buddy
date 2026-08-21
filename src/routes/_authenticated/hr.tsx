@@ -7,13 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building } from "lucide-react";
+import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { z } from "zod";
 
 const hrSearchSchema = z.object({
-  tab: z.enum(['employees', 'payroll', 'positions']).catch('employees'),
+  tab: z.enum(['employees', 'payroll', 'positions', 'recruitment']).catch('employees'),
 });
 
 export const Route = createFileRoute("/_authenticated/hr")({
@@ -143,6 +143,9 @@ function HRPage() {
           </TabsTrigger>
           <TabsTrigger value="positions" className="gap-2">
             <Briefcase className="h-4 w-4" /> Cargos & Estrutura
+          </TabsTrigger>
+          <TabsTrigger value="recruitment" className="gap-2">
+            <BriefcaseBusiness className="h-4 w-4" /> Recrutamento
           </TabsTrigger>
         </TabsList>
 
@@ -283,6 +286,28 @@ function HRPage() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+        <TabsContent value="recruitment">
+          <Card>
+            <CardHeader>
+              <CardTitle>Processos Seletivos</CardTitle>
+              <CardDescription>Acompanhe e gerencie as vagas abertas e candidatos.</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[400px] flex flex-col items-center justify-center text-center space-y-4">
+              <div className="p-4 rounded-full bg-primary/10">
+                <BriefcaseBusiness className="h-10 w-10 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Módulo de Recrutamento</h3>
+                <p className="text-muted-foreground max-w-sm">
+                  Em breve você poderá gerenciar vagas, currículos e entrevistas diretamente por aqui.
+                </p>
+              </div>
+              <Button variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" /> Criar Primeira Vaga
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
