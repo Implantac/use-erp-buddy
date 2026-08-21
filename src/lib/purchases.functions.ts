@@ -110,6 +110,9 @@ export const approvePurchaseOrder = createServerFn({ method: "POST" })
       new_data: { status: 'pending', approved_by: context.userId }
     });
 
+    // Evaluate Automation Rules
+    await evaluateRules("purchase_orders", "UPDATE", { ...order, status: 'pending' }, order.tenant_id);
+
 
     return { success: true };
   });
