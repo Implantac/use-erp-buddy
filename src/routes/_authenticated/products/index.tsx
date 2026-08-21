@@ -80,8 +80,8 @@ function ProductsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {product.stock_quantity}
-                          {product.stock_quantity <= (product as any).min_stock && (
+                          {product.stock_quantity ?? 0}
+                          {(product.stock_quantity ?? 0) <= ((product as any).min_stock ?? 0) && (
                             <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
                               Baixo
                             </Badge>
