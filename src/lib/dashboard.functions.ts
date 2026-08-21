@@ -4,6 +4,16 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const getDashboardStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    // Get profile to get the tenant_id
+    const { data: profile } = await context.supabase
+      .from("user_roles")
+      .select("tenant_id")
+      .eq("user_id", context.userId)
+      .limit(1)
+      .single();
+
+    const tid = profile?.tenant_id;
+
     // Busca contagens e saldos em paralelo
     const [companiesRes, unitsRes, groupsRes, teamRes, financeRes, stockAlertsRes] = await Promise.all([
       context.supabase.from("companies").select("*", { count: "exact", head: true }),
@@ -11,7 +21,7 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       context.supabase.from("organization_groups").select("*", { count: "exact", head: true }),
       context.supabase.from("user_roles").select("*", { count: "exact", head: true }),
       context.supabase.from("transactions").select("type, amount"),
-      context.supabase.rpc('get_low_stock_count'),
+      tid ? context.supabase.rpc('get_low_stock_count', { _tenant_id: tid }) : Promise.resolve({ data: 0, error: null }),
     ]);
 
     const summary = (financeRes.data || []).reduce((acc, curr) => {
@@ -30,6 +40,6 @@ export const getDashboardStats = createServerFn({ method: "GET" })
         income: summary.income,
         expense: summary.expense,
       },
-      stockAlerts: stockAlertsRes.data || 0
+      stockAlerts: (stockAlertsRes as any).data || 0
     };
   });
