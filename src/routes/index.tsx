@@ -1,3 +1,8 @@
+/**
+ * Status do Projeto: Fase 16 - Consolidação & RH Estratégico
+ * Implementado: Recrutamento & Seleção (Módulo RH), Relatórios Avançados por Módulo,
+ * Refinamento de Produtos V2 (Brand, Dimensões, SKU, Barcode).
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
