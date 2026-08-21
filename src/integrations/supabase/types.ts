@@ -64,6 +64,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
+          company_id: string | null
           created_at: string
           entity_id: string
           entity_name: string
@@ -71,10 +72,12 @@ export type Database = {
           new_data: Json | null
           old_data: Json | null
           tenant_id: string
+          unit_id: string | null
           user_id: string | null
         }
         Insert: {
           action: string
+          company_id?: string | null
           created_at?: string
           entity_id: string
           entity_name: string
@@ -82,10 +85,12 @@ export type Database = {
           new_data?: Json | null
           old_data?: Json | null
           tenant_id: string
+          unit_id?: string | null
           user_id?: string | null
         }
         Update: {
           action?: string
+          company_id?: string | null
           created_at?: string
           entity_id?: string
           entity_name?: string
@@ -93,14 +98,29 @@ export type Database = {
           new_data?: Json | null
           old_data?: Json | null
           tenant_id?: string
+          unit_id?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "audit_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "audit_logs_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_logs_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]

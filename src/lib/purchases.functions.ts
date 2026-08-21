@@ -103,11 +103,12 @@ export const approvePurchaseOrder = createServerFn({ method: "POST" })
     await logAudit(context.supabase, {
       tenant_id: order.tenant_id,
       user_id: context.userId,
-      action: 'update',
+      action: 'approve',
       entity_name: 'purchase_orders',
       entity_id: data.order_id,
       new_data: { status: 'pending', approved_by: context.userId }
     });
+
 
     return { success: true };
   });
