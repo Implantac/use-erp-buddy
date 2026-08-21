@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSuppliers } from "@/lib/suppliers.functions";
-import { getPurchaseOrders, receivePurchaseOrder } from "@/lib/purchases.functions";
+import { getPurchaseOrders, receivePurchaseOrder, approvePurchaseOrder } from "@/lib/purchases.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -70,6 +70,18 @@ function PurchasesDashboard() {
     }
   });
 
+  const approveMutation = useMutation({
+    mutationFn: (orderId: string) => approvePurchaseOrder({ data: { order_id: orderId } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase-orders"] });
+      toast.success("Ordem de compra aprovada!");
+    },
+    onError: (err: any) => {
+      toast.error("Erro ao aprovar: " + err.message);
+    }
+  });
+
+
 
   const { data: suppliers, isLoading: loadingSuppliers } = useQuery({
     queryKey: ["suppliers", search],
@@ -78,14 +90,17 @@ function PurchasesDashboard() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'waiting_approval':
+        return <Badge variant="outline" className="text-yellow-500 border-yellow-500/20 gap-1"><Clock className="h-3 w-3" /> Aguardando Aprovação</Badge>;
       case 'received':
         return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 gap-1"><CheckCircle2 className="h-3 w-3" /> Recebido</Badge>;
       case 'cancelled':
         return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" /> Cancelado</Badge>;
       default:
-        return <Badge variant="secondary" className="gap-1"><Clock className="h-3 w-3" /> Pendente</Badge>;
+        return <Badge variant="secondary" className="gap-1"><Truck className="h-3 w-3" /> Pendente / Enviado</Badge>;
     }
   };
+
 
   return (
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
@@ -110,8 +125,20 @@ function PurchasesDashboard() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ordens Pendentes</CardTitle>
-            <Clock className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Aguardando Aprovação</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {orders?.filter(o => o.status === 'waiting_approval').length || 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Pendentes / Em Trânsito</CardTitle>
+            <Truck className="h-4 w-4 text-orange-500" />
+
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -200,6 +227,14 @@ function PurchasesDashboard() {
                               <DropdownMenuItem className="gap-2">
                                 <FileText className="h-4 w-4" /> Ver Detalhes
                               </DropdownMenuItem>
+                              {order.status === 'waiting_approval' && (
+                                <DropdownMenuItem 
+                                  className="gap-2 text-primary focus:text-primary"
+                                  onClick={() => approveMutation.mutate(order.id)}
+                                >
+                                  <CheckCircle2 className="h-4 w-4" /> Aprovar Ordem
+                                </DropdownMenuItem>
+                              )}
                               {order.status === 'pending' && (
                                 <DropdownMenuItem 
                                   className="gap-2 text-green-600 focus:text-green-600"
@@ -208,6 +243,7 @@ function PurchasesDashboard() {
                                   <Receipt className="h-4 w-4" /> Confirmar Recebimento
                                 </DropdownMenuItem>
                               )}
+
 
                             </DropdownMenuContent>
                           </DropdownMenu>
