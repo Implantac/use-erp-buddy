@@ -53,6 +53,8 @@ export const createProduct = createServerFn({ method: "POST" })
     price: z.number().min(0, "Preço não pode ser negativo").nullable().optional(),
     cost_price: z.number().min(0, "Preço de custo não pode ser negativo").nullable().optional(),
     stock_quantity: z.number().int().min(0, "Estoque não pode ser negativo").nullable().optional(),
+    min_stock: z.number().min(0).optional(),
+    unit_of_measure: z.string().optional(),
     category_id: z.string().uuid().nullable().optional(),
     image_url: z.string().url("URL de imagem inválida").nullable().optional().or(z.literal("")),
     tenant_id: z.string().uuid(),
