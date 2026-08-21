@@ -41,7 +41,7 @@ const productSchema = z.object({
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
   stock_quantity: z.coerce.number().int().min(0, "O estoque deve ser maior ou igual a zero"),
   min_stock: z.coerce.number().min(0, "O estoque mínimo deve ser maior ou igual a zero").optional(),
-  unit_of_measure: z.string().optional(),
+  unit_of_measure: z.string().min(1, "Selecione a unidade"),
   category_id: z.string().uuid("Selecione uma categoria"),
   description: z.string().optional().nullable(),
 });
