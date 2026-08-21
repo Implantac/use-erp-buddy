@@ -497,3 +497,37 @@ function CreateWebhookDialog({ tenantId, onCreated }: { tenantId?: string, onCre
   );
 }
 
+
+function AutomationsList() {
+  const { data: rules } = useSuspenseQuery({
+    queryKey: ["automation-rules"],
+    queryFn: () => getAutomationRules(),
+  });
+
+  if (!rules?.length) return <div className="py-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">Nenhuma regra de automação.</div>;
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Evento</TableHead>
+          <TableHead>Ação</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rules.map((rule: any) => (
+          <TableRow key={rule.id}>
+            <TableCell className="font-medium">{rule.name}</TableCell>
+            <TableCell>{rule.event_type}</TableCell>
+            <TableCell>{rule.action_type}</TableCell>
+            <TableCell><Badge variant={rule.is_active ? "default" : "secondary"}>{rule.is_active ? "Ativo" : "Inativo"}</Badge></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+import { getAutomationRules } from "@/lib/automations.functions";
