@@ -174,3 +174,52 @@ export const generatePayroll = createServerFn({ method: "POST" })
 
     return record;
   });
+
+export const getJobVacancies = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("job_vacancies")
+      .select("*, companies(name), units(name)")
+      .order("created_at", { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  });
+
+export const createJobVacancy = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    title: z.string().min(3),
+    description: z.string().optional(),
+    requirements: z.string().optional(),
+    salary_range: z.string().optional(),
+    company_id: z.string().uuid().optional(),
+    unit_id: z.string().uuid().optional(),
+    tenant_id: z.string().uuid(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("job_vacancies").insert(data);
+    if (error) throw error;
+    return { success: true };
+  });
+
+export const getCandidates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: { vacancyId?: string } | undefined) => z.object({
+    vacancyId: z.string().uuid().optional(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    let query = context.supabase
+      .from("job_candidates")
+      .select("*, job_vacancies(title)")
+      .order("created_at", { ascending: false });
+    
+    if (data.vacancyId) {
+      query = query.eq("vacancy_id", data.vacancyId);
+    }
+    
+    const { data: candidates, error } = await query;
+    if (error) throw error;
+    return candidates;
+  });
