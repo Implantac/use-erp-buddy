@@ -149,6 +149,39 @@ export type Database = {
         }
         Relationships: []
       }
+      carriers: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          tax_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          tax_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          tax_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           active: boolean | null
@@ -278,6 +311,44 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          shipment_id: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          shipment_id?: string | null
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          shipment_id?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_logs_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
@@ -1049,6 +1120,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shipments: {
+        Row: {
+          carrier_id: string | null
+          created_at: string | null
+          delivered_at: string | null
+          estimated_delivery: string | null
+          id: string
+          sale_id: string
+          shipped_at: string | null
+          shipping_method_id: string | null
+          status: string
+          tenant_id: string
+          tracking_code: string | null
+        }
+        Insert: {
+          carrier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          estimated_delivery?: string | null
+          id?: string
+          sale_id: string
+          shipped_at?: string | null
+          shipping_method_id?: string | null
+          status?: string
+          tenant_id: string
+          tracking_code?: string | null
+        }
+        Update: {
+          carrier_id?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          estimated_delivery?: string | null
+          id?: string
+          sale_id?: string
+          shipped_at?: string | null
+          shipping_method_id?: string | null
+          status?: string
+          tenant_id?: string
+          tracking_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_carrier_id_fkey"
+            columns: ["carrier_id"]
+            isOneToOne: false
+            referencedRelation: "carriers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_shipping_method_id_fkey"
+            columns: ["shipping_method_id"]
+            isOneToOne: false
+            referencedRelation: "shipping_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipping_methods: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          description: string | null
+          estimated_days: number | null
+          id: string
+          name: string
+          tenant_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          estimated_days?: number | null
+          id?: string
+          name: string
+          tenant_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          estimated_days?: number | null
+          id?: string
+          name?: string
+          tenant_id?: string
+        }
+        Relationships: []
       }
       suppliers: {
         Row: {

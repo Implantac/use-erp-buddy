@@ -27,6 +27,7 @@ import { Route as AuthenticatedCrmIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedFinanceIndexRouteImport } from './routes/_authenticated/finance/index'
 import { Route as AuthenticatedGroupsIndexRouteImport } from './routes/_authenticated/groups/index'
 import { Route as AuthenticatedInventoryIndexRouteImport } from './routes/_authenticated/inventory/index'
+import { Route as AuthenticatedLogisticsIndexRouteImport } from './routes/_authenticated/logistics/index'
 import { Route as AuthenticatedProductsIndexRouteImport } from './routes/_authenticated/products/index'
 import { Route as AuthenticatedPurchasesIndexRouteImport } from './routes/_authenticated/purchases/index'
 import { Route as AuthenticatedSalesIndexRouteImport } from './routes/_authenticated/sales/index'
@@ -134,6 +135,12 @@ const AuthenticatedInventoryIndexRoute =
     path: '/inventory/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedLogisticsIndexRoute =
+  AuthenticatedLogisticsIndexRouteImport.update({
+    id: '/logistics/',
+    path: '/logistics/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedProductsIndexRoute =
   AuthenticatedProductsIndexRouteImport.update({
     id: '/products/',
@@ -218,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/finance/': typeof AuthenticatedFinanceIndexRoute
   '/groups/': typeof AuthenticatedGroupsIndexRoute
   '/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/logistics/': typeof AuthenticatedLogisticsIndexRoute
   '/products/': typeof AuthenticatedProductsIndexRoute
   '/purchases/': typeof AuthenticatedPurchasesIndexRoute
   '/sales/': typeof AuthenticatedSalesIndexRoute
@@ -245,6 +253,7 @@ export interface FileRoutesByTo {
   '/finance': typeof AuthenticatedFinanceIndexRoute
   '/groups': typeof AuthenticatedGroupsIndexRoute
   '/inventory': typeof AuthenticatedInventoryIndexRoute
+  '/logistics': typeof AuthenticatedLogisticsIndexRoute
   '/products': typeof AuthenticatedProductsIndexRoute
   '/purchases': typeof AuthenticatedPurchasesIndexRoute
   '/sales': typeof AuthenticatedSalesIndexRoute
@@ -277,6 +286,7 @@ export interface FileRoutesById {
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
   '/_authenticated/groups/': typeof AuthenticatedGroupsIndexRoute
   '/_authenticated/inventory/': typeof AuthenticatedInventoryIndexRoute
+  '/_authenticated/logistics/': typeof AuthenticatedLogisticsIndexRoute
   '/_authenticated/products/': typeof AuthenticatedProductsIndexRoute
   '/_authenticated/purchases/': typeof AuthenticatedPurchasesIndexRoute
   '/_authenticated/sales/': typeof AuthenticatedSalesIndexRoute
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/finance/'
     | '/groups/'
     | '/inventory/'
+    | '/logistics/'
     | '/products/'
     | '/purchases/'
     | '/sales/'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/groups'
     | '/inventory'
+    | '/logistics'
     | '/products'
     | '/purchases'
     | '/sales'
@@ -367,6 +379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance/'
     | '/_authenticated/groups/'
     | '/_authenticated/inventory/'
+    | '/_authenticated/logistics/'
     | '/_authenticated/products/'
     | '/_authenticated/purchases/'
     | '/_authenticated/sales/'
@@ -511,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInventoryIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/logistics/': {
+      id: '/_authenticated/logistics/'
+      path: '/logistics'
+      fullPath: '/logistics/'
+      preLoaderRoute: typeof AuthenticatedLogisticsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/products/': {
       id: '/_authenticated/products/'
       path: '/products'
@@ -636,6 +656,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
   AuthenticatedInventoryIndexRoute: typeof AuthenticatedInventoryIndexRoute
+  AuthenticatedLogisticsIndexRoute: typeof AuthenticatedLogisticsIndexRoute
   AuthenticatedProductsIndexRoute: typeof AuthenticatedProductsIndexRoute
   AuthenticatedPurchasesIndexRoute: typeof AuthenticatedPurchasesIndexRoute
   AuthenticatedSalesIndexRoute: typeof AuthenticatedSalesIndexRoute
@@ -655,6 +676,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
   AuthenticatedInventoryIndexRoute: AuthenticatedInventoryIndexRoute,
+  AuthenticatedLogisticsIndexRoute: AuthenticatedLogisticsIndexRoute,
   AuthenticatedProductsIndexRoute: AuthenticatedProductsIndexRoute,
   AuthenticatedPurchasesIndexRoute: AuthenticatedPurchasesIndexRoute,
   AuthenticatedSalesIndexRoute: AuthenticatedSalesIndexRoute,
