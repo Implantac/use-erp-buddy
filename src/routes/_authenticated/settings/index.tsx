@@ -235,8 +235,10 @@ function SettingsPage() {
                   Configure gatilhos inteligentes para automatizar processos.
                 </CardDescription>
               </div>
-              <Button size="sm" onClick={() => toast.info("Criação de regras em breve!")}>
-                <Plus className="h-4 w-4 mr-2" /> Nova Regra
+              <Button size="sm" asChild>
+                <Link to="/_authenticated/settings/automations">
+                  <Plus className="h-4 w-4 mr-2" /> Nova Regra
+                </Link>
               </Button>
             </CardHeader>
             <CardContent>
