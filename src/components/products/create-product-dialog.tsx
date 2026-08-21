@@ -38,12 +38,18 @@ import { createProduct, getCategories } from "@/lib/products.functions";
 const productSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   sku: z.string().optional(),
+  brand: z.string().optional(),
+  barcode: z.string().optional(),
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
   stock_quantity: z.coerce.number().int().min(0, "O estoque deve ser maior ou igual a zero"),
   min_stock: z.coerce.number().min(0, "O estoque mínimo deve ser maior ou igual a zero").optional(),
   unit_of_measure: z.string().min(1, "Selecione a unidade"),
   category_id: z.string().uuid("Selecione uma categoria"),
   description: z.string().optional(),
+  weight: z.coerce.number().min(0).optional(),
+  length: z.coerce.number().min(0).optional(),
+  width: z.coerce.number().min(0).optional(),
+  height: z.coerce.number().min(0).optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -63,12 +69,18 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
     defaultValues: {
       name: "",
       sku: "",
+      brand: "",
+      barcode: "",
       price: 0,
       stock_quantity: 0,
       min_stock: 0,
       unit_of_measure: "un",
       category_id: "",
       description: "",
+      weight: 0,
+      length: 0,
+      width: 0,
+      height: 0,
     },
   });
 
@@ -138,6 +150,34 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
               />
               <FormField
                 control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marca</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Marca do produto" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="barcode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código de Barras</FormLabel>
+                    <FormControl>
+                      <Input placeholder="EAN/GTIN" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
@@ -154,10 +194,59 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
                             {category.name}
                           </SelectItem>
                         ))}
-
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              <FormField
+                control={form.control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Peso (kg)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.001" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="length"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Comp (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="width"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Larg (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Alt (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
                   </FormItem>
                 )}
               />

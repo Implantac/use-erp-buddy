@@ -18,10 +18,10 @@ const hrSearchSchema = z.object({
 
 export const Route = createFileRoute("/_authenticated/hr")({
   validateSearch: hrSearchSchema,
-  component: HRDashboard,
+  component: HRPage,
 });
 
-function HRDashboard() {
+function HRPage() {
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
