@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
 import { triggerWebhook } from "./webhooks.server";
+import { evaluateRules } from "./automations.server";
 
 
 const getSalesSchema = z.object({
@@ -138,6 +139,9 @@ export const createSale = createServerFn({ method: "POST" })
       final_amount,
       customer_id: data.customer_id
     });
+    
+    // 7. Evaluate Automation Rules
+    await evaluateRules("sales", "INSERT", { saleId, final_amount }, data.tenant_id);
 
 
     return { success: true, saleId };

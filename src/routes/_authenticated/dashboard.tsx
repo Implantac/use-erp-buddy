@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/dashboard.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag, Filter, X } from "lucide-react";
+import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag, Filter, X, Bell, BellOff } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+import { getNotifications, markNotificationRead } from "@/lib/automations.functions";
 import { 
   BarChart, 
+
   Bar, 
   XAxis, 
   YAxis, 
@@ -232,16 +234,15 @@ function Dashboard() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Atividade Recente</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Notificações do Sistema</CardTitle>
+            <Bell className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-lg">
-              <ArrowUpRight className="h-8 w-8 mb-2 opacity-20" />
-              <p>Nenhuma atividade registrada hoje.</p>
-            </div>
+            <NotificationsPanel />
           </CardContent>
         </Card>
+
         <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Próximos Passos</CardTitle>
@@ -273,6 +274,58 @@ function Dashboard() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function NotificationsPanel() {
+  const queryClient = useQueryClient();
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => getNotifications(),
+  });
+
+  const markRead = useMutation({
+    mutationFn: (id: string) => markNotificationRead({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
+
+  if (isLoading) return <div className="py-8 text-center text-muted-foreground">Carregando...</div>;
+  if (!notifications?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground border-2 border-dashed rounded-lg">
+        <BellOff className="h-8 w-8 mb-2 opacity-20" />
+        <p>Sem notificações no momento.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-[400px] overflow-auto pr-2">
+      {notifications.map((n: any) => (
+        <div 
+          key={n.id} 
+          className={`p-3 rounded-lg border flex justify-between items-start gap-3 transition-colors ${n.is_read ? 'bg-background opacity-60' : 'bg-primary/5 border-primary/10'}`}
+        >
+          <div className="space-y-1">
+            <p className="text-sm font-semibold">{n.title}</p>
+            <p className="text-xs text-muted-foreground">{n.message}</p>
+            <p className="text-[10px] text-muted-foreground/60">{new Date(n.created_at).toLocaleString()}</p>
+          </div>
+          {!n.is_read && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-7 text-xs"
+              onClick={() => markRead.mutate(n.id)}
+            >
+              Lida
+            </Button>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

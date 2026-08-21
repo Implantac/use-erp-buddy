@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
-import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText, Truck as TruckIcon, Box, BarChart3, Target } from "lucide-react";
+import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText, Truck as TruckIcon, Box, BarChart3, Target, Webhook } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -246,9 +246,17 @@ function AuthenticatedLayout() {
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link to="/settings" className="flex w-full items-center gap-2">
+                      <Link to="/settings" search={{ tab: 'profile' }} className="flex w-full items-center gap-2">
                         <Settings className="h-4 w-4" />
                         <span>Sistema</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/settings" search={{ tab: 'automations' }} className="flex w-full items-center gap-2">
+                        <Webhook className="h-4 w-4" />
+                        <span>Automações</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

@@ -18,10 +18,17 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/settings/")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      tab: (search['tab'] as string) || "profile",
+    };
+  },
   component: SettingsPage,
 });
 
 function SettingsPage() {
+  const search = Route.useSearch();
+  const tab = search['tab'];
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery({
     queryKey: ["profile"],
@@ -55,7 +62,7 @@ function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs defaultValue={tab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
@@ -72,6 +79,10 @@ function SettingsPage() {
           <TabsTrigger value="developer" className="flex items-center gap-2">
             <Key className="h-4 w-4" />
             Desenvolvedor
+          </TabsTrigger>
+          <TabsTrigger value="automations" className="flex items-center gap-2">
+            <Webhook className="h-4 w-4" />
+            Automações
           </TabsTrigger>
         </TabsList>
 
@@ -212,6 +223,24 @@ function SettingsPage() {
             </CardHeader>
             <CardContent>
               <WebhooksList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="automations" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Regras de Automação</CardTitle>
+                <CardDescription>
+                  Configure gatilhos inteligentes para automatizar processos.
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={() => toast.info("Criação de regras em breve!")}>
+                <Plus className="h-4 w-4 mr-2" /> Nova Regra
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <AutomationsList />
             </CardContent>
           </Card>
         </TabsContent>
@@ -492,3 +521,38 @@ function CreateWebhookDialog({ tenantId, onCreated }: { tenantId?: string, onCre
     </Dialog>
   );
 }
+
+
+function AutomationsList() {
+  const { data: rules } = useSuspenseQuery({
+    queryKey: ["automation-rules"],
+    queryFn: () => getAutomationRules(),
+  });
+
+  if (!rules?.length) return <div className="py-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">Nenhuma regra de automação.</div>;
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nome</TableHead>
+          <TableHead>Evento</TableHead>
+          <TableHead>Ação</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rules.map((rule: any) => (
+          <TableRow key={rule.id}>
+            <TableCell className="font-medium">{rule.name}</TableCell>
+            <TableCell>{rule.event_type}</TableCell>
+            <TableCell>{rule.action_type}</TableCell>
+            <TableCell><Badge variant={rule.is_active ? "default" : "secondary"}>{rule.is_active ? "Ativo" : "Inativo"}</Badge></TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+import { getAutomationRules } from "@/lib/automations.functions";

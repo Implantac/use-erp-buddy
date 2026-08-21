@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
+import { evaluateRules } from "./automations.server";
 
 
 export const getInventoryHistory = createServerFn({ method: "GET" })
@@ -90,7 +91,10 @@ export const createInventoryTransaction = createServerFn({ method: "POST" })
          notes: `Transferência recebida da unidade ${data.unit_id}. ${data.notes || ''}`,
          tenant_id: data.tenant_id
        } as any);
-    }
+     }
+
+    // Evaluate Automation Rules
+    await evaluateRules("inventory_transactions", "INSERT", data, data.tenant_id);
 
     return { success: true };
   });

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { logAudit } from "./audit.server";
+import { evaluateRules } from "./automations.server";
 
 export const getPurchaseOrders = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -108,6 +109,9 @@ export const approvePurchaseOrder = createServerFn({ method: "POST" })
       entity_id: data.order_id,
       new_data: { status: 'pending', approved_by: context.userId }
     });
+
+    // Evaluate Automation Rules
+    await evaluateRules("purchase_orders", "UPDATE", { ...order, status: 'pending' }, order.tenant_id);
 
 
     return { success: true };
