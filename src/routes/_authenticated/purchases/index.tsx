@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSuppliers } from "@/lib/suppliers.functions";
-import { getPurchaseOrders } from "@/lib/purchases.functions";
+import { getPurchaseOrders, receivePurchaseOrder } from "@/lib/purchases.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,12 +17,24 @@ import {
   CheckCircle2, 
   Clock, 
   XCircle,
-  Building2
+  Building2,
+  Receipt
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { CreateSupplierDialog } from "@/components/purchases/create-supplier-dialog";
+import { CreatePurchaseDialog } from "@/components/purchases/create-purchase-dialog";
+import { getProfile } from "@/lib/settings.functions";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/purchases/")({
   component: PurchasesDashboard,
@@ -30,11 +42,34 @@ export const Route = createFileRoute("/_authenticated/purchases/")({
 
 function PurchasesDashboard() {
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
+  
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfile(),
+  });
+
+  const tenantId = profile?.tenant_id;
+
   
   const { data: orders, isLoading: loadingOrders } = useQuery({
     queryKey: ["purchase-orders"],
     queryFn: () => getPurchaseOrders({ data: {} }),
   });
+
+  const receiveMutation = useMutation({
+    mutationFn: (orderId: string) => receivePurchaseOrder({ data: { order_id: orderId } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["finance-stats"] });
+      toast.success("Estoque atualizado e pagamento registrado!");
+    },
+    onError: (err: any) => {
+      toast.error("Erro ao receber: " + err.message);
+    }
+  });
+
 
   const { data: suppliers, isLoading: loadingSuppliers } = useQuery({
     queryKey: ["suppliers", search],
@@ -62,15 +97,14 @@ function PurchasesDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" className="gap-2">
-            <Truck className="h-4 w-4" />
-            Novo Fornecedor
-          </Button>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Ordem de Compra
-          </Button>
+          {tenantId && (
+            <>
+              <CreateSupplierDialog tenantId={tenantId} />
+              <CreatePurchaseDialog tenantId={tenantId} />
+            </>
+          )}
         </div>
+
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -155,10 +189,29 @@ function PurchasesDashboard() {
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(order.total_amount)}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" className="gap-1">
-                            Detalhes <ChevronRight className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Abrir menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem className="gap-2">
+                                <FileText className="h-4 w-4" /> Ver Detalhes
+                              </DropdownMenuItem>
+                              {order.status === 'pending' && (
+                                <DropdownMenuItem 
+                                  className="gap-2 text-green-600 focus:text-green-600"
+                                  onClick={() => receiveMutation.mutate(order.id)}
+                                >
+                                  <Receipt className="h-4 w-4" /> Confirmar Recebimento
+                                </SelectItem> // Fixed typo to DropdownMenuItem
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
+
                       </TableRow>
                     ))
                   )}
