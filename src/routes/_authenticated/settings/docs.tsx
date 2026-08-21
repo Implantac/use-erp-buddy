@@ -421,13 +421,23 @@ function WebhookSimulator() {
           <div className="flex items-center gap-2 mt-2">
             <Filter className="h-3 w-3 text-muted-foreground" />
             <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-              <SelectTrigger className="h-8 text-xs w-[140px]">
-                <SelectValue placeholder="Filtrar Status" />
+              <SelectTrigger className="h-8 text-xs w-[130px]">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="success">Sucesso (2xx)</SelectItem>
+                <SelectItem value="all">Todos Status</SelectItem>
+                <SelectItem value="success">Sucesso</SelectItem>
                 <SelectItem value="failure">Falhas</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={eventFilter || "all"} onValueChange={(val: any) => setEventFilter(val === "all" ? undefined : val)}>
+              <SelectTrigger className="h-8 text-xs w-[130px]">
+                <SelectValue placeholder="Evento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Eventos</SelectItem>
+                <SelectItem value="sale.created">sale.created</SelectItem>
+                <SelectItem value="inventory.low">inventory.low</SelectItem>
               </SelectContent>
             </Select>
           </div>
