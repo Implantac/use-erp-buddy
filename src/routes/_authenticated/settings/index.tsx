@@ -61,7 +61,7 @@ function SettingsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs defaultValue={tab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User className="h-4 w-4" />
