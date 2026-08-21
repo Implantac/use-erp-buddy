@@ -268,6 +268,151 @@ export type Database = {
           },
         ]
       }
+      crm_interactions: {
+        Row: {
+          created_at: string
+          customer_id: string
+          date: string
+          description: string
+          id: string
+          opportunity_id: string | null
+          performed_by: string
+          tenant_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          date?: string
+          description: string
+          id?: string
+          opportunity_id?: string | null
+          performed_by: string
+          tenant_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          date?: string
+          description?: string
+          id?: string
+          opportunity_id?: string | null
+          performed_by?: string
+          tenant_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_interactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_interactions_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_interactions_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_interactions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_opportunities: {
+        Row: {
+          assigned_to: string | null
+          company_id: string
+          created_at: string
+          customer_id: string
+          description: string | null
+          expected_closing_date: string | null
+          id: string
+          probability: number | null
+          stage: string
+          status: string | null
+          tenant_id: string
+          title: string
+          updated_at: string
+          value: number | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_id: string
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          expected_closing_date?: string | null
+          id?: string
+          probability?: number | null
+          stage: string
+          status?: string | null
+          tenant_id: string
+          title: string
+          updated_at?: string
+          value?: number | null
+        }
+        Update: {
+          assigned_to?: string | null
+          company_id?: string
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          expected_closing_date?: string | null
+          id?: string
+          probability?: number | null
+          stage?: string
+          status?: string | null
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_opportunities_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           active: boolean | null
