@@ -230,6 +230,7 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
                   </FormItem>
                 )}
               />
+            </div>
             <FormField
               control={form.control}
               name="description"

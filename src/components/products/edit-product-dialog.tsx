@@ -243,6 +243,7 @@ export function EditProductDialog({ product }: EditProductDialogProps) {
                   </FormItem>
                 )}
               />
+            </div>
             <FormField
               control={form.control}
               name="description"
