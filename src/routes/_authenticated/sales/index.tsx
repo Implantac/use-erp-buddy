@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/sales/")({
 function SalesPage() {
   const { data: sales, isLoading } = useQuery({
     queryKey: ["sales"],
-    queryFn: () => getSales({ limit: 50 }),
+    queryFn: () => getSales({ data: { limit: 50 } }),
   });
 
   return (

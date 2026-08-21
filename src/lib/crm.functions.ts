@@ -2,22 +2,24 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+const getCustomersSchema = z.object({
+  search: z.string().optional(),
+  active: z.boolean().optional(),
+}).optional();
+
 export const getCustomers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: any) => z.object({
-    search: z.string().optional(),
-    active: z.boolean().optional(),
-  }).parse(data))
+  .validator((data: unknown) => getCustomersSchema.parse(data))
   .handler(async ({ data, context }) => {
     let query = context.supabase
       .from("customers" as any)
       .select("*")
       .order("name", { ascending: true });
 
-    if (data.search) {
+    if (data?.search) {
       query = (query as any).ilike("name", `%${data.search}%`);
     }
-    if (data.active !== undefined) {
+    if (data?.active !== undefined) {
       query = (query as any).eq("active", data.active);
     }
 

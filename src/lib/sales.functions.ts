@@ -2,17 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+const getSalesSchema = z.object({
+  limit: z.number().default(50),
+}).optional();
+
 export const getSales = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: any) => z.object({
-    limit: z.number().default(50),
-  }).parse(data))
+  .validator((data: unknown) => getSalesSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { data: sales, error } = await context.supabase
       .from("sales" as any)
       .select("*, customers(name)")
       .order("created_at", { ascending: false })
-      .limit(data.limit);
+      .limit(data?.limit || 50);
 
     if (error) throw error;
     return sales as any[];

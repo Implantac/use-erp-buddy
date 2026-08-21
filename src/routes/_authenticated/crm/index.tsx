@@ -18,7 +18,7 @@ function CRMPage() {
 
   const { data: customers, isLoading } = useQuery({
     queryKey: ["customers", search],
-    queryFn: () => getCustomers({ search }),
+    queryFn: () => getCustomers({ data: { search } }),
   });
 
   return (
