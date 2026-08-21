@@ -38,12 +38,18 @@ import { updateProduct, getCategories } from "@/lib/products.functions";
 const productSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
   sku: z.string().optional().nullable(),
+  brand: z.string().optional().nullable(),
+  barcode: z.string().optional().nullable(),
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
   stock_quantity: z.coerce.number().int().min(0, "O estoque deve ser maior ou igual a zero"),
   min_stock: z.coerce.number().min(0, "O estoque mínimo deve ser maior ou igual a zero").optional(),
   unit_of_measure: z.string().min(1, "Selecione a unidade"),
   category_id: z.string().uuid("Selecione uma categoria"),
   description: z.string().optional().nullable(),
+  weight: z.coerce.number().min(0).optional(),
+  length: z.coerce.number().min(0).optional(),
+  width: z.coerce.number().min(0).optional(),
+  height: z.coerce.number().min(0).optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -53,12 +59,18 @@ interface EditProductDialogProps {
     id: string;
     name: string;
     sku: string | null;
+    brand?: string | null;
+    barcode?: string | null;
     price: number | null;
     stock_quantity: number | null;
     min_stock?: number | null;
     unit_of_measure?: string | null;
     category_id: string | null;
     description: string | null;
+    weight?: number | null;
+    length?: number | null;
+    width?: number | null;
+    height?: number | null;
   };
 }
 
@@ -77,12 +89,18 @@ export function EditProductDialog({ product }: EditProductDialogProps) {
     defaultValues: {
       name: product.name,
       sku: product.sku || "",
+      brand: (product as any).brand || "",
+      barcode: (product as any).barcode || "",
       price: product.price || 0,
       stock_quantity: product.stock_quantity || 0,
       min_stock: (product as any).min_stock || 0,
       unit_of_measure: (product as any).unit_of_measure || "un",
       category_id: product.category_id || "",
       description: product.description || "",
+      weight: (product as any).weight || 0,
+      length: (product as any).length || 0,
+      width: (product as any).width || 0,
+      height: (product as any).height || 0,
     },
   });
 
@@ -151,6 +169,34 @@ export function EditProductDialog({ product }: EditProductDialogProps) {
               />
               <FormField
                 control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marca</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Marca do produto" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="barcode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Código de Barras</FormLabel>
+                    <FormControl>
+                      <Input placeholder="EAN/GTIN" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="category_id"
                 render={({ field }) => (
                   <FormItem>
@@ -167,10 +213,59 @@ export function EditProductDialog({ product }: EditProductDialogProps) {
                             {category.name} {category.active === false ? "(Inativa)" : ""}
                           </SelectItem>
                         ))}
-
                       </SelectContent>
                     </Select>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              <FormField
+                control={form.control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Peso (kg)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.001" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="length"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Comp (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="width"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Larg (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[10px] uppercase">Alt (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
                   </FormItem>
                 )}
               />
