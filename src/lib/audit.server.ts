@@ -5,7 +5,7 @@ interface AuditLogEntry {
   user_id: string;
   company_id?: string;
   unit_id?: string;
-  action: 'insert' | 'update' | 'delete' | 'login' | 'logout' | 'approve' | 'transfer';
+  action: 'insert' | 'update' | 'delete' | 'login' | 'logout' | 'approve' | 'transfer' | 'production';
   entity_name: string;
   entity_id?: string;
   old_data?: any;
