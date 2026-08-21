@@ -139,6 +139,9 @@ export const createSale = createServerFn({ method: "POST" })
       final_amount,
       customer_id: data.customer_id
     });
+    
+    // 7. Evaluate Automation Rules
+    await evaluateRules("sales", "INSERT", { saleId, final_amount }, data.tenant_id);
 
 
     return { success: true, saleId };
