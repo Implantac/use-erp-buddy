@@ -81,6 +81,7 @@ function Index() {
           <p className="mt-2">ok continue com as implementações</p>
           <p className="mt-2">prossiga com a proxima fase</p>
           <p className="mt-2 text-xs text-primary font-medium">Fase 4: Gestão de Estoque e Inteligência Operacional concluída. Iniciando Fase 5: CRM e Vendas.</p>
+          <p className="mt-2">prossiga</p>
 
 
         </div>
