@@ -11,21 +11,21 @@ export const getInventoryHistory = createServerFn({ method: "GET" })
   }).parse(data))
   .handler(async ({ data, context }) => {
     let query = context.supabase
-      .from("inventory_transactions")
+      .from("inventory_transactions" as any)
       .select("*, products(name), units(name)")
       .order("created_at", { ascending: false })
       .limit(data.limit);
 
     if (data.productId) {
-      query = query.eq("product_id", data.productId);
+      query = (query as any).eq("product_id", data.productId);
     }
     if (data.unitId) {
-      query = query.eq("unit_id", data.unitId);
+      query = (query as any).eq("unit_id", data.unitId);
     }
 
     const { data: history, error } = await query;
     if (error) throw error;
-    return history;
+    return history as any[];
   });
 
 export const createInventoryTransaction = createServerFn({ method: "POST" })
@@ -39,7 +39,7 @@ export const createInventoryTransaction = createServerFn({ method: "POST" })
     tenant_id: z.string().uuid(),
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("inventory_transactions").insert(data as any);
+    const { error } = await context.supabase.from("inventory_transactions" as any).insert(data as any);
     if (error) throw new Error(error.message);
     return { success: true };
   });
@@ -50,9 +50,10 @@ export const getStockAlerts = createServerFn({ method: "GET" })
     const { data: products, error } = await context.supabase
       .from("products")
       .select("id, name, stock_quantity, min_stock")
-      .lt("stock_quantity", context.supabase.raw("min_stock"))
       .eq("active", true);
 
     if (error) throw error;
-    return products || [];
+    
+    // Manual filter for column comparison as standard Postgrest client doesn't support col-to-col easily
+    return (products || []).filter((p: any) => (p.stock_quantity || 0) < (p.min_stock || 0));
   });

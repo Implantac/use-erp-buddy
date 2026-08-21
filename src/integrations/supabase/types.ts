@@ -168,6 +168,64 @@ export type Database = {
           },
         ]
       }
+      inventory_transactions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          product_id: string
+          quantity: number
+          tenant_id: string
+          type: string
+          unit_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          product_id: string
+          quantity: number
+          tenant_id: string
+          type: string
+          unit_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          product_id?: string
+          quantity?: number
+          tenant_id?: string
+          type?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_groups: {
         Row: {
           created_at: string
@@ -209,11 +267,13 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          min_stock: number | null
           name: string
           price: number | null
           sku: string | null
           stock_quantity: number | null
           tenant_id: string
+          unit_of_measure: string | null
         }
         Insert: {
           active?: boolean | null
@@ -223,11 +283,13 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          min_stock?: number | null
           name: string
           price?: number | null
           sku?: string | null
           stock_quantity?: number | null
           tenant_id: string
+          unit_of_measure?: string | null
         }
         Update: {
           active?: boolean | null
@@ -237,11 +299,13 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          min_stock?: number | null
           name?: string
           price?: number | null
           sku?: string | null
           stock_quantity?: number | null
           tenant_id?: string
+          unit_of_measure?: string | null
         }
         Relationships: [
           {
@@ -447,6 +511,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_low_stock_count: { Args: { _tenant_id: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
