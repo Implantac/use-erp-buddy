@@ -80,3 +80,46 @@ export const getFinanceSummary = createServerFn({ method: "GET" })
       balance: summary.income - summary.expense,
     };
   });
+
+export const getFinanceChartData = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    // Busca transações dos últimos 6 meses
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const { data: transactions, error } = await context.supabase
+      .from("transactions")
+      .select("type, amount, date")
+      .gte("date", sixMonthsAgo.toISOString().split('T')[0]);
+
+    if (error) throw error;
+
+    const monthlyData: Record<string, { month: string; income: number; expense: number }> = {};
+    
+    // Nomes dos meses em português
+    const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+    (transactions || []).forEach((tx) => {
+      const date = new Date(tx.date);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthlyData[key]) {
+        monthlyData[key] = {
+          month: `${monthNames[date.getMonth()]}/${date.getFullYear().toString().slice(-2)}`,
+          income: 0,
+          expense: 0
+        };
+      }
+
+      if (tx.type === 'income') monthlyData[key].income += Number(tx.amount);
+      else monthlyData[key].expense += Number(tx.amount);
+    });
+
+    return Object.values(monthlyData).sort((a, b) => {
+      const [mA, yA] = a.month.split('/');
+      const [mB, yB] = b.month.split('/');
+      return new Date(`20${yA}-${monthNames.indexOf(mA) + 1}-01`).getTime() - 
+             new Date(`20${yB}-${monthNames.indexOf(mB) + 1}-01`).getTime();
+    });
+  });
