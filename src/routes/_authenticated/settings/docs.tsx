@@ -487,6 +487,36 @@ function WebhookSimulator() {
             )}
           </ScrollArea>
         </CardContent>
+        {selectedSub && totalPages > 1 && (
+          <CardFooter className="flex items-center justify-between pt-4 border-t px-6 py-4">
+            <div className="text-xs text-muted-foreground">
+              Total: {total} logs
+            </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8" 
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs font-medium">
+                {page + 1} de {totalPages}
+              </span>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8" 
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );
