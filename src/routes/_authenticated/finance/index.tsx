@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { getTransactions, getFinanceSummary } from "@/lib/finance.functions";
+import { getTransactions, getFinanceSummary, getFinanceChartData } from "@/lib/finance.functions";
 import { CreateTransactionDialog } from "@/components/finance/create-transaction-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { getProfile } from "@/lib/settings.functions";
-import { Plus, TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, Wallet, Calendar } from "lucide-react";
 import { 
-
   Table, 
-
   TableBody, 
   TableCell, 
   TableHead, 
@@ -16,6 +14,16 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Legend 
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/finance/")({
   component: FinancePage,
