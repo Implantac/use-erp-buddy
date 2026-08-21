@@ -1,6 +1,6 @@
-import { createServerFn } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
  * Zod schemas for validation
@@ -18,8 +18,9 @@ const ruleSchema = z.object({
  * Get all automation rules for the current tenant
  */
 export const getAutomationRules = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data, error } = await supabase
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
       .from("automation_rules")
       .select("*")
       .order("created_at", { ascending: false });
@@ -32,23 +33,32 @@ export const getAutomationRules = createServerFn({ method: "GET" })
  * Create a new automation rule
  */
 export const createAutomationRule = createServerFn({ method: "POST" })
-  .inputValidator((data) => ruleSchema.parse(data))
-  .handler(async ({ data }) => {
-    // Get tenant_id from profile
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Unauthorized");
-
-    const { data: profile } = await supabase
-      .from("profiles")
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => ruleSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    // profile likely has tenant_id via RLS on user_roles/tenants 
+    // but in this project tenant_id is often directly on the records.
+    // We fetch tenant_id from user_roles or similar if needed, 
+    // but usually the middleware context handles the user.
+    
+    // First, get the tenant_id for this user
+    const { data: userRole } = await context.supabase
+      .from("user_roles")
       .select("tenant_id")
-      .eq("id", user.id)
+      .eq("user_id", context.userId)
+      .limit(1)
       .single();
 
-    if (!profile) throw new Error("Profile not found");
+    if (!userRole) throw new Error("No tenant associated with user");
 
-    const { data: rule, error } = await supabase
+    const { data: rule, error } = await context.supabase
       .from("automation_rules")
-      .insert([{ ...data, tenant_id: profile.tenant_id }])
+      .insert([{ 
+        ...data, 
+        tenant_id: userRole.tenant_id,
+        condition_json: data.condition_json || {},
+        action_config: data.action_config || {}
+      }])
       .select()
       .single();
 
@@ -60,8 +70,9 @@ export const createAutomationRule = createServerFn({ method: "POST" })
  * Get system notifications
  */
 export const getNotifications = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { data, error } = await supabase
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
       .from("system_notifications")
       .select("*")
       .order("created_at", { ascending: false })
@@ -75,12 +86,13 @@ export const getNotifications = createServerFn({ method: "GET" })
  * Mark notification as read
  */
 export const markNotificationRead = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({ id: z.string() }).parse(data))
-  .handler(async ({ data }) => {
-    const { error } = await supabase
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
       .from("system_notifications")
       .update({ is_read: true })
-      .eq("id", data.id);
+      .eq("id", (data as { id: string }).id);
 
     if (error) throw new Error(error.message);
     return { success: true };
