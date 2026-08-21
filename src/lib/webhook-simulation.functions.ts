@@ -13,12 +13,13 @@ export const simulateWebhook = createServerFn({ method: "POST" })
     const { subscription_id, event, payload } = input;
     const { supabase } = context;
 
-    // 1. Get the subscription to find the target URL
+    // 1. Get the subscription to find the target URL and tenant_id
     const { data: sub, error: subError } = await supabase
       .from("webhook_subscriptions")
-      .select("target_url, secret")
+      .select("target_url, secret, tenant_id")
       .eq("id", subscription_id)
       .single();
+
 
     if (subError || !sub) {
       throw new Error("Assinatura de webhook não encontrada");
