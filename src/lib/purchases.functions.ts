@@ -43,7 +43,7 @@ export const createPurchaseOrder = createServerFn({ method: "POST" })
       .insert({
         tenant_id: data.tenant_id,
         supplier_id: data.supplier_id,
-        status: 'pending',
+        status: 'waiting_approval',
         total_amount,
       } as any)
       .select()
@@ -78,7 +78,42 @@ export const createPurchaseOrder = createServerFn({ method: "POST" })
     return { success: true, orderId: order.id };
   });
 
+export const approvePurchaseOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    order_id: z.string().uuid(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: order, error: fetchError } = await context.supabase
+      .from("purchase_orders")
+      .select("*")
+      .eq("id", data.order_id)
+      .single();
+
+    if (fetchError || !order) throw new Error("Order not found");
+    if (order.status !== 'waiting_approval') throw new Error("Order is not waiting for approval");
+
+    const { error: updateError } = await context.supabase
+      .from("purchase_orders")
+      .update({ status: 'pending' } as any)
+      .eq("id", data.order_id);
+
+    if (updateError) throw updateError;
+
+    await logAudit(context.supabase, {
+      tenant_id: order.tenant_id,
+      user_id: context.userId,
+      action: 'update',
+      entity_name: 'purchase_orders',
+      entity_id: data.order_id,
+      new_data: { status: 'pending', approved_by: context.userId }
+    });
+
+    return { success: true };
+  });
+
 export const receivePurchaseOrder = createServerFn({ method: "POST" })
+
   .middleware([requireSupabaseAuth])
   .validator((data: any) => z.object({
     order_id: z.string().uuid(),
