@@ -236,7 +236,7 @@ function SettingsPage() {
                 </CardDescription>
               </div>
               <Button size="sm" asChild>
-                <Link to="/_authenticated/settings/automations">
+                <Link to="/settings/automations">
                   <Plus className="h-4 w-4 mr-2" /> Nova Regra
                 </Link>
               </Button>
