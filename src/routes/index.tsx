@@ -77,7 +77,7 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 14 em Início - CRM Avançado & Funil de Vendas</p>
+          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 14 Finalizada - CRM Avançado & Funil de Vendas</p>
           <p className="mt-2 text-xs text-muted-foreground">Ecossistema completo: ERP, Industrial, RH, Logística e agora expandindo para CRM Estratégico.</p>
 
 
