@@ -31,8 +31,8 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       return acc;
     }, { income: 0, expense: 0 });
 
-    const salesTotal = (salesRes.data || []).reduce((sum, s) => sum + Number(s.final_amount), 0);
-    const salesCount = salesRes.data?.length || 0;
+    const salesTotal = ((salesRes.data as any[]) || []).reduce((sum, s) => sum + Number(s.final_amount), 0);
+    const salesCount = (salesRes.data as any[])?.length || 0;
     const avgTicket = salesCount > 0 ? salesTotal / salesCount : 0;
 
     return {
