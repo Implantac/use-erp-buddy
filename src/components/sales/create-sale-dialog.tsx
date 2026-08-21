@@ -38,14 +38,14 @@ import { getProducts } from "@/lib/products.functions";
 
 const saleItemSchema = z.object({
   product_id: z.string().uuid("Selecione um produto"),
-  quantity: z.number().positive("Quantidade deve ser positiva"),
-  unit_price: z.number().positive("Preço deve ser positivo"),
+  quantity: z.coerce.number().min(0.01, "A quantidade deve ser maior que zero"),
+  unit_price: z.coerce.number().min(0.01, "O preço deve ser maior que zero"),
 });
 
 const saleSchema = z.object({
-  customer_id: z.string().uuid("Selecione um cliente").optional().or(z.literal("")),
+  customer_id: z.string().optional().nullable(),
   items: z.array(saleItemSchema).min(1, "Adicione pelo menos um item"),
-  discount_amount: z.number().min(0).default(0),
+  discount_amount: z.coerce.number().min(0).default(0),
 });
 
 type SaleFormValues = z.infer<typeof saleSchema>;
@@ -72,11 +72,10 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
       items: [{ product_id: "", quantity: 1, unit_price: 0 }],
       discount_amount: 0,
     },
-
   });
 
-  const { watch, setValue } = form;
-  const items = watch("items");
+  const { watch, setValue, control, handleSubmit, reset, formState: { errors } } = form;
+  const items = watch("items") || [];
 
   const addItem = () => {
     setValue("items", [...items, { product_id: "", quantity: 1, unit_price: 0 }]);
@@ -100,7 +99,6 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
       };
       setValue("items", newItems);
     }
-
   };
 
   const total = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
@@ -118,14 +116,13 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
           discount_amount: values.discount_amount,
         },
       });
-
       toast.success("Venda registrada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["sales"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["finance-summary"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
       setOpen(false);
-      form.reset();
+      reset();
     } catch (error: any) {
       toast.error(error.message || "Erro ao registrar venda");
     } finally {
@@ -149,9 +146,9 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FormField
-              control={form.control}
+              control={control}
               name="customer_id"
               render={({ field }) => (
                 <FormItem>
@@ -173,7 +170,6 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                 </FormItem>
               )}
             />
-
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -240,20 +236,20 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                   </div>
                 </div>
               ))}
-              {form.formState.errors.items && (
-                <p className="text-sm font-medium text-destructive">{form.formState.errors.items.message}</p>
+              {errors.items && (
+                <p className="text-sm font-medium text-destructive">{errors.items.message}</p>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-4 border-t pt-4">
               <FormField
-                control={form.control}
+                control={control}
                 name="discount_amount"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Desconto (R$)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} onChange={e => field.onChange(Number(e.target.value))} />
+                      <Input type="number" step="0.01" {...field} value={field.value ?? 0} onChange={e => field.onChange(Number(e.target.value))} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
