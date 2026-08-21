@@ -59,13 +59,24 @@ export const hireEmployee = createServerFn({ method: "POST" })
 
     if (!roleData?.tenant_id) throw new Error("Tenant not found");
 
+    const insertData: any = {
+      tenant_id: roleData.tenant_id,
+      full_name: data.full_name,
+      email: data.email ?? null,
+      phone: data.phone ?? null,
+      document_number: data.document_number ?? null,
+      hire_date: data.hire_date,
+      salary: data.salary,
+      company_id: data.company_id ?? null,
+      unit_id: data.unit_id ?? null,
+      department_id: data.department_id ?? null,
+      job_position_id: data.job_position_id ?? null,
+      status: 'active'
+    };
+
     const { data: employee, error } = await context.supabase
       .from("employees")
-      .insert({
-        tenant_id: roleData.tenant_id,
-        ...data,
-        status: 'active'
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -132,7 +143,7 @@ export const generatePayroll = createServerFn({ method: "POST" })
 
     if (empError || !employee) throw new Error("Employee not found");
 
-    const netSalary = employee.salary + data.additions - data.deductions;
+    const netSalary = employee.salary + (data.additions || 0) - (data.deductions || 0);
 
     const { data: record, error } = await context.supabase
       .from("payroll_records")
@@ -142,8 +153,8 @@ export const generatePayroll = createServerFn({ method: "POST" })
         period_month: data.month,
         period_year: data.year,
         base_salary: employee.salary,
-        additions: data.additions,
-        deductions: data.deductions,
+        additions: data.additions || 0,
+        deductions: data.deductions || 0,
         net_salary: netSalary,
         status: 'pending'
       })
