@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { logAudit } from "./audit.server";
+
 
 const getCustomersSchema = z.object({
   search: z.string().optional(),
@@ -41,6 +43,16 @@ export const createCustomer = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("customers" as any).insert(data as any);
     if (error) throw new Error(error.message);
+
+    // Log Audit
+    await logAudit(context.supabase, {
+      tenant_id: data.tenant_id,
+      user_id: context.userId,
+      action: 'insert',
+      entity_name: 'customers',
+      new_data: data
+    });
+
     return { success: true };
   });
 

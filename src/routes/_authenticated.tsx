@@ -149,6 +149,23 @@ function AuthenticatedLayout() {
             </SidebarGroup>
 
             <SidebarGroup>
+              <SidebarGroupLabel>Segurança</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/audit" className="flex w-full items-center gap-2">
+                        <History className="h-4 w-4" />
+                        <span>Auditoria</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            <SidebarGroup>
+
               <SidebarGroupLabel>Configurações</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>

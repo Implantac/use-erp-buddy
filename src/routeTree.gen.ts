@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedUnitsRouteImport } from './routes/_authenticated/units'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthenticatedAuditIndexRouteImport } from './routes/_authenticated/audit/index'
 import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies/index'
 import { Route as AuthenticatedCompaniesCompanyIdRouteImport } from './routes/_authenticated/companies/$companyId'
 import { Route as AuthenticatedCompaniesNewRouteImport } from './routes/_authenticated/companies/new'
@@ -70,6 +71,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
+} as any)
+const AuthenticatedAuditIndexRoute = AuthenticatedAuditIndexRouteImport.update({
+  id: '/audit/',
+  path: '/audit/',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCompaniesIndexRoute =
   AuthenticatedCompaniesIndexRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/audit/': typeof AuthenticatedAuditIndexRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/crm/': typeof AuthenticatedCrmIndexRoute
   '/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/audit': typeof AuthenticatedAuditIndexRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
   '/crm': typeof AuthenticatedCrmIndexRoute
   '/finance': typeof AuthenticatedFinanceIndexRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
+  '/_authenticated/audit/': typeof AuthenticatedAuditIndexRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/_authenticated/crm/': typeof AuthenticatedCrmIndexRoute
   '/_authenticated/finance/': typeof AuthenticatedFinanceIndexRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/companies/new'
     | '/units/$unitId'
     | '/units/new'
+    | '/audit/'
     | '/companies/'
     | '/crm/'
     | '/finance/'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/companies/new'
     | '/units/$unitId'
     | '/units/new'
+    | '/audit'
     | '/companies'
     | '/crm'
     | '/finance'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/_authenticated/companies/new'
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
+    | '/_authenticated/audit/'
     | '/_authenticated/companies/'
     | '/_authenticated/crm/'
     | '/_authenticated/finance/'
@@ -352,6 +364,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/reset-password'
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_authenticated/audit/': {
+      id: '/_authenticated/audit/'
+      path: '/audit'
+      fullPath: '/audit/'
+      preLoaderRoute: typeof AuthenticatedAuditIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/companies/': {
       id: '/_authenticated/companies/'
@@ -491,6 +510,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedUnitsRoute: typeof AuthenticatedUnitsRouteWithChildren
+  AuthenticatedAuditIndexRoute: typeof AuthenticatedAuditIndexRoute
   AuthenticatedCrmIndexRoute: typeof AuthenticatedCrmIndexRoute
   AuthenticatedFinanceIndexRoute: typeof AuthenticatedFinanceIndexRoute
   AuthenticatedGroupsIndexRoute: typeof AuthenticatedGroupsIndexRoute
@@ -505,6 +525,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedUnitsRoute: AuthenticatedUnitsRouteWithChildren,
+  AuthenticatedAuditIndexRoute: AuthenticatedAuditIndexRoute,
   AuthenticatedCrmIndexRoute: AuthenticatedCrmIndexRoute,
   AuthenticatedFinanceIndexRoute: AuthenticatedFinanceIndexRoute,
   AuthenticatedGroupsIndexRoute: AuthenticatedGroupsIndexRoute,
