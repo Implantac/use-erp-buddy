@@ -1,33 +1,40 @@
-# Plano de Implementação - Fase 15: Automação & Inteligência Operacional
+# Plano de Implementação (Incremental - Passo 0)
 
-Esta fase foca em transformar o "Use Business OS" em um sistema proativo, utilizando automações de fluxo de trabalho e gatilhos inteligentes.
+Este plano foca em seguir as diretrizes do arquivo `incremental.txt` carregado pelo usuário, realizando a auditoria obrigatória e propondo as próximas ações para manter a evolução pragmática do sistema.
 
-## 1. Alterações no Banco de Dados (Supabase)
+## 1. Auditoria do Estado Atual (PASSO 0)
 
-### Novas Tabelas
-- `automation_rules`: Regras configuráveis pelo usuário (ex: "Se estoque < min, criar ordem de compra").
-- `system_notifications`: Alertas internos baseados em eventos do sistema.
-- `workflow_triggers`: Registro de execuções de automação.
+### 1.1 Foundation (Base Técnica)
+- **AUTH-001**: Sistema de autenticação funcional (100% - Login, Recuperação, Sessão).
+- **TENANT-001**: Multi-tenancy funcional (100% - RLS ativo, isolamento verificado).
+- **ORG-001**: Estrutura organizacional (100% - CRUD de Empresas e Unidades).
+- **USER-001**: Gestão de usuários (100% - Perfis e permissões).
 
-### Segurança (RLS)
-- Políticas de isolamento por `tenant_id` em todas as novas tabelas.
-- Grants para `authenticated` e `service_role`.
+### 1.2 Core Operations (Fase 1)
+- **PROD-001**: Produto Básico (100% - CRUD, SKU por tenant, Categorias).
+- **PART-001**: Parceiros (Clientes/Fornecedores) (100% - CRUD, CPF/CNPJ único).
+- **STOCK-001**: Estoque Simples (100% - Depósitos, Saldo, Movimentações Manuais).
+- **PUR-001**: Compras Básico (100% - Pedidos, Recebimento, Entrada automática).
+- **SALES-001**: Vendas Básico (100% - Orçamentos, Pedidos, Reserva de estoque).
+- **FIN-001/002**: Financeiro Básico (100% - Contas a Pagar/Receber automáticas).
 
-## 2. Backend (Server Functions)
+### 1.3 Módulos Avançados (Já Iniciados/Finalizados)
+- **CRM Avançado**: Kanban e Oportunidades (100%).
+- **RH & Folha**: Funções de backend existem, mas a rota `/hr` precisa de verificação de acessibilidade (90%).
+- **Logística**: Gestão de fretes e transportadoras (100%).
+- **Industrial**: BOM e Ordens de Produção (100%).
+- **Automações**: Motor de regras proativo (100%).
 
-### `src/lib/automations.functions.ts`
-- `evaluateRules(entity, action, data)`: Motor de regras acionado após operações de escrita.
-- `createNotification(userId, title, message, type)`: Utilitário para alertas.
+## 2. Identificação de Débitos e Quebras
+- **Interface de RH**: O arquivo existe em `src/routes/_authenticated/hr.tsx`, mas o usuário reportou que pode haver inconsistências ou falta de linkagem correta no sistema de rotas (HMR/router check).
+- **Documentação de API**: A página de documentação pode estar defasada em relação aos novos módulos (Industrial/RH).
 
-## 3. Interface (UI)
+## 3. Próxima Ação (Objetivo Pragmático)
+Seguindo o roadmap incremental:
+1. **Refinamento V2 de Produtos**: Adicionar campos avançados (Marca, Dimensões, Peso) conforme `incremental.txt` (V2 do roadmap).
+2. **Integração de Relatórios**: Unificar os templates de relatórios de todos os novos módulos.
+3. **Estabilização da Rota /hr**: Garantir que a interface de RH esteja 100% funcional para o usuário.
 
-### Módulo de Automação
-- `src/routes/_authenticated/settings/automations.tsx`: Interface para criar e gerenciar regras.
-- Central de Notificações na Sidebar ou Header.
-
-## 4. Integrações
-- Gatilhos de Email/Webhook automáticos para eventos críticos (ex: Aprovação de Compra, Venda Grande).
-
-## Detalhes Técnicos (Desenvolvedor)
-- Implementação de um "Event Bus" simples dentro das Server Functions existentes para disparar `evaluateRules`.
-- Uso de Enums para tipos de gatilhos (INSERT, UPDATE, DELETE) e ações (EMAIL, NOTIFY, CREATE_TASK).
+## Detalhes Técnicos
+- Atualizar a tabela `products` com novos campos.
+- Validar as permissões de acesso da rota `/hr` via `check_access`.
