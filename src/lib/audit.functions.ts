@@ -78,7 +78,7 @@ export const exportAuditLogsCsv = createServerFn({ method: "GET" })
       query = (query as any).eq("company_id", data.companyId);
     }
     if (data?.unitId) {
-      query = (query as any).eq("unit_id", data.unit_id);
+      query = (query as any).eq("unit_id", data.unitId);
     }
     if (data?.userId) {
       query = (query as any).eq("user_id", data.userId);
