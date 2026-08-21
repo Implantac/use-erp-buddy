@@ -142,7 +142,7 @@ export const resendWebhook = createServerFn({ method: "POST" })
         headers: {
           "Content-Type": "application/json",
           "x-webhook-event": log.event_type,
-          "x-webhook-signature": sub.secret, // Use real secret if available, or HMAC logic
+          "x-webhook-signature": sub.secret || "", // Use real secret if available, or HMAC logic
           "x-webhook-retry": "true",
           "x-original-log-id": log_id
         },
