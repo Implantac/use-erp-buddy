@@ -1,12 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { z } from 'zod';
-import { supabaseAdmin } from '@/integrations/supabase/client.server';
 
 export const Route = createFileRoute('/api/public/products')({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const url = new URL(request.url);
         const apiKey = request.headers.get('x-api-key');
 
         if (!apiKey) {
@@ -15,6 +12,8 @@ export const Route = createFileRoute('/api/public/products')({
             headers: { 'Content-Type': 'application/json' }
           });
         }
+
+        const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
 
         // Validate API Key (Security Gate)
         const { data: keyData, error: keyError } = await supabaseAdmin
@@ -43,8 +42,11 @@ export const Route = createFileRoute('/api/public/products')({
           });
         }
 
-        // Log access in audit (optional but recommended)
-        await supabaseAdmin.from('api_keys').update({ last_used_at: new Date().toISOString() }).eq('key_hash', apiKey);
+        // Log access in audit (last used update)
+        await supabaseAdmin
+          .from('api_keys')
+          .update({ last_used_at: new Date().toISOString() })
+          .eq('key_hash', apiKey);
 
         return new Response(JSON.stringify(products), {
           status: 200,

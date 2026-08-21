@@ -32,6 +32,7 @@ import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
 import { Route as AuthenticatedUnitsNewRouteImport } from './routes/_authenticated/units/new'
+import { Route as ApiPublicProductsRouteImport } from './routes/api/public/products'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -156,6 +157,11 @@ const AuthenticatedUnitsNewRoute = AuthenticatedUnitsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthenticatedUnitsRoute,
 } as any)
+const ApiPublicProductsRoute = ApiPublicProductsRouteImport.update({
+  id: '/api/public/products',
+  path: '/api/public/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/products': typeof ApiPublicProductsRoute
   '/audit/': typeof AuthenticatedAuditIndexRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/crm/': typeof AuthenticatedCrmIndexRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/products': typeof ApiPublicProductsRoute
   '/audit': typeof AuthenticatedAuditIndexRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
   '/crm': typeof AuthenticatedCrmIndexRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated/companies/new': typeof AuthenticatedCompaniesNewRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/products': typeof ApiPublicProductsRoute
   '/_authenticated/audit/': typeof AuthenticatedAuditIndexRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
   '/_authenticated/crm/': typeof AuthenticatedCrmIndexRoute
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/companies/new'
     | '/units/$unitId'
     | '/units/new'
+    | '/api/public/products'
     | '/audit/'
     | '/companies/'
     | '/crm/'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/companies/new'
     | '/units/$unitId'
     | '/units/new'
+    | '/api/public/products'
     | '/audit'
     | '/companies'
     | '/crm'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated/companies/new'
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
+    | '/api/public/products'
     | '/_authenticated/audit/'
     | '/_authenticated/companies/'
     | '/_authenticated/crm/'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ApiPublicProductsRoute: typeof ApiPublicProductsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUnitsNewRouteImport
       parentRoute: typeof AuthenticatedUnitsRoute
     }
+    '/api/public/products': {
+      id: '/api/public/products'
+      path: '/api/public/products'
+      fullPath: '/api/public/products'
+      preLoaderRoute: typeof ApiPublicProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -556,6 +576,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ApiPublicProductsRoute: ApiPublicProductsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
