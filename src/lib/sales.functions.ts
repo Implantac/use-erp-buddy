@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { logAudit } from "./audit.server";
+
 
 const getSalesSchema = z.object({
   limit: z.number().default(50),
@@ -102,6 +104,17 @@ export const createSale = createServerFn({ method: "POST" })
     } as any);
 
     if (financeError) console.error("Failed to create financial transaction:", financeError);
+
+    // 5. Log Audit
+    await logAudit(context.supabase, {
+      tenant_id: data.tenant_id,
+      user_id: context.userId,
+      action: 'insert',
+      entity_name: 'sales',
+      entity_id: saleId,
+      new_data: { total_amount, final_amount, items_count: data.items.length }
+    });
+
 
     return { success: true, saleId };
   });
