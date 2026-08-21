@@ -108,7 +108,7 @@ function Dashboard() {
         <div className="w-[200px]">
           <Select 
             value={filters.company_id || "all"} 
-            onValueChange={(val) => setFilters(prev => ({ ...prev, company_id: val === "all" ? undefined : val, unit_id: undefined }))}
+            onValueChange={(val) => setFilters(prev => ({ company_id: val === "all" ? undefined : val, unit_id: undefined }))}
           >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Todas as Empresas" />
@@ -125,7 +125,7 @@ function Dashboard() {
         <div className="w-[200px]">
           <Select 
             value={filters.unit_id || "all"} 
-            onValueChange={(val) => setFilters(prev => ({ ...prev, unit_id: val === "all" ? undefined : val }))}
+            onValueChange={(val) => setFilters(prev => ({ company_id: prev.company_id, unit_id: val === "all" ? undefined : val }))}
           >
             <SelectTrigger className="bg-background">
               <SelectValue placeholder="Todas as Unidades" />
