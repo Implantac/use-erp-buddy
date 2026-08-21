@@ -22,7 +22,7 @@ export const createWebhookSubscription = createServerFn({ method: "POST" })
     events: z.array(z.string()),
   }).parse(data))
   .middleware([requireSupabaseAuth])
-  .handler(async ({ input, context }) => {
+  .handler(async ({ data: input, context }) => {
     const secret = `whsec_${Math.random().toString(36).substring(2, 15)}`;
     
     const { data, error } = await context.supabase
@@ -43,7 +43,7 @@ export const deleteWebhookSubscription = createServerFn({ method: "POST" })
     id: z.string().uuid(),
   }).parse(data))
   .middleware([requireSupabaseAuth])
-  .handler(async ({ input, context }) => {
+  .handler(async ({ data: input, context }) => {
     const { error } = await context.supabase
       .from("webhook_subscriptions")
       .delete()
