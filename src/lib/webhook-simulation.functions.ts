@@ -120,6 +120,10 @@ export const resendWebhook = createServerFn({ method: "POST" })
       throw new Error("Log de webhook não encontrado");
     }
 
+    if (!log.subscription_id) {
+      throw new Error("Log não possui um ID de assinatura válido");
+    }
+
     // 2. Get the current subscription details
     const { data: sub, error: subError } = await supabase
       .from("webhook_subscriptions")
