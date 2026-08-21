@@ -77,9 +77,6 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 15 Finalizada - Automação & Inteligência Operacional</p>
-          <p className="mt-2 text-xs text-muted-foreground">Ecossistema completo: ERP, Industrial, RH, Logística, CRM e agora com Motor de Automações Proativo.</p>
-          <p className="mt-2 text-xs font-bold text-primary">siga com as proximas fases</p>
 
 
 
