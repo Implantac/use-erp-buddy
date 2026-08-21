@@ -1,40 +1,28 @@
-# Plano de Implementação (Incremental - Passo 0)
+# Plano de Implementação - Fase 16: Consolidação & RH Estratégico
 
-Este plano foca em seguir as diretrizes do arquivo `incremental.txt` carregado pelo usuário, realizando a auditoria obrigatória e propondo as próximas ações para manter a evolução pragmática do sistema.
+Este plano foca na conclusão dos refinamentos de produtos, expansão do módulo de RH com recrutamento e organização de relatórios por módulo conforme o roadmap incremental.
 
-## 1. Auditoria do Estado Atual (PASSO 0)
+## Alterações Técnicas
 
-### 1.1 Foundation (Base Técnica)
-- **AUTH-001**: Sistema de autenticação funcional (100% - Login, Recuperação, Sessão).
-- **TENANT-001**: Multi-tenancy funcional (100% - RLS ativo, isolamento verificado).
-- **ORG-001**: Estrutura organizacional (100% - CRUD de Empresas e Unidades).
-- **USER-001**: Gestão de usuários (100% - Perfis e permissões).
+### Backend & Database
+- [x] Refinamento da tabela `products`: Adicionados campos `brand`, `weight`, `length`, `width`, `height`, `barcode`, `sku`.
+- [ ] Segurança RLS: Revisar e aplicar `GRANT` e políticas em funções `SECURITY DEFINER` para evitar avisos do linter.
+- [x] Migração de Dados: Inserir templates de relatórios padrão para novos módulos (RH, Industrial, Logística, CRM).
 
-### 1.2 Core Operations (Fase 1)
-- **PROD-001**: Produto Básico (100% - CRUD, SKU por tenant, Categorias).
-- **PART-001**: Parceiros (Clientes/Fornecedores) (100% - CRUD, CPF/CNPJ único).
-- **STOCK-001**: Estoque Simples (100% - Depósitos, Saldo, Movimentações Manuais).
-- **PUR-001**: Compras Básico (100% - Pedidos, Recebimento, Entrada automática).
-- **SALES-001**: Vendas Básico (100% - Orçamentos, Pedidos, Reserva de estoque).
-- **FIN-001/002**: Financeiro Básico (100% - Contas a Pagar/Receber automáticas).
+### Server Functions (`src/lib/`)
+- [x] `products.functions.ts`: Atualizar validadores de `createProduct` e `updateProduct` para suportar os novos campos técnicos.
+- [ ] `hr.functions.ts`: Implementar CRUD inicial para Recrutamento (Vagas e Candidatos).
+- [ ] `reports.functions.ts`: Refinar lógica de exportação para garantir isolamento por tenant em todos os novos templates.
 
-### 1.3 Módulos Avançados (Já Iniciados/Finalizados)
-- **CRM Avançado**: Kanban e Oportunidades (100%).
-- **RH & Folha**: Funções de backend existem, mas a rota `/hr` precisa de verificação de acessibilidade (90%).
-- **Logística**: Gestão de fretes e transportadoras (100%).
-- **Industrial**: BOM e Ordens de Produção (100%).
-- **Automações**: Motor de regras proativo (100%).
+### Frontend & UI
+- [x] `create-product-dialog.tsx` & `edit-product-dialog.tsx`: Formulários atualizados com campos de marca, dimensões e logística.
+- [x] `_authenticated.tsx` (Sidebar): Adicionado atalho para "Recrutamento & Seleção" sob o grupo de RH.
+- [x] `hr.tsx`: Adicionada aba de "Recrutamento" com dashboard operacional de vagas.
+- [x] `reports/index.tsx`: Interface de relatórios agora exibe categorias para todos os módulos do sistema.
 
-## 2. Identificação de Débitos e Quebras
-- **Interface de RH**: O arquivo existe em `src/routes/_authenticated/hr.tsx`, mas o usuário reportou que pode haver inconsistências ou falta de linkagem correta no sistema de rotas (HMR/router check).
-- **Documentação de API**: A página de documentação pode estar defasada em relação aos novos módulos (Industrial/RH).
+## Próximos Passos
+1. Finalizar a lógica de recrutamento no backend.
+2. Resolver os avisos de segurança do Supabase Linter (search_path, grants).
+3. Iniciar a Fase 17: Dashboard Executivo & Mobile First.
 
-## 3. Próxima Ação (Objetivo Pragmático)
-Seguindo o roadmap incremental:
-1. **Refinamento V2 de Produtos**: Adicionar campos avançados (Marca, Dimensões, Peso) conforme `incremental.txt` (V2 do roadmap).
-2. **Integração de Relatórios**: Unificar os templates de relatórios de todos os novos módulos.
-3. **Estabilização da Rota /hr**: Garantir que a interface de RH esteja 100% funcional para o usuário.
-
-## Detalhes Técnicos
-- Atualizar a tabela `products` com novos campos.
-- Validar as permissões de acesso da rota `/hr` via `check_access`.
+**Atenção:** As alterações visuais no rodapé da página inicial foram removidas conforme solicitado, mantendo o registro de progresso apenas em comentários técnicos de cabeçalho.

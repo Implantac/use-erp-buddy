@@ -57,6 +57,13 @@ export const createProduct = createServerFn({ method: "POST" })
     unit_of_measure: z.string().optional(),
     category_id: z.string().uuid().nullable().optional(),
     image_url: z.string().url("URL de imagem inválida").nullable().optional().or(z.literal("")),
+    brand: z.string().nullable().optional(),
+    weight: z.number().min(0).optional(),
+    length: z.number().min(0).optional(),
+    width: z.number().min(0).optional(),
+    height: z.number().min(0).optional(),
+    barcode: z.string().nullable().optional(),
+    custom_attributes: z.record(z.any()).optional(),
     tenant_id: z.string().uuid(),
   }).parse(data))
   .handler(async ({ data, context }) => {
@@ -80,6 +87,13 @@ export const updateProduct = createServerFn({ method: "POST" })
       stock_quantity: z.number().int().min(0).nullable().optional(),
       active: z.boolean().optional(),
       category_id: z.string().uuid().nullable().optional(),
+      brand: z.string().nullable().optional(),
+      weight: z.number().min(0).optional(),
+      length: z.number().min(0).optional(),
+      width: z.number().min(0).optional(),
+      height: z.number().min(0).optional(),
+      barcode: z.string().nullable().optional(),
+      custom_attributes: z.record(z.any()).optional(),
     }),
   }).parse(data))
   .handler(async ({ data, context }) => {
