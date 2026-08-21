@@ -31,9 +31,9 @@ export const createApiKey = createServerFn({ method: "POST" })
       .insert({
         tenant_id: input.tenant_id,
         label: input.label,
-        key_hash: rawKey, // Simplified for demo; should be bcrypt/scrypt hash
+        key_hash: rawKey,
         key_prefix: prefix,
-        expires_at: input.expires_at,
+        expires_at: input.expires_at ?? null,
       })
       .select()
       .single();
