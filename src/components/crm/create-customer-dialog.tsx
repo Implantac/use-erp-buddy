@@ -29,10 +29,10 @@ import { createCustomer } from "@/lib/crm.functions";
 
 const customerSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
-  document: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
-  phone: z.string().optional(),
-  address: z.string().optional(),
+  document: z.string().optional().nullable(),
+  email: z.string().email("Email inválido").optional().nullable().or(z.literal("")),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -60,6 +60,10 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
         data: {
           ...values,
           tenant_id: tenantId,
+          document: values.document || null,
+          email: values.email || null,
+          phone: values.phone || null,
+          address: values.address || null,
         },
       });
       toast.success("Cliente cadastrado com sucesso!");
@@ -97,7 +101,7 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
                 <FormItem>
                   <FormLabel>Nome Completo / Razão Social</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome do cliente" {...field} />
+                    <Input placeholder="Nome do cliente" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,7 +115,7 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
                   <FormItem>
                     <FormLabel>CPF / CNPJ</FormLabel>
                     <FormControl>
-                      <Input placeholder="000.000.000-00" {...field} />
+                      <Input placeholder="000.000.000-00" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -124,7 +128,7 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
                   <FormItem>
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
-                      <Input placeholder="(00) 00000-0000" {...field} />
+                      <Input placeholder="(00) 00000-0000" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -138,7 +142,7 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="email@exemplo.com" {...field} />
+                    <Input type="email" placeholder="email@exemplo.com" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +155,7 @@ export function CreateCustomerDialog({ tenantId }: { tenantId: string }) {
                 <FormItem>
                   <FormLabel>Endereço</FormLabel>
                   <FormControl>
-                    <Input placeholder="Rua, Número, Bairro, Cidade - UF" {...field} />
+                    <Input placeholder="Rua, Número, Bairro, Cidade - UF" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
