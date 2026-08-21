@@ -3,11 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getEmployees, getPayrollRecords, getDepartments, getJobPositions } from "@/lib/hr.functions";
 import { getProfile } from "@/lib/settings.functions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness } from "lucide-react";
+import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness, MapPin } from "lucide-react";
+import { CreateVacancyDialog } from "@/components/hr/create-vacancy-dialog";
+import { getJobVacancies } from "@/lib/hr.functions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { z } from "zod";
@@ -52,6 +54,12 @@ function HRPage() {
     queryKey: ["job-positions"],
     queryFn: () => getJobPositions() as Promise<any[]>,
   });
+
+  const { data: jobVacancies, isLoading: loadingVacancies } = useQuery({
+    queryKey: ["job-vacancies"],
+    queryFn: () => getJobVacancies() as Promise<any[]>,
+  });
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -289,23 +297,65 @@ function HRPage() {
         </TabsContent>
         <TabsContent value="recruitment">
           <Card>
-            <CardHeader>
-              <CardTitle>Processos Seletivos</CardTitle>
-              <CardDescription>Acompanhe e gerencie as vagas abertas e candidatos.</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[400px] flex flex-col items-center justify-center text-center space-y-4">
-              <div className="p-4 rounded-full bg-primary/10">
-                <BriefcaseBusiness className="h-10 w-10 text-primary" />
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold">Módulo de Recrutamento</h3>
-                <p className="text-muted-foreground max-w-sm">
-                  Em breve você poderá gerenciar vagas, currículos e entrevistas diretamente por aqui.
-                </p>
+                <CardTitle>Processos Seletivos</CardTitle>
+                <CardDescription>Acompanhe e gerencie as vagas abertas e candidatos.</CardDescription>
               </div>
-              <Button variant="outline" className="gap-2">
-                <Plus className="h-4 w-4" /> Criar Primeira Vaga
-              </Button>
+              <CreateVacancyDialog tenantId={tenantId} />
+            </CardHeader>
+            <CardContent>
+              {loadingVacancies ? (
+                <div className="text-center py-8">Carregando vagas...</div>
+              ) : jobVacancies?.length === 0 ? (
+                <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="p-4 rounded-full bg-primary/10">
+                    <BriefcaseBusiness className="h-10 w-10 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">Nenhuma vaga aberta</h3>
+                    <p className="text-muted-foreground max-w-sm">
+                      Comece abrindo sua primeira vaga para atrair novos talentos.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {jobVacancies?.map((vacancy) => (
+                    <Card key={vacancy.id} className="overflow-hidden group hover:border-primary/50 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <Badge variant={vacancy.status === 'open' ? 'default' : 'secondary'}>
+                            {vacancy.status === 'open' ? 'Aberta' : 'Fechada'}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-lg mt-2">{vacancy.title}</CardTitle>
+                        <CardDescription className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {(vacancy.units as any)?.name || (vacancy.companies as any)?.name || 'Remoto'}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="pb-3">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Salário:</span>
+                            <span className="font-medium text-[12px]">{vacancy.salary_range || 'Não informado'}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Candidatos:</span>
+                            <span className="font-medium">0</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="bg-muted/30 pt-3 border-t">
+                        <Button variant="ghost" className="w-full gap-2 text-xs group-hover:text-primary transition-colors">
+                          Ver Candidatos <Plus className="h-3 w-3" />
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

@@ -174,3 +174,59 @@ export const generatePayroll = createServerFn({ method: "POST" })
 
     return record;
   });
+
+export const getJobVacancies = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("job_vacancies")
+      .select("*, companies(name), units(name)")
+      .order("created_at", { ascending: false });
+    
+    if (error) throw error;
+    return data;
+  });
+
+export const createJobVacancy = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    title: z.string().min(3),
+    description: z.string().optional().nullable(),
+    requirements: z.string().optional().nullable(),
+    salary_range: z.string().optional().nullable(),
+    company_id: z.string().uuid().optional().nullable(),
+    unit_id: z.string().uuid().optional().nullable(),
+    tenant_id: z.string().uuid(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("job_vacancies").insert({
+      ...data,
+      description: data.description ?? null,
+      requirements: data.requirements ?? null,
+      salary_range: data.salary_range ?? null,
+      company_id: data.company_id ?? null,
+      unit_id: data.unit_id ?? null,
+    } as any);
+    if (error) throw error;
+    return { success: true };
+  });
+
+export const getCandidates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    vacancyId: z.string().uuid().optional(),
+  }).parse(data || {}))
+  .handler(async ({ data, context }) => {
+    let query = context.supabase
+      .from("job_candidates")
+      .select("*, job_vacancies(title)")
+      .order("created_at", { ascending: false });
+    
+    if (data?.vacancyId) {
+      query = query.eq("vacancy_id", data.vacancyId);
+    }
+    
+    const { data: candidates, error } = await query;
+    if (error) throw error;
+    return candidates;
+  });
