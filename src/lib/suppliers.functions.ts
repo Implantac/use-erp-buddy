@@ -36,7 +36,7 @@ export const createSupplier = createServerFn({ method: "POST" })
     address: z.string().nullable().optional(),
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("suppliers").insert(data);
+    const { error } = await context.supabase.from("suppliers").insert(data as any);
     if (error) throw new Error(error.message);
 
     await logAudit(context.supabase, {
@@ -64,7 +64,7 @@ export const updateSupplier = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data, context }) => {
     const { id, updates } = data;
-    const { error } = await context.supabase.from("suppliers").update(updates).eq("id", id);
+    const { error } = await context.supabase.from("suppliers").update(updates as any).eq("id", id);
     if (error) throw new Error(error.message);
     return { success: true };
   });
