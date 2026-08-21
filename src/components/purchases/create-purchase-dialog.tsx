@@ -64,22 +64,30 @@ export function CreatePurchaseDialog({ tenantId }: { tenantId: string }) {
 
   const updateItem = (index: number, field: string, value: any) => {
     const newItems = [...items];
-    (newItems[index] as any)[field] = value;
+    const item = newItems[index];
+    if (!item) return;
+
+    (item as any)[field] = value;
     
     if (field === "product_id") {
       const product = products.find((p: any) => p.id === value);
       if (product) {
-        newItems[index].unit_price = product.cost_price || product.price || 0;
+        item.unit_price = product.cost_price || product.price || 0;
       }
     }
     
     setItems(newItems);
   };
 
-
   const handleCreate = () => {
-    if (!supplierId) return toast.error("Selecione um fornecedor");
-    if (items.some(i => !i.product_id)) return toast.error("Selecione os produtos");
+    if (!supplierId) {
+      toast.error("Selecione um fornecedor");
+      return;
+    }
+    if (items.some(i => !i.product_id)) {
+      toast.error("Selecione os produtos");
+      return;
+    }
 
     mutation.mutate({
       tenant_id: tenantId,
@@ -87,6 +95,7 @@ export function CreatePurchaseDialog({ tenantId }: { tenantId: string }) {
       items
     });
   };
+
 
   const total = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
 
