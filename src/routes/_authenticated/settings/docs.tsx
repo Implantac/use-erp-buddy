@@ -3,13 +3,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
+import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getWebhookSubscriptions } from "@/lib/webhooks.functions";
+import { simulateWebhook, getWebhookLogs } from "@/lib/webhook-simulation.functions";
 
 const SwaggerUI = React.lazy(() => import("swagger-ui-react"));
 import "swagger-ui-react/swagger-ui.css";
+
 
 export const Route = createFileRoute("/_authenticated/settings/docs")({
   component: ApiDocsPage,
@@ -80,7 +87,11 @@ function ApiDocsPage() {
             <Button variant="ghost" className="w-full justify-start font-normal" asChild>
               <a href="#webhooks">Webhooks</a>
             </Button>
+            <Button variant="ghost" className="w-full justify-start font-normal" asChild>
+              <a href="#webhook-simulator">Simulador</a>
+            </Button>
           </div>
+
           <div className="space-y-1">
             <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Recursos</h4>
             <Button variant="outline" size="sm" className="w-full justify-start gap-2" asChild>
@@ -222,6 +233,19 @@ function ApiDocsPage() {
               </Card>
             </div>
           </section>
+
+          {/* Webhook Simulator */}
+          <section id="webhook-simulator" className="scroll-mt-20 space-y-6">
+            <div className="flex items-center gap-2">
+              <Send className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold">Simulador de Webhooks</h2>
+            </div>
+            <p>
+              Teste sua integração simulando disparos de eventos para seus endpoints configurados.
+            </p>
+            <WebhookSimulator />
+          </section>
+
 
           <section className="pt-12 border-t text-center">
             <p className="text-muted-foreground text-sm">
