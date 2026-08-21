@@ -15,12 +15,13 @@ export const getDashboardStats = createServerFn({ method: "GET" })
     const tid = profile?.tenant_id;
 
     // Busca contagens e saldos em paralelo
-    const [companiesRes, unitsRes, groupsRes, teamRes, financeRes, stockAlertsRes] = await Promise.all([
+    const [companiesRes, unitsRes, groupsRes, teamRes, financeRes, salesRes, stockAlertsRes] = await Promise.all([
       context.supabase.from("companies").select("*", { count: "exact", head: true }),
       context.supabase.from("units").select("*", { count: "exact", head: true }),
       context.supabase.from("organization_groups").select("*", { count: "exact", head: true }),
       context.supabase.from("user_roles").select("*", { count: "exact", head: true }),
       context.supabase.from("transactions").select("type, amount"),
+      context.supabase.from("sales" as any).select("final_amount, created_at"),
       tid ? context.supabase.rpc('get_low_stock_count', { _tenant_id: tid }) : Promise.resolve({ data: 0, error: null }),
     ]);
 
@@ -29,6 +30,10 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       else acc.expense += Number(curr.amount);
       return acc;
     }, { income: 0, expense: 0 });
+
+    const salesTotal = (salesRes.data || []).reduce((sum, s) => sum + Number(s.final_amount), 0);
+    const salesCount = salesRes.data?.length || 0;
+    const avgTicket = salesCount > 0 ? salesTotal / salesCount : 0;
 
     return {
       companies: companiesRes.count || 0,
@@ -39,6 +44,11 @@ export const getDashboardStats = createServerFn({ method: "GET" })
         balance: summary.income - summary.expense,
         income: summary.income,
         expense: summary.expense,
+      },
+      sales: {
+        total: salesTotal,
+        count: salesCount,
+        avgTicket
       },
       stockAlerts: (stockAlertsRes as any).data || 0
     };

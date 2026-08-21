@@ -40,6 +40,11 @@ function FinancePage() {
     queryFn: () => getTransactions({ data: { page: 1, pageSize: 10 } }),
   });
 
+  const { data: chartData } = useSuspenseQuery({
+    queryKey: ["finance-chart"],
+    queryFn: () => getFinanceChartData(),
+  });
+
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: () => getProfile(undefined),
@@ -93,7 +98,72 @@ function FinancePage() {
             <div className="text-2xl font-bold text-green-600">{formatCurrency(summary.income)}</div>
           </CardContent>
         </Card>
-        <Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Fluxo de Caixa Mensal</CardTitle>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="month" />
+                <YAxis tickFormatter={(value) => `R$ ${value}`} />
+                <Tooltip 
+                  formatter={(value: number) => formatCurrency(value)}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Legend />
+                <Bar dataKey="income" name="Receitas" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="expense" name="Despesas" fill="#ef4444" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Resumo Estratégico</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col justify-center h-[300px] space-y-6">
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-full">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Margem Operacional</p>
+                  <p className="text-xs text-muted-foreground">Eficiência de conversão</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xl font-bold">
+                  {summary.income > 0 ? ((summary.balance / summary.income) * 100).toFixed(1) : 0}%
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-full">
+                  <Calendar className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Média por Transação</p>
+                  <p className="text-xs text-muted-foreground">Ticket médio geral</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xl font-bold">
+                  {transactionsData.totalCount > 0 ? formatCurrency(summary.income / transactionsData.totalCount) : 'R$ 0,00'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Despesas</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
