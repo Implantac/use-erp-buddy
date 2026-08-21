@@ -43,6 +43,42 @@ export const addTeamMember = createServerFn({ method: "POST" })
     throw new Error("O fluxo de convite via email está em desenvolvimento. Por favor, adicione o UUID do usuário diretamente (em breve).");
   });
 
+export const addTeamMemberById = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data) => z.object({
+    user_id: z.string().uuid(),
+    role: z.enum(['admin', 'manager', 'user', 'viewer']),
+    tenant_id: z.string().uuid()
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("user_roles")
+      .insert({
+        user_id: data.user_id,
+        role: data.role,
+        tenant_id: data.tenant_id
+      });
+
+    if (error) throw error;
+    return { success: true };
+  });
+
+export const updateMemberRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data) => z.object({
+    id: z.string().uuid(),
+    role: z.enum(['admin', 'manager', 'user', 'viewer'])
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("user_roles")
+      .update({ role: data.role })
+      .eq("id", data.id);
+
+    if (error) throw error;
+    return { success: true };
+  });
+
 export const removeTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))

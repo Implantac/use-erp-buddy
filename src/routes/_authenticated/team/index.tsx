@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTeamMembers, removeTeamMember } from "@/lib/team.functions";
+import { getTeamMembers, removeTeamMember, updateMemberRole } from "@/lib/team.functions";
+import { AddMemberDialog } from "@/components/team/add-member-dialog";
+import { getProfile } from "@/lib/settings.functions";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserPlus, Shield, MoreHorizontal, UserMinus } from "lucide-react";
@@ -46,6 +49,13 @@ function TeamList() {
     queryFn: () => getTeamMembers(),
   });
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfile(undefined),
+  });
+
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id || (profile as any)?.tenant_id;
+
   const removeMutation = useMutation({
     mutationFn: (id: string) => removeTeamMember({ data: { id } }),
     onSuccess: () => {
@@ -54,6 +64,17 @@ function TeamList() {
     },
     onError: (error: any) => {
       toast.error("Erro ao remover membro: " + (error.message || "Tente novamente."));
+    }
+  });
+
+  const updateRoleMutation = useMutation({
+    mutationFn: ({ id, role }: { id: string; role: any }) => updateMemberRole({ data: { id, role } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["team-members"] });
+      toast.success("Papel atualizado com sucesso.");
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao atualizar papel: " + (error.message || "Tente novamente."));
     }
   });
 
@@ -66,10 +87,7 @@ function TeamList() {
             Gerencie os membros e as permissões de acesso da sua organização.
           </p>
         </div>
-        <Button onClick={() => toast.info("Funcionalidade de convite em breve!")}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Convidar Membro
-        </Button>
+        {tenantId && <AddMemberDialog tenantId={tenantId} />}
       </div>
 
       <Card>
@@ -120,6 +138,17 @@ function TeamList() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Alterar Papel</DropdownMenuLabel>
+                        {Object.entries(ROLE_LABELS).map(([role, label]) => (
+                          <DropdownMenuItem 
+                            key={role}
+                            onSelect={() => updateRoleMutation.mutate({ id: member.id, role })}
+                            disabled={member.role === role}
+                          >
+                            Tornar {label}
+                          </DropdownMenuItem>
+                        ))}
+                        <div className="h-px bg-muted my-1" />
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem 
