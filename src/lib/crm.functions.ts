@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const getCustomers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { search?: string; active?: boolean } | undefined) => z.object({
+  .validator((data: any) => z.object({
     search: z.string().optional(),
     active: z.boolean().optional(),
   }).parse(data))
@@ -28,7 +28,7 @@ export const getCustomers = createServerFn({ method: "GET" })
 
 export const createCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data) => z.object({
+  .validator((data: any) => z.object({
     tenant_id: z.string().uuid(),
     name: z.string().min(2),
     document: z.string().optional(),
@@ -44,9 +44,9 @@ export const createCustomer = createServerFn({ method: "POST" })
 
 export const updateCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data) => z.object({
+  .validator((data: any) => z.object({
     id: z.string().uuid(),
-    name: z.string().min(2),
+    name: z.string().min(2).optional(),
     document: z.string().optional(),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional(),

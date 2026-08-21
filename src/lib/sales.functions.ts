@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export const getSales = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { limit?: number } | undefined) => z.object({
+  .validator((data: any) => z.object({
     limit: z.number().default(50),
   }).parse(data))
   .handler(async ({ data, context }) => {
@@ -20,7 +20,7 @@ export const getSales = createServerFn({ method: "GET" })
 
 export const createSale = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data) => z.object({
+  .validator((data: any) => z.object({
     tenant_id: z.string().uuid(),
     customer_id: z.string().uuid().optional(),
     items: z.array(z.object({
@@ -31,7 +31,7 @@ export const createSale = createServerFn({ method: "POST" })
     discount_amount: z.number().default(0),
   }).parse(data))
   .handler(async ({ data, context }) => {
-    const total_amount = data.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
+    const total_amount = data.items.reduce((sum: number, item: any) => sum + (item.quantity * item.unit_price), 0);
     const final_amount = total_amount - data.discount_amount;
 
     // 1. Create Sale Header
@@ -52,7 +52,7 @@ export const createSale = createServerFn({ method: "POST" })
     const saleId = (sale as any).id;
 
     // 2. Create Sale Items
-    const saleItems = data.items.map(item => ({
+    const saleItems = data.items.map((item: any) => ({
       sale_id: saleId,
       product_id: item.product_id,
       quantity: item.quantity,
