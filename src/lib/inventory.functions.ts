@@ -40,9 +40,31 @@ export const createInventoryTransaction = createServerFn({ method: "POST" })
     destination_unit_id: z.string().uuid().optional(),
   }).parse(data))
   .handler(async ({ data, context }) => {
+    // Permission check: Can user access origin unit?
+    const { data: canAccessOrigin } = await context.supabase.rpc('check_access', { 
+      _user_id: context.userId, 
+      _unit_id: data.unit_id 
+    });
+    
+    if (!canAccessOrigin) {
+      throw new Error("Acesso negado à unidade de origem.");
+    }
+
+    // If transfer, check destination unit access
+    if (data.type === 'transfer' && data.destination_unit_id) {
+      const { data: canAccessDest } = await context.supabase.rpc('check_access', { 
+        _user_id: context.userId, 
+        _unit_id: data.destination_unit_id 
+      });
+      
+      if (!canAccessDest) {
+        throw new Error("Acesso negado à unidade de destino.");
+      }
+    }
+
     // If it's a transfer, we handle stock movement explicitly if needed
-    // For now, the transaction record is the source of truth
     const { error } = await context.supabase.from("inventory_transactions" as any).insert(data as any);
+
     if (error) throw new Error(error.message);
 
     // If it's a transfer, we should ideally also create an 'in' transaction for the destination

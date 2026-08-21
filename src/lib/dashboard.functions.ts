@@ -11,15 +11,21 @@ export const getDashboardStats = createServerFn({ method: "GET" })
   }).parse(data))
   .handler(async ({ data: filters, context }) => {
 
-    // Get profile to get the tenant_id
-    const { data: profile } = await context.supabase
+    // Get user roles to determine scope
+    const { data: userRole } = await context.supabase
       .from("user_roles")
-      .select("tenant_id")
+      .select("tenant_id, role, company_id, unit_id")
       .eq("user_id", context.userId)
       .limit(1)
       .single();
+    
+    const tid = userRole?.tenant_id;
+    const isGlobalAdmin = userRole?.role === 'admin' && !userRole.company_id && !userRole.unit_id;
+    
+    // Override filters if user has restricted scope
+    const effectiveCompanyId = isGlobalAdmin ? filters.company_id : (userRole?.company_id || filters.company_id);
+    const effectiveUnitId = isGlobalAdmin ? filters.unit_id : (userRole?.unit_id || filters.unit_id);
 
-    const tid = profile?.tenant_id;
 
     // Build base queries with filters
     const companiesQuery = context.supabase.from("companies").select("*", { count: "exact", head: true });
@@ -30,16 +36,29 @@ export const getDashboardStats = createServerFn({ method: "GET" })
     let financeQuery = context.supabase.from("transactions").select("type, amount");
     let salesQuery = context.supabase.from("sales" as any).select("final_amount, created_at");
 
-    if (filters.company_id) {
-      // Assuming related tables have company_id or link through units
-      // For this simplified version, we'll apply filters where columns exist
-      (unitsQuery as any).eq("company_id", filters.company_id);
+    if (effectiveCompanyId) {
+      (unitsQuery as any).eq("company_id", effectiveCompanyId);
+      // If we filter by company, also filter other entities that belong to it
+      (financeQuery as any).eq("company_id", effectiveCompanyId); 
+      (salesQuery as any).eq("company_id", effectiveCompanyId);
+    }
+    
+    if (effectiveUnitId) {
+      (financeQuery as any).eq("unit_id", effectiveUnitId);
+      (salesQuery as any).eq("unit_id", effectiveUnitId);
+    }
+    
+    // Apply role-based mandatory filtering if not global admin
+    if (!isGlobalAdmin) {
+      if (userRole?.company_id) {
+        (companiesQuery as any).eq("id", userRole.company_id);
+        (teamQuery as any).eq("company_id", userRole.company_id);
+      }
+      if (userRole?.unit_id) {
+        (unitsQuery as any).eq("id", userRole.unit_id);
+      }
     }
 
-    if (filters.unit_id) {
-      (financeQuery as any).eq("unit_id", filters.unit_id);
-      (salesQuery as any).eq("unit_id", filters.unit_id);
-    }
 
     // Busca contagens e saldos em paralelo
     const [companiesRes, unitsRes, groupsRes, teamRes, financeRes, salesRes, stockAlertsRes] = await Promise.all([

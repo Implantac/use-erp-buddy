@@ -36,9 +36,11 @@ function Dashboard() {
   const { data: companiesData } = useQuery({
     queryKey: ["companies"],
     queryFn: async () => {
+      // The backend filters these based on user role already, but we can also use rpc here if needed
       const { data } = await supabase.from("companies").select("id, name");
       return data;
     },
+
   });
 
   const { data: unitsData } = useQuery({
@@ -47,6 +49,7 @@ function Dashboard() {
       const { data } = await supabase.from("units").select("id, name, company_id");
       return data;
     },
+
   });
 
 
