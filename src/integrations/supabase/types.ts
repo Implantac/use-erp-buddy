@@ -1025,6 +1025,108 @@ export type Database = {
           },
         ]
       }
+      report_exports: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          filters: Json
+          format: string
+          id: string
+          name: string
+          profile_id: string | null
+          status: string
+          template_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          filters?: Json
+          format: string
+          id?: string
+          name: string
+          profile_id?: string | null
+          status?: string
+          template_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          filters?: Json
+          format?: string
+          id?: string
+          name?: string
+          profile_id?: string | null
+          status?: string
+          template_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_exports_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_exports_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_exports_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_templates: {
+        Row: {
+          category: Database["public"]["Enums"]["report_category"]
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["report_category"]
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["report_category"]
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sale_items: {
         Row: {
           created_at: string
@@ -1555,6 +1657,7 @@ export type Database = {
         | "in_production"
         | "completed"
         | "cancelled"
+      report_category: "sales" | "finance" | "hr" | "logistics" | "inventory"
       transaction_type: "income" | "expense"
     }
     CompositeTypes: {
@@ -1691,6 +1794,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
+      report_category: ["sales", "finance", "hr", "logistics", "inventory"],
       transaction_type: ["income", "expense"],
     },
   },
