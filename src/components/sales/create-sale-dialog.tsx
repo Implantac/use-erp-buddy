@@ -92,14 +92,18 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
     const product = productsData?.products?.find((p) => p.id === productId);
     if (product) {
       const newItems = [...items];
-      newItems[index] = {
-        product_id: productId,
-        quantity: newItems[index].quantity,
-        unit_price: product.price || 0,
-      };
-      setValue("items", newItems);
+      const currentItem = newItems[index];
+      if (currentItem) {
+        newItems[index] = {
+          product_id: productId,
+          quantity: currentItem.quantity,
+          unit_price: product.price || 0,
+        };
+        setValue("items", newItems);
+      }
     }
   };
+
 
   const total = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
   const discount = watch("discount_amount") || 0;
@@ -205,9 +209,16 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                       value={item.quantity} 
                       onChange={(e) => {
                         const newItems = [...items];
-                        newItems[index].quantity = Number(e.target.value);
-                        setValue("items", newItems);
+                        const currentItem = newItems[index];
+                        if (currentItem) {
+                          newItems[index] = {
+                            ...currentItem,
+                            quantity: Number(e.target.value)
+                          };
+                          setValue("items", newItems);
+                        }
                       }}
+
                     />
                   </div>
                   <div className="col-span-3">
@@ -218,9 +229,16 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
                       value={item.unit_price} 
                       onChange={(e) => {
                         const newItems = [...items];
-                        newItems[index].unit_price = Number(e.target.value);
-                        setValue("items", newItems);
+                        const currentItem = newItems[index];
+                        if (currentItem) {
+                          newItems[index] = {
+                            ...currentItem,
+                            unit_price: Number(e.target.value)
+                          };
+                          setValue("items", newItems);
+                        }
                       }}
+
                     />
                   </div>
                   <div className="col-span-2 flex justify-end">
