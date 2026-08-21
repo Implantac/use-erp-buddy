@@ -3,14 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import React, { Suspense } from "react";
 
+const SwaggerUI = React.lazy(() => import("swagger-ui-react"));
+import "swagger-ui-react/swagger-ui.css";
 
 export const Route = createFileRoute("/_authenticated/settings/docs")({
   component: ApiDocsPage,
 });
+
 
 function ApiDocsPage() {
   const copyToClipboard = (text: string) => {
@@ -61,6 +65,9 @@ function ApiDocsPage() {
             <Button variant="ghost" className="w-full justify-start font-normal" asChild>
               <a href="#base-url">URL Base</a>
             </Button>
+            <Button variant="ghost" className="w-full justify-start font-normal" asChild>
+              <a href="#playground">Playground (Swagger)</a>
+            </Button>
           </div>
           <div className="space-y-1">
             <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Endpoints</h4>
@@ -84,6 +91,7 @@ function ApiDocsPage() {
             </Button>
           </div>
         </aside>
+
 
 
         <main className="space-y-12">
@@ -116,6 +124,33 @@ function ApiDocsPage() {
               {window.location.origin}/api/public
             </div>
           </section>
+          
+          {/* Swagger UI Playground */}
+          <section id="playground" className="scroll-mt-20 space-y-4">
+            <div className="flex items-center gap-2">
+              <Play className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold">API Playground</h2>
+            </div>
+            <p>
+              Teste os endpoints em tempo real usando a interface interativa abaixo. 
+              Use o botão <strong>Authorize</strong> para inserir sua API Key.
+            </p>
+            <Card className="overflow-hidden border-muted-foreground/20 shadow-sm">
+              <CardContent className="p-0 bg-white">
+                <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Carregando interface do Swagger...</div>}>
+                  <div className="swagger-ui-container py-4">
+                    <style>{`
+                      .swagger-ui .topbar { display: none }
+                      .swagger-ui .info { margin: 20px 0 }
+                      .swagger-ui .scheme-container { background: transparent; box-shadow: none; padding: 20px 0 }
+                    `}</style>
+                    <SwaggerUI url="/api/public/openapi" />
+                  </div>
+                </Suspense>
+              </CardContent>
+            </Card>
+          </section>
+
 
           {/* Products Endpoint */}
           <section id="products" className="scroll-mt-20 space-y-6">
