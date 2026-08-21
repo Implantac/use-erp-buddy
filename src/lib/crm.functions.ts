@@ -6,10 +6,10 @@ import { logAudit } from "./audit.server";
 // Customer Schemas
 const customerSchema = z.object({
   name: z.string().min(2),
-  document: z.string().optional(),
-  email: z.string().email().optional().or(z.literal("")),
-  phone: z.string().optional(),
-  address: z.string().optional(),
+  document: z.string().optional().nullable(),
+  email: z.string().email().optional().nullable().or(z.literal("")),
+  phone: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
   tenant_id: z.string().uuid(),
 });
 
@@ -60,21 +60,28 @@ export const createCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => customerSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const typedData = customerSchema.parse(data);
     const { data: customer, error } = await context.supabase
       .from("customers")
-      .insert(data)
+      .insert({
+        ...typedData,
+        document: typedData.document || null,
+        email: typedData.email || null,
+        phone: typedData.phone || null,
+        address: typedData.address || null,
+      })
       .select()
       .single();
 
     if (error) throw error;
 
     await logAudit(context.supabase, {
-      tenant_id: data.tenant_id,
+      tenant_id: typedData.tenant_id,
       user_id: context.userId,
       action: 'insert',
       entity_name: 'customers',
       entity_id: customer.id,
-      new_data: data
+      new_data: typedData
     });
 
     return customer;
@@ -97,13 +104,14 @@ export const createOpportunity = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => opportunitySchema.parse(data))
   .handler(async ({ data, context }) => {
+    const typedData = opportunitySchema.parse(data);
     const { data: opportunity, error } = await context.supabase
       .from("crm_opportunities")
       .insert({
-        ...data,
-        description: data.description || null,
-        expected_closing_date: data.expected_closing_date || null,
-        assigned_to: data.assigned_to || null,
+        ...typedData,
+        description: typedData.description || null,
+        expected_closing_date: typedData.expected_closing_date || null,
+        assigned_to: typedData.assigned_to || null,
       })
       .select()
       .single();
@@ -111,12 +119,12 @@ export const createOpportunity = createServerFn({ method: "POST" })
     if (error) throw error;
 
     await logAudit(context.supabase, {
-      tenant_id: data.tenant_id,
+      tenant_id: typedData.tenant_id,
       user_id: context.userId,
       action: 'insert',
       entity_name: 'crm_opportunities',
       entity_id: opportunity.id,
-      new_data: data
+      new_data: typedData
     });
 
     return opportunity;
