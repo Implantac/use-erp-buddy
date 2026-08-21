@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle, Filter, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -266,8 +266,17 @@ function WebhookSimulator() {
 
   const [statusFilter, setStatusFilter] = useState<"all" | "success" | "failure">("all");
   const [eventFilter, setEventFilter] = useState<string | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 5;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const { data: subs } = useSuspenseQuery({
     queryKey: ["webhook-subscriptions"],
@@ -275,9 +284,9 @@ function WebhookSimulator() {
   });
 
   const { data: logsData, refetch: refetchLogs } = useSuspenseQuery({
-    queryKey: ["webhook-logs", selectedSub, page, statusFilter, eventFilter],
+    queryKey: ["webhook-logs", selectedSub, page, statusFilter, eventFilter, debouncedSearch],
     queryFn: () => selectedSub 
-      ? getWebhookLogs({ data: { subscription_id: selectedSub, page, pageSize, status: statusFilter, event: eventFilter } }) 
+      ? getWebhookLogs({ data: { subscription_id: selectedSub, page, pageSize, status: statusFilter, event: eventFilter, search: debouncedSearch } }) 
       : Promise.resolve({ data: [], total: 0, page: 0, pageSize }),
   });
 
@@ -287,7 +296,7 @@ function WebhookSimulator() {
 
   useEffect(() => {
     setPage(0);
-  }, [selectedSub, statusFilter, eventFilter]);
+  }, [selectedSub, statusFilter, eventFilter, debouncedSearch]);
 
   useEffect(() => {
     if (event === "sale.created") {
@@ -419,28 +428,39 @@ function WebhookSimulator() {
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex items-center gap-2 mt-2">
-            <Filter className="h-3 w-3 text-muted-foreground" />
-            <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
-              <SelectTrigger className="h-8 text-xs w-[130px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos Status</SelectItem>
-                <SelectItem value="success">Sucesso</SelectItem>
-                <SelectItem value="failure">Falhas</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={eventFilter || "all"} onValueChange={(val: any) => setEventFilter(val === "all" ? undefined : val)}>
-              <SelectTrigger className="h-8 text-xs w-[130px]">
-                <SelectValue placeholder="Evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos Eventos</SelectItem>
-                <SelectItem value="sale.created">sale.created</SelectItem>
-                <SelectItem value="inventory.low">inventory.low</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar em eventos ou payload..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 h-9 text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-3 w-3 text-muted-foreground" />
+              <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
+                <SelectTrigger className="h-8 text-xs w-[130px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Status</SelectItem>
+                  <SelectItem value="success">Sucesso</SelectItem>
+                  <SelectItem value="failure">Falhas</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={eventFilter || "all"} onValueChange={(val: any) => setEventFilter(val === "all" ? undefined : val)}>
+                <SelectTrigger className="h-8 text-xs w-[130px]">
+                  <SelectValue placeholder="Evento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos Eventos</SelectItem>
+                  <SelectItem value="sale.created">sale.created</SelectItem>
+                  <SelectItem value="inventory.low">inventory.low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
