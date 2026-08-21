@@ -162,11 +162,12 @@ export function EditProductDialog({ product }: EditProductDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories?.map((category) => (
+                        {categories?.filter(c => c.active !== false || c.id === product.category_id).map((category) => (
                           <SelectItem key={category.id} value={category.id}>
-                            {category.name}
+                            {category.name} {category.active === false ? "(Inativa)" : ""}
                           </SelectItem>
                         ))}
+
                       </SelectContent>
                     </Select>
                     <FormMessage />
