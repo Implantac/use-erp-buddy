@@ -56,8 +56,8 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
   const queryClient = useQueryClient();
 
   const { data: customers } = useQuery({
-    queryKey: ["customers", { active: true }],
-    queryFn: () => getCustomers({ data: { active: true } }),
+    queryKey: ["customers"],
+    queryFn: () => getCustomers({ data: {} }),
   });
 
   const { data: productsData } = useQuery({

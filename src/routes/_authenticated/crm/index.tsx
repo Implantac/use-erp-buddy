@@ -74,12 +74,12 @@ function CRMPage() {
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8">Carregando...</TableCell>
                 </TableRow>
-              ) : customers?.length === 0 ? (
+              ) : (customers as any[])?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Nenhum cliente encontrado.</TableCell>
                 </TableRow>
               ) : (
-                customers?.map((customer: any) => (
+                (customers as any[])?.map((customer: any) => (
                   <TableRow key={customer.id}>
                     <TableCell className="font-medium">{customer.name}</TableCell>
                     <TableCell>{customer.document || "-"}</TableCell>
