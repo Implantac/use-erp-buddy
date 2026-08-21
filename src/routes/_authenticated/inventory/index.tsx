@@ -200,7 +200,8 @@ function InventoryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Unidade</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
+
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione a unidade" />
@@ -262,7 +263,8 @@ function InventoryPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Unidade de Destino</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
+
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Selecione o destino" />

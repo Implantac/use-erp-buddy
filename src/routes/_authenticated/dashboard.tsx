@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const [filters, setFilters] = useState<{ company_id?: string; unit_id?: string }>({});
+  const [filters, setFilters] = useState<{ company_id: string | undefined; unit_id: string | undefined }>({ company_id: undefined, unit_id: undefined });
   
   const { data: stats } = useSuspenseQuery({
     queryKey: ["dashboard-stats", filters],
@@ -143,7 +143,7 @@ function Dashboard() {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => setFilters({})} 
+            onClick={() => setFilters({ company_id: undefined, unit_id: undefined })} 
             className="text-muted-foreground"
           >
             <X className="h-4 w-4 mr-2" />
