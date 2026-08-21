@@ -49,7 +49,7 @@ function PurchasesDashboard() {
     queryFn: () => getProfile(),
   });
 
-  const tenantId = profile?.tenant_id;
+  const tenantId = (profile as any)?.user_roles?.[0]?.tenant_id;
 
   
   const { data: orders, isLoading: loadingOrders } = useQuery({

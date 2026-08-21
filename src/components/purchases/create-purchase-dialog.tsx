@@ -66,7 +66,6 @@ export function CreatePurchaseDialog({ tenantId }: { tenantId: string }) {
     const newItems = [...items];
     (newItems[index] as any)[field] = value;
     
-    // Auto-fill price if product changes
     if (field === "product_id") {
       const product = products.find((p: any) => p.id === value);
       if (product) {
@@ -76,6 +75,7 @@ export function CreatePurchaseDialog({ tenantId }: { tenantId: string }) {
     
     setItems(newItems);
   };
+
 
   const handleCreate = () => {
     if (!supplierId) return toast.error("Selecione um fornecedor");
