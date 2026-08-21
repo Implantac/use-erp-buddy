@@ -8,7 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Building, Shield } from "lucide-react";
+import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus } from "lucide-react";
+import { getApiKeys, createApiKey, revokeApiKey } from "@/lib/api-keys.functions";
+import { getWebhookSubscriptions, createWebhookSubscription, deleteWebhookSubscription } from "@/lib/webhooks.functions";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 import { useState } from "react";
@@ -64,6 +68,10 @@ function SettingsPage() {
           <TabsTrigger value="security" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             Segurança
+          </TabsTrigger>
+          <TabsTrigger value="developer" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            Desenvolvedor
           </TabsTrigger>
         </TabsList>
 
@@ -170,7 +178,311 @@ function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="developer" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Chaves de API</CardTitle>
+                <CardDescription>
+                  Use estas chaves para integrar sistemas externos ao ERP.
+                </CardDescription>
+              </div>
+              <CreateApiKeyDialog tenantId={tenant?.id} onCreated={() => queryClient.invalidateQueries({ queryKey: ["api-keys"] })} />
+            </CardHeader>
+            <CardContent>
+              <ApiKeysList />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Webhooks</CardTitle>
+                <CardDescription>
+                  Receba notificações em tempo real sobre eventos do sistema.
+                </CardDescription>
+              </div>
+              <CreateWebhookDialog tenantId={tenant?.id} onCreated={() => queryClient.invalidateQueries({ queryKey: ["webhooks"] })} />
+            </CardHeader>
+            <CardContent>
+              <WebhooksList />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function ApiKeysList() {
+  const queryClient = useQueryClient();
+  const { data: keys, isLoading } = useSuspenseQuery({
+    queryKey: ["api-keys"],
+    queryFn: () => getApiKeys(),
+  });
+
+  const revokeMutation = useMutation({
+    mutationFn: (id: string) => revokeApiKey({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["api-keys"] });
+      toast.success("Chave revogada com sucesso.");
+    }
+  });
+
+  if (isLoading) return <div className="py-4 text-center text-muted-foreground">Carregando chaves...</div>;
+  if (!keys?.length) return <div className="py-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">Nenhuma chave de API gerada.</div>;
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Label</TableHead>
+          <TableHead>Prefixo</TableHead>
+          <TableHead>Criada em</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Ações</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {keys.map((key: any) => (
+          <TableRow key={key.id}>
+            <TableCell className="font-medium">{key.label}</TableCell>
+            <TableCell><code>{key.key_prefix}***</code></TableCell>
+            <TableCell>{new Date(key.created_at).toLocaleDateString()}</TableCell>
+            <TableCell>
+              <Badge variant={key.is_active ? "default" : "secondary"}>
+                {key.is_active ? "Ativa" : "Revogada"}
+              </Badge>
+            </TableCell>
+            <TableCell className="text-right">
+              {key.is_active && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-destructive"
+                  onClick={() => revokeMutation.mutate(key.id)}
+                  disabled={revokeMutation.isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function CreateApiKeyDialog({ tenantId, onCreated }: { tenantId?: string, onCreated: () => void }) {
+  const [label, setLabel] = useState("");
+  const [open, setOpen] = useState(false);
+  const [newKey, setNewKey] = useState<string | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: (vars: { label: string, tenant_id: string }) => createApiKey({ data: vars }),
+    onSuccess: (data) => {
+      setNewKey(data.rawKey);
+      onCreated();
+    }
+  });
+
+  const handleCreate = () => {
+    if (!tenantId) return;
+    mutation.mutate({ label, tenant_id: tenantId });
+  };
+
+  const copyToClipboard = () => {
+    if (newKey) {
+      navigator.clipboard.writeText(newKey);
+      toast.success("Chave copiada!");
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setNewKey(null); setLabel(""); } }}>
+      <DialogTrigger asChild>
+        <Button size="sm"><Plus className="h-4 w-4 mr-2" /> Gerar Chave</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nova Chave de API</DialogTitle>
+          <DialogDescription>
+            {newKey 
+              ? "Copie sua chave agora. Por segurança, você não poderá vê-la novamente."
+              : "Dê um nome para identificar onde esta chave será usada."}
+          </DialogDescription>
+        </DialogHeader>
+
+        {newKey ? (
+          <div className="space-y-4 py-4">
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-md border font-mono text-sm break-all">
+              {newKey}
+              <Button size="icon" variant="ghost" className="shrink-0" onClick={copyToClipboard}>
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-yellow-600 font-medium">
+              Aviso: Se você perder esta chave, precisará gerar uma nova.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="label">Identificador</Label>
+              <Input 
+                id="label" 
+                placeholder="Ex: Integração Site, App Mobile" 
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+
+        <DialogFooter>
+          {newKey ? (
+            <Button onClick={() => setOpen(false)}>Concluído</Button>
+          ) : (
+            <Button onClick={handleCreate} disabled={mutation.isPending || !label}>
+              {mutation.isPending ? "Gerando..." : "Gerar"}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function WebhooksList() {
+  const queryClient = useQueryClient();
+  const { data: webhooks, isLoading } = useSuspenseQuery({
+    queryKey: ["webhooks"],
+    queryFn: () => getWebhookSubscriptions(),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteWebhookSubscription({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["webhooks"] });
+      toast.success("Webhook removido.");
+    }
+  });
+
+  if (isLoading) return <div className="py-4 text-center text-muted-foreground">Carregando webhooks...</div>;
+  if (!webhooks?.length) return <div className="py-8 text-center text-muted-foreground border-2 border-dashed rounded-lg">Nenhum webhook configurado.</div>;
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Label</TableHead>
+          <TableHead>URL de Destino</TableHead>
+          <TableHead>Eventos</TableHead>
+          <TableHead className="text-right">Ações</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {webhooks.map((wh: any) => (
+          <TableRow key={wh.id}>
+            <TableCell className="font-medium">{wh.label}</TableCell>
+            <TableCell className="text-xs font-mono">{wh.target_url}</TableCell>
+            <TableCell>
+              <div className="flex flex-wrap gap-1">
+                {wh.events.map((e: string) => (
+                  <Badge key={e} variant="outline" className="text-[10px]">{e}</Badge>
+                ))}
+              </div>
+            </TableCell>
+            <TableCell className="text-right">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-destructive"
+                onClick={() => deleteMutation.mutate(wh.id)}
+                disabled={deleteMutation.isPending}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+function CreateWebhookDialog({ tenantId, onCreated }: { tenantId?: string, onCreated: () => void }) {
+  const [label, setLabel] = useState("");
+  const [url, setUrl] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: (vars: { label: string, target_url: string, tenant_id: string, events: string[] }) => 
+      createWebhookSubscription({ data: vars }),
+    onSuccess: () => {
+      toast.success("Webhook configurado.");
+      setOpen(false);
+      onCreated();
+      setLabel("");
+      setUrl("");
+    }
+  });
+
+  const handleCreate = () => {
+    if (!tenantId) return;
+    mutation.mutate({ 
+      label, 
+      target_url: url, 
+      tenant_id: tenantId, 
+      events: ["sale.created", "inventory.low"] 
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm"><Plus className="h-4 w-4 mr-2" /> Novo Endpoint</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Configurar Webhook</DialogTitle>
+          <DialogDescription>
+            Insira a URL para onde enviaremos as notificações de eventos.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="wh-label">Identificador</Label>
+            <Input 
+              id="wh-label" 
+              placeholder="Ex: Integração ERP, Slack Bot" 
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="url">URL de Destino</Label>
+            <Input 
+              id="url" 
+              type="url"
+              placeholder="https://api.seusistema.com/webhooks" 
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Por padrão, todos os eventos (Vendas e Estoque Baixo) serão enviados.
+          </p>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={handleCreate} disabled={mutation.isPending || !label || !url}>
+            {mutation.isPending ? "Salvando..." : "Salvar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

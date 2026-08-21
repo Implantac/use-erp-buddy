@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          key_hash: string
+          key_prefix: string
+          label: string
+          last_used_at: string | null
+          permissions: Json | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          key_prefix: string
+          label: string
+          last_used_at?: string | null
+          permissions?: Json | null
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          key_prefix?: string
+          label?: string
+          last_used_at?: string | null
+          permissions?: Json | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -642,6 +689,107 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "user_roles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          delivery_attempts: number | null
+          event_type: string
+          id: string
+          is_success: boolean | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          subscription_id: string | null
+          target_url: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_attempts?: number | null
+          event_type: string
+          id?: string
+          is_success?: boolean | null
+          payload: Json
+          response_body?: string | null
+          response_status?: number | null
+          subscription_id?: string | null
+          target_url: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_attempts?: number | null
+          event_type?: string
+          id?: string
+          is_success?: boolean | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          subscription_id?: string | null
+          target_url?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_subscriptions: {
+        Row: {
+          created_at: string
+          events: string[]
+          id: string
+          is_active: boolean
+          label: string
+          secret: string
+          target_url: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          events?: string[]
+          id?: string
+          is_active?: boolean
+          label: string
+          secret: string
+          target_url: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          events?: string[]
+          id?: string
+          is_active?: boolean
+          label?: string
+          secret?: string
+          target_url?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_subscriptions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
