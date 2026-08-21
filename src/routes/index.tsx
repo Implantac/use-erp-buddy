@@ -77,8 +77,8 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 7 Finalizada - Inteligência de Negócio & Colaboração</p>
-          <p className="mt-2 text-xs text-muted-foreground">Dashboards estratégicos, indicadores de BI e gestão avançada de equipe integrados.</p>
+          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 8 Finalizada - Ecossistema & API Pública</p>
+          <p className="mt-2 text-xs text-muted-foreground">Documentação técnica, API REST protegida e Webhooks ativos para integração total.</p>
 
 
 
