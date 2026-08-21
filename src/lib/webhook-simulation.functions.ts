@@ -90,6 +90,7 @@ export const getWebhookLogs = createServerFn({ method: "GET" })
     pageSize: z.number().default(10),
     status: z.enum(["all", "success", "failure"]).default("all"),
     event: z.string().optional(),
+    search: z.string().optional(),
   }).parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data: input, context }) => {
