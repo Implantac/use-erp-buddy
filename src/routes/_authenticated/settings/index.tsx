@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProfile, updateProfile, getTenantSettings } from "@/lib/settings.functions";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus, ExternalLink } from "lucide-react";
+import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus, ExternalLink, Zap } from "lucide-react";
 import { getApiKeys, createApiKey, revokeApiKey } from "@/lib/api-keys.functions";
 import { getWebhookSubscriptions, createWebhookSubscription, deleteWebhookSubscription } from "@/lib/webhooks.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -81,7 +81,7 @@ function SettingsPage() {
             Desenvolvedor
           </TabsTrigger>
           <TabsTrigger value="automations" className="flex items-center gap-2">
-            <Webhook className="h-4 w-4" />
+            <Zap className="h-4 w-4" />
             Automações
           </TabsTrigger>
         </TabsList>
@@ -235,8 +235,10 @@ function SettingsPage() {
                   Configure gatilhos inteligentes para automatizar processos.
                 </CardDescription>
               </div>
-              <Button size="sm" onClick={() => toast.info("Criação de regras em breve!")}>
-                <Plus className="h-4 w-4 mr-2" /> Nova Regra
+              <Button size="sm" asChild>
+                <Link to="/settings/automations">
+                  <Plus className="h-4 w-4 mr-2" /> Nova Regra
+                </Link>
               </Button>
             </CardHeader>
             <CardContent>
