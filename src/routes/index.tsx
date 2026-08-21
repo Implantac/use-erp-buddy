@@ -83,6 +83,8 @@ function Index() {
           <p className="mt-2 text-xs text-primary font-medium">Fase 4: Gestão de Estoque e Inteligência Operacional concluída. Iniciando Fase 5: CRM e Vendas.</p>
           <p className="mt-2 text-xs text-primary font-medium">Fase 5: CRM e Gestão de Vendas concluída. Iniciando Fase 6: Auditoria e Automações.</p>
           <p className="mt-2 text-xs text-primary font-medium">Fase 6: Auditoria e Automações concluída. Sistema operacional Use ERP está com sua base core completa.</p>
+          <p className="mt-2">ok continue com as implementações</p>
+
 
 
         </div>
