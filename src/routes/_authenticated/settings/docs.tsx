@@ -3,13 +3,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
+import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getWebhookSubscriptions } from "@/lib/webhooks.functions";
+import { simulateWebhook, getWebhookLogs } from "@/lib/webhook-simulation.functions";
 
 const SwaggerUI = React.lazy(() => import("swagger-ui-react"));
 import "swagger-ui-react/swagger-ui.css";
+
 
 export const Route = createFileRoute("/_authenticated/settings/docs")({
   component: ApiDocsPage,
@@ -80,7 +87,11 @@ function ApiDocsPage() {
             <Button variant="ghost" className="w-full justify-start font-normal" asChild>
               <a href="#webhooks">Webhooks</a>
             </Button>
+            <Button variant="ghost" className="w-full justify-start font-normal" asChild>
+              <a href="#webhook-simulator">Simulador</a>
+            </Button>
           </div>
+
           <div className="space-y-1">
             <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Recursos</h4>
             <Button variant="outline" size="sm" className="w-full justify-start gap-2" asChild>
@@ -223,6 +234,19 @@ function ApiDocsPage() {
             </div>
           </section>
 
+          {/* Webhook Simulator */}
+          <section id="webhook-simulator" className="scroll-mt-20 space-y-6">
+            <div className="flex items-center gap-2">
+              <Send className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-bold">Simulador de Webhooks</h2>
+            </div>
+            <p>
+              Teste sua integração simulando disparos de eventos para seus endpoints configurados.
+            </p>
+            <WebhookSimulator />
+          </section>
+
+
           <section className="pt-12 border-t text-center">
             <p className="text-muted-foreground text-sm">
               Precisa de ajuda com a integração? Entre em contato com o suporte técnico.
@@ -233,3 +257,180 @@ function ApiDocsPage() {
     </div>
   );
 }
+
+function WebhookSimulator() {
+  const queryClient = useQueryClient();
+  const [selectedSub, setSelectedSub] = useState<string>("");
+  const [event, setEvent] = useState<string>("sale.created");
+  const [payload, setPayload] = useState<string>("");
+
+  const { data: subs } = useSuspenseQuery({
+    queryKey: ["webhook-subscriptions"],
+    queryFn: () => getWebhookSubscriptions(),
+  });
+
+  const { data: logs, refetch: refetchLogs } = useSuspenseQuery({
+    queryKey: ["webhook-logs", selectedSub],
+    queryFn: () => selectedSub ? getWebhookLogs({ data: { subscription_id: selectedSub } }) : Promise.resolve([]),
+  });
+
+  useEffect(() => {
+    if (event === "sale.created") {
+      setPayload(JSON.stringify({
+        id: "sale_" + Math.random().toString(36).substring(7),
+        total: 150.75,
+        currency: "BRL",
+        customer: { name: "Cliente Teste", email: "teste@example.com" }
+      }, null, 2));
+    } else if (event === "inventory.low") {
+      setPayload(JSON.stringify({
+        product_id: "prod_" + Math.random().toString(36).substring(7),
+        sku: "TEST-SKU-001",
+        current_stock: 3,
+        min_stock: 5
+      }, null, 2));
+    }
+  }, [event]);
+
+  const simulationMutation = useMutation({
+    mutationFn: (vars: { subscription_id: string, event: string, payload: any }) => simulateWebhook({ data: vars }),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("Webhook disparado com sucesso!");
+      } else {
+        toast.error(`Falha no disparo: Status ${data.status}`);
+      }
+      refetchLogs();
+    },
+    onError: (err: any) => {
+      toast.error("Erro na simulação: " + err.message);
+    }
+  });
+
+  const handleSimulate = () => {
+    if (!selectedSub) {
+      toast.error("Selecione um endpoint");
+      return;
+    }
+    try {
+      const parsedPayload = JSON.parse(payload);
+      simulationMutation.mutate({
+        subscription_id: selectedSub,
+        event,
+        payload: parsedPayload
+      });
+    } catch (e) {
+      toast.error("Payload JSON inválido");
+    }
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Configurar Simulação</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Endpoint de Destino</Label>
+            <Select value={selectedSub} onValueChange={setSelectedSub}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um webhook configurado" />
+              </SelectTrigger>
+              <SelectContent>
+                {subs?.map((sub: any) => (
+                  <SelectItem key={sub.id} value={sub.id}>
+                    {sub.label} ({sub.target_url})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Evento</Label>
+            <Select value={event} onValueChange={setEvent}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sale.created">sale.created</SelectItem>
+                <SelectItem value="inventory.low">inventory.low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Payload (JSON)</Label>
+            <textarea
+              className="flex min-h-[200px] w-full rounded-md border border-input bg-zinc-950 px-3 py-2 text-sm text-zinc-300 font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={payload}
+              onChange={(e) => setPayload(e.target.value)}
+            />
+          </div>
+          <Button 
+            className="w-full" 
+            onClick={handleSimulate}
+            disabled={simulationMutation.isPending || !selectedSub}
+          >
+            {simulationMutation.isPending ? (
+              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Simular Disparo
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Logs Recentes</CardTitle>
+          <Button variant="ghost" size="icon" onClick={() => refetchLogs()}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[450px] pr-4">
+            {!selectedSub ? (
+              <div className="text-center py-12 text-muted-foreground">
+                Selecione um endpoint para ver os logs
+              </div>
+            ) : !logs?.length ? (
+              <div className="text-center py-12 text-muted-foreground">
+                Nenhuma entrega registrada para este endpoint
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {logs.map((log: any) => (
+                  <div key={log.id} className="p-3 border rounded-lg space-y-2 bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {log.is_success ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-destructive" />
+                        )}
+                        <span className="text-xs font-mono font-bold uppercase">{log.event_type}</span>
+                      </div>
+                      <Badge variant={log.is_success ? "outline" : "destructive"} className="text-[10px]">
+                        HTTP {log.response_status}
+                      </Badge>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {new Date(log.created_at).toLocaleString()}
+                    </div>
+                    {log.response_body && (
+                      <div className="mt-2 text-[10px] font-mono bg-zinc-950 text-zinc-400 p-2 rounded max-h-20 overflow-hidden">
+                        {log.response_body}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
