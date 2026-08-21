@@ -77,8 +77,8 @@ function Index() {
       <footer className="mt-20 border-t bg-card py-12">
         <div className="mx-auto max-w-7xl px-6 text-center text-sm text-muted-foreground">
           <p>© 2026 Use Business OS. Todos os direitos reservados.</p>
-          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 8 Finalizada - Ecossistema & API Pública</p>
-          <p className="mt-2 text-xs text-muted-foreground">Documentação técnica, API REST protegida e Webhooks ativos para integração total.</p>
+          <p className="mt-4 text-xs font-medium text-primary">Status do Projeto: Fase 9 Finalizada - Gestão de Compras & Suprimentos</p>
+          <p className="mt-2 text-xs text-muted-foreground">Ciclo operacional completo: compras, vendas, estoque e financeiro integrados com API e Webhooks.</p>
 
 
 
