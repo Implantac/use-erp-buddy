@@ -40,6 +40,8 @@ const productSchema = z.object({
   sku: z.string().optional(),
   price: z.coerce.number().min(0, "O preço deve ser maior ou igual a zero"),
   stock_quantity: z.coerce.number().int().min(0, "O estoque deve ser maior ou igual a zero"),
+  min_stock: z.coerce.number().min(0, "O estoque mínimo deve ser maior ou igual a zero").optional(),
+  unit_of_measure: z.string().default("un"),
   category_id: z.string().uuid("Selecione uma categoria"),
   description: z.string().optional(),
 });
@@ -63,6 +65,8 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
       sku: "",
       price: 0,
       stock_quantity: 0,
+      min_stock: 0,
+      unit_of_measure: "un",
       category_id: "",
       description: "",
     },
@@ -185,6 +189,47 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
                 )}
               />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="min_stock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estoque Mínimo</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unit_of_measure"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unidade de Medida</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="un">Unidade (un)</SelectItem>
+                        <SelectItem value="kg">Quilograma (kg)</SelectItem>
+                        <SelectItem value="g">Grama (g)</SelectItem>
+                        <SelectItem value="l">Litro (l)</SelectItem>
+                        <SelectItem value="ml">Mililitro (ml)</SelectItem>
+                        <SelectItem value="m">Metro (m)</SelectItem>
+                        <SelectItem value="m2">Metro Quadrado (m²)</SelectItem>
+                        <SelectItem value="cx">Caixa (cx)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             <FormField
               control={form.control}
               name="description"

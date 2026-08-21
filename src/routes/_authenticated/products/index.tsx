@@ -78,7 +78,16 @@ function ProductsPage() {
                       <TableCell>
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price || 0)}
                       </TableCell>
-                      <TableCell>{product.stock_quantity}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {product.stock_quantity}
+                          {product.stock_quantity <= (product as any).min_stock && (
+                            <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">
+                              Baixo
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={product.active !== false ? "default" : "secondary"} className={product.active !== false ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
                           {product.active !== false ? "Ativo" : "Inativo"}
