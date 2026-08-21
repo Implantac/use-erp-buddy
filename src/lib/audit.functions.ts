@@ -20,17 +20,16 @@ export const getAuditLogs = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let query = context.supabase
       .from("audit_logs" as any)
-      .select("*, profiles(full_name), companies(name), units(name)")
+      .select("*, profiles(full_name), companies(name), units(name)", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    if (data?.limit && !data.offset) {
-       query = query.limit(data.limit);
-    } else if (data?.limit && data.offset) {
-       query = query.range(data.offset, data.offset + data.limit - 1);
+    if (data?.limit) {
+      const offset = data.offset || 0;
+      query = query.range(offset, offset + data.limit - 1);
     }
 
     if (data?.entityName) {
-      query = (query as any).eq("entity_name", data.entityName);
+      query = (query as any).ilike("entity_name", `%${data.entityName}%`);
     }
     if (data?.action) {
       query = (query as any).eq("action", data.action);
@@ -51,9 +50,13 @@ export const getAuditLogs = createServerFn({ method: "GET" })
       query = (query as any).lte("created_at", data.endDate);
     }
 
-    const { data: logs, error } = await query;
+    const { data: logs, count, error } = await query;
     if (error) throw error;
-    return logs as any[];
+    
+    return {
+      logs: logs as any[],
+      count: count || 0
+    };
   });
 
 export const exportAuditLogsCsv = createServerFn({ method: "GET" })

@@ -11,42 +11,58 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { History, Shield, Info, Download, Filter, Search, X } from "lucide-react";
+import { History, Shield, Info, Download, Filter, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export const Route = createFileRoute("/_authenticated/audit/")({
   component: AuditLogsPage,
 });
 
 function AuditLogsPage() {
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
   const [filters, setFilters] = useState({
     action: "all",
     companyId: "all",
     unitId: "all",
     startDate: "",
     endDate: "",
+    entityName: "",
   });
 
-  const { data: logs, isLoading } = useQuery({
-    queryKey: ["audit-logs", filters],
+  const debouncedEntityName = useDebounce(filters.entityName, 500);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["audit-logs", { ...filters, entityName: debouncedEntityName, page }],
     queryFn: () => getAuditLogs({ 
       data: { 
-        limit: 100,
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
         action: filters.action === "all" ? undefined : filters.action,
         companyId: filters.companyId === "all" ? undefined : filters.companyId,
         unitId: filters.unitId === "all" ? undefined : filters.unitId,
+        entityName: debouncedEntityName || undefined,
         startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
         endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined,
       } 
     }),
   });
+
+  const logs = data?.logs || [];
+  const totalCount = data?.count || 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters.action, filters.companyId, filters.unitId, filters.startDate, filters.endDate, debouncedEntityName]);
 
   const { data: companies } = useQuery({
     queryKey: ["companies"],
@@ -70,6 +86,7 @@ function AuditLogsPage() {
         action: filters.action === "all" ? undefined : filters.action,
         companyId: filters.companyId === "all" ? undefined : filters.companyId,
         unitId: filters.unitId === "all" ? undefined : filters.unitId,
+        entityName: filters.entityName || undefined,
         startDate: filters.startDate ? new Date(filters.startDate).toISOString() : undefined,
         endDate: filters.endDate ? new Date(filters.endDate).toISOString() : undefined,
       } 
@@ -109,7 +126,9 @@ function AuditLogsPage() {
       unitId: "all",
       startDate: "",
       endDate: "",
+      entityName: "",
     });
+    setPage(1);
   };
 
   return (
@@ -143,7 +162,7 @@ function AuditLogsPage() {
               <Filter className="h-5 w-5 text-muted-foreground" />
               <CardTitle className="text-lg">Filtros</CardTitle>
             </div>
-            {(filters.action !== "all" || filters.companyId !== "all" || filters.unitId !== "all" || filters.startDate || filters.endDate) && (
+            {(filters.action !== "all" || filters.companyId !== "all" || filters.unitId !== "all" || filters.startDate || filters.endDate || filters.entityName) && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8">
                 <X className="h-3 w-3 mr-2" />
                 Limpar
@@ -152,7 +171,20 @@ function AuditLogsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="space-y-2 lg:col-span-1">
+              <label className="text-xs font-medium text-muted-foreground uppercase">Busca</label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Entidade..."
+                  className="pl-9"
+                  value={filters.entityName}
+                  onChange={(e) => setFilters(prev => ({ ...prev, entityName: e.target.value }))}
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase">Ação</label>
               <Select value={filters.action} onValueChange={(val) => setFilters(prev => ({ ...prev, action: val }))}>
@@ -284,6 +316,38 @@ function AuditLogsPage() {
                   )}
                 </TableBody>
               </Table>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-4 bg-muted/20 border-t">
+                  <div className="text-sm text-muted-foreground">
+                    Mostrando <span className="font-medium">{logs.length}</span> de <span className="font-medium">{totalCount}</span> registros
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Anterior
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-medium px-2">
+                        Página {page} de {totalPages}
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                    >
+                      Próximo
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
