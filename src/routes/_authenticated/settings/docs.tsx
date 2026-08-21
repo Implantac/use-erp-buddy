@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson, Play, Send, RefreshCw, CheckCircle2, XCircle, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -264,15 +264,30 @@ function WebhookSimulator() {
   const [event, setEvent] = useState<string>("sale.created");
   const [payload, setPayload] = useState<string>("");
 
+  const [statusFilter, setStatusFilter] = useState<"all" | "success" | "failure">("all");
+  const [eventFilter, setEventFilter] = useState<string | undefined>(undefined);
+  const [page, setPage] = useState(0);
+  const pageSize = 5;
+
   const { data: subs } = useSuspenseQuery({
     queryKey: ["webhook-subscriptions"],
     queryFn: () => getWebhookSubscriptions(),
   });
 
-  const { data: logs, refetch: refetchLogs } = useSuspenseQuery({
-    queryKey: ["webhook-logs", selectedSub],
-    queryFn: () => selectedSub ? getWebhookLogs({ data: { subscription_id: selectedSub } }) : Promise.resolve([]),
+  const { data: logsData, refetch: refetchLogs } = useSuspenseQuery({
+    queryKey: ["webhook-logs", selectedSub, page, statusFilter, eventFilter],
+    queryFn: () => selectedSub 
+      ? getWebhookLogs({ data: { subscription_id: selectedSub, page, pageSize, status: statusFilter, event: eventFilter } }) 
+      : Promise.resolve({ data: [], total: 0, page: 0, pageSize }),
   });
+
+  const logs = logsData?.data || [];
+  const total = logsData?.total || 0;
+  const totalPages = Math.ceil(total / pageSize);
+
+  useEffect(() => {
+    setPage(0);
+  }, [selectedSub, statusFilter, eventFilter]);
 
   useEffect(() => {
     if (event === "sale.created") {
@@ -397,11 +412,36 @@ function WebhookSimulator() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Logs Recentes</CardTitle>
-          <Button variant="ghost" size="icon" onClick={() => refetchLogs()}>
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+        <CardHeader className="pb-3">
+          <div className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Histórico de Entregas</CardTitle>
+            <Button variant="ghost" size="icon" onClick={() => refetchLogs()}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <Filter className="h-3 w-3 text-muted-foreground" />
+            <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
+              <SelectTrigger className="h-8 text-xs w-[130px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Status</SelectItem>
+                <SelectItem value="success">Sucesso</SelectItem>
+                <SelectItem value="failure">Falhas</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={eventFilter || "all"} onValueChange={(val: any) => setEventFilter(val === "all" ? undefined : val)}>
+              <SelectTrigger className="h-8 text-xs w-[130px]">
+                <SelectValue placeholder="Evento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos Eventos</SelectItem>
+                <SelectItem value="sale.created">sale.created</SelectItem>
+                <SelectItem value="inventory.low">inventory.low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[450px] pr-4">
@@ -458,6 +498,36 @@ function WebhookSimulator() {
             )}
           </ScrollArea>
         </CardContent>
+        {selectedSub && totalPages > 1 && (
+          <CardFooter className="flex items-center justify-between pt-4 border-t px-6 py-4">
+            <div className="text-xs text-muted-foreground">
+              Total: {total} logs
+            </div>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8" 
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-xs font-medium">
+                {page + 1} de {totalPages}
+              </span>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-8 w-8" 
+                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                disabled={page >= totalPages - 1}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

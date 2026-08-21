@@ -86,18 +86,43 @@ export const simulateWebhook = createServerFn({ method: "POST" })
 export const getWebhookLogs = createServerFn({ method: "GET" })
   .validator((data: unknown) => z.object({
     subscription_id: z.string().uuid(),
+    page: z.number().default(0),
+    pageSize: z.number().default(10),
+    status: z.enum(["all", "success", "failure"]).default("all"),
+    event: z.string().optional(),
   }).parse(data))
   .middleware([requireSupabaseAuth])
   .handler(async ({ data: input, context }) => {
-    const { data, error } = await context.supabase
+    let query = context.supabase
       .from("webhook_logs")
-      .select("*")
-      .eq("subscription_id", input.subscription_id)
+      .select("*", { count: "exact" })
+      .eq("subscription_id", input.subscription_id);
+
+    if (input.status === "success") {
+      query = query.eq("is_success", true);
+    } else if (input.status === "failure") {
+      query = query.eq("is_success", false);
+    }
+
+    if (input.event) {
+      query = query.eq("event_type", input.event);
+    }
+
+    const from = input.page * input.pageSize;
+    const to = from + input.pageSize - 1;
+
+    const { data, count, error } = await query
       .order("created_at", { ascending: false })
-      .limit(10);
+      .range(from, to);
 
     if (error) throw error;
-    return data;
+    
+    return {
+      data,
+      total: count || 0,
+      page: input.page,
+      pageSize: input.pageSize
+    };
   });
 
 export const resendWebhook = createServerFn({ method: "POST" })
