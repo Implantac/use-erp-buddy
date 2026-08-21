@@ -219,6 +219,24 @@ function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <TabsContent value="automations" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Regras de Automação</CardTitle>
+                <CardDescription>
+                  Configure gatilhos inteligentes para automatizar processos.
+                </CardDescription>
+              </div>
+              <Button size="sm" onClick={() => toast.info("Criação de regras em breve!")}>
+                <Plus className="h-4 w-4 mr-2" /> Nova Regra
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <AutomationsList />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
