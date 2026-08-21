@@ -15,13 +15,13 @@ export const getWebhookSubscriptions = createServerFn({ method: "GET" })
   });
 
 export const createWebhookSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .input(z.object({
+  .validator((data: unknown) => z.object({
     tenant_id: z.string().uuid(),
     label: z.string().min(3),
     target_url: z.string().url(),
     events: z.array(z.string()),
-  }))
+  }).parse(data))
+  .middleware([requireSupabaseAuth])
   .handler(async ({ input, context }) => {
     const secret = `whsec_${Math.random().toString(36).substring(2, 15)}`;
     
@@ -39,10 +39,10 @@ export const createWebhookSubscription = createServerFn({ method: "POST" })
   });
 
 export const deleteWebhookSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .input(z.object({
+  .validator((data: unknown) => z.object({
     id: z.string().uuid(),
-  }))
+  }).parse(data))
+  .middleware([requireSupabaseAuth])
   .handler(async ({ input, context }) => {
     const { error } = await context.supabase
       .from("webhook_subscriptions")

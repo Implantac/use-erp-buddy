@@ -15,12 +15,12 @@ export const getApiKeys = createServerFn({ method: "GET" })
   });
 
 export const createApiKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .input(z.object({
+  .validator((data: unknown) => z.object({
     label: z.string().min(3),
     tenant_id: z.string().uuid(),
     expires_at: z.string().optional(),
-  }))
+  }).parse(data))
+  .middleware([requireSupabaseAuth])
   .handler(async ({ input, context }) => {
     // In a real app, we'd hash the key. For this demo, we'll return the raw key once.
     const rawKey = `ub_${Math.random().toString(36).substring(2, 15)}`;
@@ -43,10 +43,10 @@ export const createApiKey = createServerFn({ method: "POST" })
   });
 
 export const revokeApiKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .input(z.object({
+  .validator((data: unknown) => z.object({
     id: z.string().uuid(),
-  }))
+  }).parse(data))
+  .middleware([requireSupabaseAuth])
   .handler(async ({ input, context }) => {
     const { error } = await context.supabase
       .from("api_keys")
