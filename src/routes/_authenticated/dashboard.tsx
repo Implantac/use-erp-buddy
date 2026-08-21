@@ -21,10 +21,23 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
+  const [filters, setFilters] = useState<{ company_id?: string; unit_id?: string }>({});
+  
   const { data: stats } = useSuspenseQuery({
-    queryKey: ["dashboard-stats"],
-    queryFn: () => getDashboardStats(),
+    queryKey: ["dashboard-stats", filters],
+    queryFn: () => getDashboardStats({ data: filters }),
   });
+
+  const { data: companiesData } = useQuery({
+    queryKey: ["companies"],
+    queryFn: () => context.supabase.from("companies").select("id, name"),
+  });
+
+  const { data: unitsData } = useQuery({
+    queryKey: ["units"],
+    queryFn: () => context.supabase.from("units").select("id, name, company_id"),
+  });
+
 
   const cards = [
     {
