@@ -190,9 +190,10 @@ export function CategoriesManager({ tenantId }: CategoriesManagerProps) {
               <TableRow key={category.id}>
                 <TableCell className="font-medium">{category.name}</TableCell>
                 <TableCell>
-                  <Badge variant={category.active !== false ? "default" : "secondary"} className={category.active !== false ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
+                  <Badge variant={category.active !== false ? "outline" : "secondary"} className={category.active !== false ? "border-green-500 text-green-700 bg-green-50" : ""}>
                     {category.active !== false ? "Ativa" : "Inativa"}
                   </Badge>
+
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">

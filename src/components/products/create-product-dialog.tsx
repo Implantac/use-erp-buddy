@@ -149,11 +149,12 @@ export function CreateProductDialog({ tenantId }: { tenantId: string }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories?.map((category) => (
+                        {categories?.filter(c => c.active !== false).map((category) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
                           </SelectItem>
                         ))}
+
                       </SelectContent>
                     </Select>
                     <FormMessage />
