@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness } from "lucide-react";
+import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness, MapPin } from "lucide-react";
+import { CreateVacancyDialog } from "@/components/hr/create-vacancy-dialog";
+import { getJobVacancies } from "@/lib/hr.functions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { z } from "zod";
