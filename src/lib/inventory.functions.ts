@@ -91,7 +91,10 @@ export const createInventoryTransaction = createServerFn({ method: "POST" })
          notes: `Transferência recebida da unidade ${data.unit_id}. ${data.notes || ''}`,
          tenant_id: data.tenant_id
        } as any);
-    }
+     }
+
+    // Evaluate Automation Rules
+    await evaluateRules("inventory_transactions", "INSERT", data, data.tenant_id);
 
     return { success: true };
   });
