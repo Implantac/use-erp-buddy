@@ -207,9 +207,10 @@ function InventoryPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {unitsData?.units?.map((u) => (
-                            <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
-                          ))}
+                            {unitsData?.units?.map((u) => (
+                              <SelectItem key={u.id} value={u.id!}>{u.name}</SelectItem>
+                            ))}
+
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -269,8 +270,9 @@ function InventoryPage() {
                           </FormControl>
                           <SelectContent>
                             {unitsData?.units?.filter(u => u.id !== form.watch("unit_id")).map((u) => (
-                              <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+                              <SelectItem key={u.id} value={u.id!}>{u.name}</SelectItem>
                             ))}
+
                           </SelectContent>
                         </Select>
                         <FormMessage />

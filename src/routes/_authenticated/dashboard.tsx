@@ -1,8 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/dashboard.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag } from "lucide-react";
+import { Building2, MapPin, Users, FolderTree, ArrowUpRight, Wallet, TrendingUp, TrendingDown, ShoppingBag, Filter, X } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
 import { 
   BarChart, 
   Bar, 
@@ -30,13 +35,20 @@ function Dashboard() {
 
   const { data: companiesData } = useQuery({
     queryKey: ["companies"],
-    queryFn: () => context.supabase.from("companies").select("id, name"),
+    queryFn: async () => {
+      const { data } = await supabase.from("companies").select("id, name");
+      return data;
+    },
   });
 
   const { data: unitsData } = useQuery({
     queryKey: ["units"],
-    queryFn: () => context.supabase.from("units").select("id, name, company_id"),
+    queryFn: async () => {
+      const { data } = await supabase.from("units").select("id, name, company_id");
+      return data;
+    },
   });
+
 
 
   const cards = [
@@ -86,6 +98,60 @@ function Dashboard() {
           Visão geral da sua organização e operações.
         </p>
       </div>
+
+      <div className="flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg border border-border">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mr-2">
+          <Filter className="h-4 w-4" />
+          Filtros:
+        </div>
+        
+        <div className="w-[200px]">
+          <Select 
+            value={filters.company_id || "all"} 
+            onValueChange={(val) => setFilters(prev => ({ ...prev, company_id: val === "all" ? undefined : val, unit_id: undefined }))}
+          >
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Todas as Empresas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Empresas</SelectItem>
+              {companiesData?.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="w-[200px]">
+          <Select 
+            value={filters.unit_id || "all"} 
+            onValueChange={(val) => setFilters(prev => ({ ...prev, unit_id: val === "all" ? undefined : val }))}
+          >
+            <SelectTrigger className="bg-background">
+              <SelectValue placeholder="Todas as Unidades" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Unidades</SelectItem>
+              {unitsData?.filter(u => !filters.company_id || u.company_id === filters.company_id).map((u) => (
+                <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {(filters.company_id || filters.unit_id) && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setFilters({})} 
+            className="text-muted-foreground"
+          >
+            <X className="h-4 w-4 mr-2" />
+            Limpar
+          </Button>
+        )}
+      </div>
+
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
