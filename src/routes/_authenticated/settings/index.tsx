@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus } from "lucide-react";
+import { User, Building, Shield, Key, Webhook, Copy, Trash2, Plus, ExternalLink } from "lucide-react";
 import { getApiKeys, createApiKey, revokeApiKey } from "@/lib/api-keys.functions";
 import { getWebhookSubscriptions, createWebhookSubscription, deleteWebhookSubscription } from "@/lib/webhooks.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -185,6 +185,12 @@ function SettingsPage() {
                 <CardTitle>Chaves de API</CardTitle>
                 <CardDescription>
                   Use estas chaves para integrar sistemas externos ao ERP.
+                  <Button variant="link" size="sm" className="p-0 h-auto flex items-center gap-1 mt-1 text-primary" asChild>
+                    <a href="/settings/docs">
+                      <ExternalLink className="h-3 w-3" />
+                      Ver documentação da API
+                    </a>
+                  </Button>
                 </CardDescription>
               </div>
               <CreateApiKeyDialog tenantId={tenant?.id} onCreated={() => queryClient.invalidateQueries({ queryKey: ["api-keys"] })} />
