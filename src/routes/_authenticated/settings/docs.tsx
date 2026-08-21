@@ -265,6 +265,7 @@ function WebhookSimulator() {
   const [payload, setPayload] = useState<string>("");
 
   const [statusFilter, setStatusFilter] = useState<"all" | "success" | "failure">("all");
+  const [eventFilter, setEventFilter] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(0);
   const pageSize = 5;
 
@@ -274,9 +275,9 @@ function WebhookSimulator() {
   });
 
   const { data: logsData, refetch: refetchLogs } = useSuspenseQuery({
-    queryKey: ["webhook-logs", selectedSub, page, statusFilter],
+    queryKey: ["webhook-logs", selectedSub, page, statusFilter, eventFilter],
     queryFn: () => selectedSub 
-      ? getWebhookLogs({ data: { subscription_id: selectedSub, page, pageSize, status: statusFilter } }) 
+      ? getWebhookLogs({ data: { subscription_id: selectedSub, page, pageSize, status: statusFilter, event: eventFilter } }) 
       : Promise.resolve({ data: [], total: 0, page: 0, pageSize }),
   });
 
@@ -286,7 +287,7 @@ function WebhookSimulator() {
 
   useEffect(() => {
     setPage(0);
-  }, [selectedSub, statusFilter]);
+  }, [selectedSub, statusFilter, eventFilter]);
 
   useEffect(() => {
     if (event === "sale.created") {
