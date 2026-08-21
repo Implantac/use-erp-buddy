@@ -27,7 +27,8 @@ export const Route = createFileRoute("/_authenticated/settings/")({
 });
 
 function SettingsPage() {
-  const { tab } = Route.useSearch();
+  const search = Route.useSearch();
+  const tab = search['tab'];
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery({
     queryKey: ["profile"],
