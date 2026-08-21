@@ -20,7 +20,6 @@ export const simulateWebhook = createServerFn({ method: "POST" })
       .eq("id", subscription_id)
       .single();
 
-
     if (subError || !sub) {
       throw new Error("Assinatura de webhook não encontrada");
     }
@@ -56,19 +55,18 @@ export const simulateWebhook = createServerFn({ method: "POST" })
       success = false;
     }
 
-    const duration = Date.now() - startTime;
-
     // 3. Log the attempt in webhook_logs
     const { data: logEntry, error: logError } = await supabase
       .from("webhook_logs")
       .insert({
+        tenant_id: sub.tenant_id,
         subscription_id,
-        event,
+        event_type: event,
+        target_url: sub.target_url,
         payload,
         response_status: status,
-        response_body: responseBody.substring(0, 1000), // Truncate if too long
-        delivery_duration_ms: duration,
-        success
+        response_body: responseBody.substring(0, 1000),
+        is_success: success
       })
       .select()
       .single();
