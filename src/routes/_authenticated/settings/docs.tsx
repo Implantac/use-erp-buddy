@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Terminal, Copy, ExternalLink, Key, Code, Webhook } from "lucide-react";
+import { Terminal, Copy, ExternalLink, Key, Code, Webhook, FileJson } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/settings/docs")({
   component: ApiDocsPage,
@@ -73,7 +74,17 @@ function ApiDocsPage() {
               <a href="#webhooks">Webhooks</a>
             </Button>
           </div>
+          <div className="space-y-1">
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">Recursos</h4>
+            <Button variant="outline" size="sm" className="w-full justify-start gap-2" asChild>
+              <a href="/api/public/openapi" target="_blank" rel="noopener noreferrer">
+                <FileJson className="h-4 w-4" />
+                OpenAPI Spec
+              </a>
+            </Button>
+          </div>
         </aside>
+
 
         <main className="space-y-12">
           {/* Autenticação */}

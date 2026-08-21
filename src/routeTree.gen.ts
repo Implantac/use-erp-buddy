@@ -33,6 +33,7 @@ import { Route as AuthenticatedTeamIndexRouteImport } from './routes/_authentica
 import { Route as AuthenticatedUnitsIndexRouteImport } from './routes/_authenticated/units/index'
 import { Route as AuthenticatedUnitsUnitIdRouteImport } from './routes/_authenticated/units/$unitId'
 import { Route as AuthenticatedUnitsNewRouteImport } from './routes/_authenticated/units/new'
+import { Route as ApiPublicOpenapiRouteImport } from './routes/api/public/openapi'
 import { Route as ApiPublicProductsRouteImport } from './routes/api/public/products'
 
 const IndexRoute = IndexRouteImport.update({
@@ -164,6 +165,11 @@ const AuthenticatedUnitsNewRoute = AuthenticatedUnitsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthenticatedUnitsRoute,
 } as any)
+const ApiPublicOpenapiRoute = ApiPublicOpenapiRouteImport.update({
+  id: '/api/public/openapi',
+  path: '/api/public/openapi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicProductsRoute = ApiPublicProductsRouteImport.update({
   id: '/api/public/products',
   path: '/api/public/products',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/openapi': typeof ApiPublicOpenapiRoute
   '/api/public/products': typeof ApiPublicProductsRoute
   '/audit/': typeof AuthenticatedAuditIndexRoute
   '/companies/': typeof AuthenticatedCompaniesIndexRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/openapi': typeof ApiPublicOpenapiRoute
   '/api/public/products': typeof ApiPublicProductsRoute
   '/audit': typeof AuthenticatedAuditIndexRoute
   '/companies': typeof AuthenticatedCompaniesIndexRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/docs': typeof AuthenticatedSettingsDocsRoute
   '/_authenticated/units/$unitId': typeof AuthenticatedUnitsUnitIdRoute
   '/_authenticated/units/new': typeof AuthenticatedUnitsNewRoute
+  '/api/public/openapi': typeof ApiPublicOpenapiRoute
   '/api/public/products': typeof ApiPublicProductsRoute
   '/_authenticated/audit/': typeof AuthenticatedAuditIndexRoute
   '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
@@ -262,6 +271,7 @@ export interface FileRouteTypes {
     | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
+    | '/api/public/openapi'
     | '/api/public/products'
     | '/audit/'
     | '/companies/'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/settings/docs'
     | '/units/$unitId'
     | '/units/new'
+    | '/api/public/openapi'
     | '/api/public/products'
     | '/audit'
     | '/companies'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/docs'
     | '/_authenticated/units/$unitId'
     | '/_authenticated/units/new'
+    | '/api/public/openapi'
     | '/api/public/products'
     | '/_authenticated/audit/'
     | '/_authenticated/companies/'
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ApiPublicOpenapiRoute: typeof ApiPublicOpenapiRoute
   ApiPublicProductsRoute: typeof ApiPublicProductsRoute
 }
 
@@ -503,6 +516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUnitsNewRouteImport
       parentRoute: typeof AuthenticatedUnitsRoute
     }
+    '/api/public/openapi': {
+      id: '/api/public/openapi'
+      path: '/api/public/openapi'
+      fullPath: '/api/public/openapi'
+      preLoaderRoute: typeof ApiPublicOpenapiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/products': {
       id: '/api/public/products'
       path: '/api/public/products'
@@ -598,6 +618,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ApiPublicOpenapiRoute: ApiPublicOpenapiRoute,
   ApiPublicProductsRoute: ApiPublicProductsRoute,
 }
 export const routeTree = rootRouteImport
