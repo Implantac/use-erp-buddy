@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { logAudit } from "./audit.server";
+
 
 export const getInventoryHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -66,6 +68,17 @@ export const createInventoryTransaction = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("inventory_transactions" as any).insert(data as any);
 
     if (error) throw new Error(error.message);
+
+    // Audit Log
+    await logAudit(context.supabase, {
+      tenant_id: data.tenant_id,
+      user_id: context.userId,
+      unit_id: data.unit_id,
+      action: data.type === 'transfer' ? 'transfer' : 'insert',
+      entity_name: 'inventory_transactions',
+      new_data: data
+    });
+
 
     // If it's a transfer, we should ideally also create an 'in' transaction for the destination
     if (data.type === 'transfer' && data.destination_unit_id) {
