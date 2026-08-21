@@ -8,6 +8,13 @@ import { ShoppingCart, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CreateSaleDialog } from "@/components/sales/create-sale-dialog";
 import { getProfile } from "@/lib/settings.functions";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Info } from "lucide-react";
+
 
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -64,7 +71,9 @@ function SalesPage() {
                 <TableHead>Cliente</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
+                <TableHead className="text-center">Itens</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -91,11 +100,15 @@ function SalesPage() {
                     <TableCell className="text-right font-semibold">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.final_amount)}
                     </TableCell>
+                    <TableCell className="text-center">
+                      <SaleItemsPopover saleId={sale.id} />
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon">
                         <Receipt className="h-4 w-4" />
                       </Button>
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
@@ -106,3 +119,48 @@ function SalesPage() {
     </div>
   );
 }
+
+function SaleItemsPopover({ saleId }: { saleId: string }) {
+  const { data: items, isLoading } = useQuery({
+    queryKey: ["sale-items", saleId],
+    queryFn: () => getSaleItems({ data: { saleId } }),
+  });
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Info className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Itens do Pedido</h4>
+            <p className="text-xs text-muted-foreground">
+              Detalhamento dos produtos desta venda.
+            </p>
+          </div>
+          <div className="grid gap-2">
+            {isLoading ? (
+              <p className="text-xs">Carregando...</p>
+            ) : items?.map((item: any) => (
+              <div key={item.id} className="flex items-center justify-between text-sm border-b pb-1 last:border-0">
+                <div className="flex flex-col">
+                  <span className="font-medium text-xs">{item.products?.name}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {item.quantity} x {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.unit_price)}
+                  </span>
+                </div>
+                <span className="font-semibold text-xs">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total_price)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
