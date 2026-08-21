@@ -18,10 +18,16 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/settings/")({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      tab: (search.tab as string) || "profile",
+    };
+  },
   component: SettingsPage,
 });
 
 function SettingsPage() {
+  const { tab } = Route.useSearch();
   const queryClient = useQueryClient();
   const { data: profile } = useSuspenseQuery({
     queryKey: ["profile"],
