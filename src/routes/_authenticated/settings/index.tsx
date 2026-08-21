@@ -20,7 +20,7 @@ import { useState } from "react";
 export const Route = createFileRoute("/_authenticated/settings/")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
-      tab: (search.tab as string) || "profile",
+      tab: (search['tab'] as string) || "profile",
     };
   },
   component: SettingsPage,
