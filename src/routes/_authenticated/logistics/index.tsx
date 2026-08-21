@@ -202,7 +202,7 @@ function LogisticsDashboard() {
                               className="gap-2 text-green-600"
                               onClick={() => {
                                 const loc = prompt("Local de entrega (opcional):");
-                                updateStatusMutation.mutate({ shipment_id: shipment.id, status: 'delivered', location: loc || undefined });
+                                updateStatusMutation.mutate({ shipment_id: shipment.id, status: 'delivered', location: loc || null });
                               }}
                             >
                               <CheckCircle2 className="h-4 w-4" /> Confirmar Entrega
