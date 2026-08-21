@@ -115,6 +115,7 @@ function AuditLogsPage() {
       case 'delete': return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Exclusão</Badge>;
       case 'approve': return <Badge className="bg-purple-500/10 text-purple-500 border-purple-500/20">Aprovação</Badge>;
       case 'transfer': return <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">Transferência</Badge>;
+      case 'production': return <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20">Produção</Badge>;
       default: return <Badge variant="outline">{action}</Badge>;
     }
   };
@@ -198,6 +199,7 @@ function AuditLogsPage() {
                   <SelectItem value="delete">Exclusão</SelectItem>
                   <SelectItem value="approve">Aprovação</SelectItem>
                   <SelectItem value="transfer">Transferência</SelectItem>
+                  <SelectItem value="production">Produção</SelectItem>
                 </SelectContent>
               </Select>
             </div>

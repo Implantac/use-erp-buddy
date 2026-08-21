@@ -282,6 +282,45 @@ export type Database = {
           },
         ]
       }
+      formula_items: {
+        Row: {
+          component_product_id: string
+          created_at: string | null
+          formula_id: string
+          id: string
+          quantity: number
+        }
+        Insert: {
+          component_product_id: string
+          created_at?: string | null
+          formula_id: string
+          id?: string
+          quantity: number
+        }
+        Update: {
+          component_product_id?: string
+          created_at?: string | null
+          formula_id?: string
+          id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formula_items_component_product_id_fkey"
+            columns: ["component_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "formula_items_formula_id_fkey"
+            columns: ["formula_id"]
+            isOneToOne: false
+            referencedRelation: "product_formulas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_transactions: {
         Row: {
           created_at: string
@@ -378,6 +417,141 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_formulas: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          product_id: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          product_id: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          product_id?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_formulas_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_formulas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      production_orders: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          end_date: string | null
+          formula_id: string
+          id: string
+          notes: string | null
+          quantity_produced: number | null
+          quantity_target: number
+          start_date: string | null
+          status: Database["public"]["Enums"]["production_order_status"] | null
+          target_product_id: string
+          tenant_id: string
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          end_date?: string | null
+          formula_id: string
+          id?: string
+          notes?: string | null
+          quantity_produced?: number | null
+          quantity_target: number
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["production_order_status"] | null
+          target_product_id: string
+          tenant_id: string
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          end_date?: string | null
+          formula_id?: string
+          id?: string
+          notes?: string | null
+          quantity_produced?: number | null
+          quantity_target?: number
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["production_order_status"] | null
+          target_product_id?: string
+          tenant_id?: string
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_orders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_orders_formula_id_fkey"
+            columns: ["formula_id"]
+            isOneToOne: false
+            referencedRelation: "product_formulas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_orders_target_product_id_fkey"
+            columns: ["target_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_orders_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -993,6 +1167,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "manager" | "user" | "viewer"
+      production_order_status:
+        | "draft"
+        | "planned"
+        | "in_production"
+        | "completed"
+        | "cancelled"
       transaction_type: "income" | "expense"
     }
     CompositeTypes: {
@@ -1122,6 +1302,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "manager", "user", "viewer"],
+      production_order_status: [
+        "draft",
+        "planned",
+        "in_production",
+        "completed",
+        "cancelled",
+      ],
       transaction_type: ["income", "expense"],
     },
   },
