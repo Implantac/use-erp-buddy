@@ -781,6 +781,57 @@ export type Database = {
           },
         ]
       }
+      job_candidates: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          resume_url: string | null
+          status: string | null
+          tenant_id: string
+          vacancy_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          resume_url?: string | null
+          status?: string | null
+          tenant_id: string
+          vacancy_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          resume_url?: string | null
+          status?: string | null
+          tenant_id?: string
+          vacancy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_candidates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_candidates_vacancy_id_fkey"
+            columns: ["vacancy_id"]
+            isOneToOne: false
+            referencedRelation: "job_vacancies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_positions: {
         Row: {
           base_salary: number | null
@@ -815,6 +866,70 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_vacancies: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          requirements: string | null
+          salary_range: string | null
+          status: string | null
+          tenant_id: string
+          title: string
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          requirements?: string | null
+          salary_range?: string | null
+          status?: string | null
+          tenant_id: string
+          title: string
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          requirements?: string | null
+          salary_range?: string | null
+          status?: string | null
+          tenant_id?: string
+          title?: string
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_vacancies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_vacancies_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_vacancies_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
             referencedColumns: ["id"]
           },
         ]
@@ -1313,6 +1428,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          query_sql: string | null
           tenant_id: string
           updated_at: string
         }
@@ -1323,6 +1439,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          query_sql?: string | null
           tenant_id: string
           updated_at?: string
         }
@@ -1333,6 +1450,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          query_sql?: string | null
           tenant_id?: string
           updated_at?: string
         }
