@@ -35,22 +35,22 @@ function HRDashboard() {
 
   const { data: employees, isLoading: loadingEmployees } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => getEmployees(),
+    queryFn: () => getEmployees() as Promise<any[]>,
   });
 
   const { data: payroll, isLoading: loadingPayroll } = useQuery({
     queryKey: ["payroll-records"],
-    queryFn: () => getPayrollRecords(),
+    queryFn: () => getPayrollRecords() as Promise<any[]>,
   });
 
   const { data: departments } = useQuery({
     queryKey: ["departments"],
-    queryFn: () => getDepartments(),
+    queryFn: () => getDepartments() as Promise<any[]>,
   });
 
   const { data: positions } = useQuery({
     queryKey: ["job-positions"],
-    queryFn: () => getJobPositions(),
+    queryFn: () => getJobPositions() as Promise<any[]>,
   });
 
   const getStatusBadge = (status: string) => {
@@ -66,8 +66,8 @@ function HRDashboard() {
     }
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const formatCurrency = (value: number | null | undefined) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
   };
 
   return (
@@ -93,7 +93,7 @@ function HRDashboard() {
             <Users2 className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(employees as any[])?.length || 0}</div>
+            <div className="text-2xl font-bold">{employees?.length || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -103,7 +103,7 @@ function HRDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(employees as any[])?.filter(e => e.status === 'active').length || 0}
+              {employees?.filter(e => e.status === 'active').length || 0}
             </div>
           </CardContent>
         </Card>
@@ -123,7 +123,7 @@ function HRDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCurrency((employees as any[])?.reduce((acc, curr) => acc + (curr.salary || 0), 0) || 0)}
+              {formatCurrency(employees?.reduce((acc, curr) => acc + (curr.salary || 0), 0) || 0)}
             </div>
           </CardContent>
         </Card>
@@ -258,7 +258,7 @@ function HRDashboard() {
                         <p className="font-medium">{dept.name}</p>
                         <p className="text-xs text-muted-foreground">{dept.description || 'Sem descrição'}</p>
                       </div>
-                      <Badge variant="outline">{(employees as any[])?.filter(e => e.department_id === dept.id).length || 0} Colabs</Badge>
+                      <Badge variant="outline">{employees?.filter(e => e.department_id === dept.id).length || 0} Colabs</Badge>
                     </div>
                   ))}
                 </div>
