@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
@@ -43,9 +43,9 @@ const saleItemSchema = z.object({
 });
 
 const saleSchema = z.object({
-  customer_id: z.string().optional().nullable(),
+  customer_id: z.string().nullable(),
   items: z.array(saleItemSchema).min(1, "Adicione pelo menos um item"),
-  discount_amount: z.coerce.number().min(0).default(0),
+  discount_amount: z.coerce.number().min(0),
 });
 
 type SaleFormValues = z.infer<typeof saleSchema>;
@@ -105,7 +105,7 @@ export function CreateSaleDialog({ tenantId }: { tenantId: string }) {
   const discount = watch("discount_amount") || 0;
   const finalTotal = total - discount;
 
-  async function onSubmit(values: SaleFormValues) {
+  const onSubmit: SubmitHandler<SaleFormValues> = async (values) => {
     try {
       setLoading(true);
       await createSale({
