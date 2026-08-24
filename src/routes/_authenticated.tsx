@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupLabel, SidebarGroupContent } from "@/components/ui/sidebar";
 import { Building2, LayoutDashboard, Users, Settings, LogOut, MapPin, FolderTree, Package, Receipt, ShoppingCart, UserPlus, History as HistoryIcon, Truck, Factory, Users2, Briefcase, FileText, Truck as TruckIcon, Box, BarChart3, Target, Webhook, BriefcaseBusiness } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +7,8 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
+    // A sessão fica no storage do navegador; no SSR não há sessão para validar.
+    if (typeof window === "undefined") return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
       throw redirect({
@@ -18,6 +21,18 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   const navigate = Route.useNavigate();
+
+  useEffect(() => {
+    // Revalida a sessão após a hidratação (o guard do SSR não tem acesso ao storage).
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) navigate({ to: "/auth" });
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) navigate({ to: "/auth" });
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
