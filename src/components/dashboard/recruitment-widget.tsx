@@ -30,9 +30,11 @@ export function RecruitmentWidget({ vacancies, candidates }: RecruitmentWidgetPr
           
           <div className="pt-4 border-t border-border mt-2">
             <Button variant="ghost" size="sm" className="w-full justify-between" asChild>
-              <Link to="/hr" className="w-full flex justify-between items-center">
-                Gerenciar Recrutamento
-                <ArrowRight className="h-4 w-4 ml-2" />
+              <Link to="/hr">
+                <span className="w-full flex justify-between items-center">
+                  Gerenciar Recrutamento
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </span>
               </Link>
             </Button>
           </div>
