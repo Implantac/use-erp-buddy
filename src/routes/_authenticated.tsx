@@ -120,14 +120,14 @@ function AuthenticatedLayout() {
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-+                  <SidebarMenuItem>
-+                    <SidebarMenuButton asChild>
-+                      <Link to="/hr" search={{ tab: 'recruitment' }} className="flex w-full items-center gap-2">
-+                        <BriefcaseBusiness className="h-4 w-4" />
-+                        <span>Recrutamento & Seleção</span>
-+                      </Link>
-+                    </SidebarMenuButton>
-+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/hr" search={{ tab: 'recruitment' }} className="flex w-full items-center gap-2">
+                        <BriefcaseBusiness className="h-4 w-4" />
+                        <span>Recrutamento & Seleção</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
