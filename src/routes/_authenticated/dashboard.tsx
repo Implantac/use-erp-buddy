@@ -234,7 +234,6 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Notificações do Sistema</CardTitle>
