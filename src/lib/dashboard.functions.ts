@@ -35,17 +35,23 @@ export const getDashboardStats = createServerFn({ method: "GET" })
     
     let financeQuery = context.supabase.from("transactions").select("type, amount");
     let salesQuery = context.supabase.from("sales" as any).select("final_amount, created_at");
+    let vacanciesQuery = context.supabase.from("job_vacancies").select("*", { count: "exact", head: true });
+    let candidatesQuery = context.supabase.from("job_candidates").select("*", { count: "exact", head: true });
+    let productionQuery = context.supabase.from("production_orders").select("status");
 
     if (effectiveCompanyId) {
       (unitsQuery as any).eq("company_id", effectiveCompanyId);
-      // If we filter by company, also filter other entities that belong to it
       (financeQuery as any).eq("company_id", effectiveCompanyId); 
       (salesQuery as any).eq("company_id", effectiveCompanyId);
+      (vacanciesQuery as any).eq("company_id", effectiveCompanyId);
+      (productionQuery as any).eq("company_id", effectiveCompanyId);
     }
     
     if (effectiveUnitId) {
       (financeQuery as any).eq("unit_id", effectiveUnitId);
       (salesQuery as any).eq("unit_id", effectiveUnitId);
+      (vacanciesQuery as any).eq("unit_id", effectiveUnitId);
+      (productionQuery as any).eq("unit_id", effectiveUnitId);
     }
     
     // Apply role-based mandatory filtering if not global admin
@@ -59,9 +65,19 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       }
     }
 
-
     // Busca contagens e saldos em paralelo
-    const [companiesRes, unitsRes, groupsRes, teamRes, financeRes, salesRes, stockAlertsRes] = await Promise.all([
+    const [
+      companiesRes, 
+      unitsRes, 
+      groupsRes, 
+      teamRes, 
+      financeRes, 
+      salesRes, 
+      stockAlertsRes,
+      vacanciesRes,
+      candidatesRes,
+      productionRes
+    ] = await Promise.all([
       companiesQuery,
       unitsQuery,
       groupsQuery,
@@ -69,8 +85,10 @@ export const getDashboardStats = createServerFn({ method: "GET" })
       financeQuery,
       salesQuery,
       tid ? context.supabase.rpc('get_low_stock_count', { _tenant_id: tid }) : Promise.resolve({ data: 0, error: null }),
+      vacanciesQuery,
+      candidatesQuery,
+      productionQuery
     ]);
-
 
     const summary = (financeRes.data || []).reduce((acc, curr) => {
       if (curr.type === 'income') acc.income += Number(curr.amount);
@@ -81,6 +99,11 @@ export const getDashboardStats = createServerFn({ method: "GET" })
     const salesTotal = ((salesRes.data as any[]) || []).reduce((sum, s) => sum + Number(s.final_amount), 0);
     const salesCount = (salesRes.data as any[])?.length || 0;
     const avgTicket = salesCount > 0 ? salesTotal / salesCount : 0;
+
+    const productionStats = (productionRes.data || []).reduce((acc: any, curr: any) => {
+      acc[curr.status] = (acc[curr.status] || 0) + 1;
+      return acc;
+    }, { planned: 0, in_production: 0, completed: 0, cancelled: 0 });
 
     return {
       companies: companiesRes.count || 0,
@@ -97,6 +120,11 @@ export const getDashboardStats = createServerFn({ method: "GET" })
         count: salesCount,
         avgTicket
       },
-      stockAlerts: (stockAlertsRes as any).data || 0
+      stockAlerts: (stockAlertsRes as any).data || 0,
+      hr: {
+        vacancies: vacanciesRes.count || 0,
+        candidates: candidatesRes.count || 0
+      },
+      production: productionStats
     };
   });
