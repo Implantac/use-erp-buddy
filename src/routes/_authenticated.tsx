@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
+  // Área privada depende da sessão do navegador: renderiza só no cliente.
+  ssr: false,
   beforeLoad: async () => {
     // A sessão fica no storage do navegador; no SSR não há sessão para validar.
     if (typeof window === "undefined") return;
