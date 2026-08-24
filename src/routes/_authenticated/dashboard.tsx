@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 
 import { getNotifications, markNotificationRead } from "@/lib/automations.functions";
+import { RecruitmentWidget } from "@/components/dashboard/recruitment-widget";
+import { ProductionWidget } from "@/components/dashboard/production-widget";
 import { 
   BarChart, 
-
   Bar, 
   XAxis, 
   YAxis, 
