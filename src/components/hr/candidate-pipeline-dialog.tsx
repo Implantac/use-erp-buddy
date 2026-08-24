@@ -95,6 +95,10 @@ export function CandidatePipelineDialog({
               toast.error("Informe o nome completo do candidato.");
               return;
             }
+            if (!email.trim()) {
+              toast.error("Informe o e-mail do candidato.");
+              return;
+            }
             addMutation.mutate();
           }}
         >
@@ -104,7 +108,7 @@ export function CandidatePipelineDialog({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cand-email">E-mail</Label>
-            <Input id="cand-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="opcional" />
+            <Input id="cand-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="candidato@email.com" />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="cand-phone">Telefone</Label>
