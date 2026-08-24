@@ -51,7 +51,7 @@ export function ProductionWidget({ stats }: ProductionWidgetProps) {
 
           <div className="pt-2 border-t border-border mt-2">
             <Button variant="ghost" size="sm" className="w-full justify-between" asChild>
-              <Link to="/production" disabled>
+              <Link to="/production" disabled className="w-full flex justify-between items-center">
                 Ordens de Produção
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
