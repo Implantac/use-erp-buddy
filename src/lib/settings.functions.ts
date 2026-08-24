@@ -7,12 +7,23 @@ export const getProfile = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data: profile, error } = await context.supabase
       .from("profiles")
-      .select("*, user_roles(tenant_id)")
+      .select("*")
       .eq("id", context.userId)
       .single();
 
     if (error) throw error;
-    return profile;
+
+    // O tenant vem de user_roles (não há relação direta com profiles).
+    const { data: roles } = await context.supabase
+      .from("user_roles")
+      .select("tenant_id, role")
+      .eq("user_id", context.userId);
+
+    return {
+      ...(profile as any),
+      tenant_id: roles?.[0]?.tenant_id ?? null,
+      user_roles: roles ?? [],
+    };
   });
 
 export const updateProfile = createServerFn({ method: "POST" })

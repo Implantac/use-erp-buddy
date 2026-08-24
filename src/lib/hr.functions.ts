@@ -230,3 +230,101 @@ export const getCandidates = createServerFn({ method: "GET" })
     if (error) throw error;
     return candidates;
   });
+
+export const createCandidate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    vacancy_id: z.string().uuid(),
+    full_name: z.string().min(3),
+    email: z.string().email().optional().nullable(),
+    phone: z.string().optional().nullable(),
+    resume_url: z.string().url().optional().nullable(),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: vacancy, error: vacancyError } = await context.supabase
+      .from("job_vacancies")
+      .select("id, tenant_id")
+      .eq("id", data.vacancy_id)
+      .single();
+    if (vacancyError || !vacancy) throw new Error("Vaga não encontrada");
+
+    const { data: candidate, error } = await context.supabase
+      .from("job_candidates")
+      .insert({
+        tenant_id: vacancy.tenant_id,
+        vacancy_id: data.vacancy_id,
+        full_name: data.full_name,
+        email: data.email ?? null,
+        phone: data.phone ?? null,
+        resume_url: data.resume_url ?? null,
+        status: "applied",
+      } as any)
+      .select()
+      .single();
+    if (error) throw error;
+
+    await logAudit(context.supabase, {
+      tenant_id: vacancy.tenant_id,
+      user_id: context.userId,
+      action: "insert",
+      entity_name: "job_candidates",
+      entity_id: candidate.id,
+      new_data: candidate,
+    });
+
+    return candidate;
+  });
+
+export const updateCandidateStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    id: z.string().uuid(),
+    status: z.enum(["applied", "screening", "interview", "offer", "hired", "rejected"]),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: candidate, error } = await context.supabase
+      .from("job_candidates")
+      .update({ status: data.status } as any)
+      .eq("id", data.id)
+      .select()
+      .single();
+    if (error) throw error;
+
+    await logAudit(context.supabase, {
+      tenant_id: candidate.tenant_id,
+      user_id: context.userId,
+      action: "update",
+      entity_name: "job_candidates",
+      entity_id: candidate.id,
+      new_data: { status: data.status },
+    });
+
+    return candidate;
+  });
+
+export const updateVacancyStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((data: any) => z.object({
+    id: z.string().uuid(),
+    status: z.enum(["open", "paused", "closed"]),
+  }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: vacancy, error } = await context.supabase
+      .from("job_vacancies")
+      .update({ status: data.status } as any)
+      .eq("id", data.id)
+      .select()
+      .single();
+    if (error) throw error;
+
+    await logAudit(context.supabase, {
+      tenant_id: vacancy.tenant_id,
+      user_id: context.userId,
+      action: "update",
+      entity_name: "job_vacancies",
+      entity_id: vacancy.id,
+      new_data: { status: data.status },
+    });
+
+    return vacancy;
+  });

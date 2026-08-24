@@ -9,7 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Users2, Briefcase, FileText, Plus, UserCheck, UserX, Clock, DollarSign, Building, Search, Filter, BriefcaseBusiness, MapPin } from "lucide-react";
 import { CreateVacancyDialog } from "@/components/hr/create-vacancy-dialog";
-import { getJobVacancies } from "@/lib/hr.functions";
+import { getJobVacancies, getCandidates, updateVacancyStatus } from "@/lib/hr.functions";
+import { CandidatePipelineDialog } from "@/components/hr/candidate-pipeline-dialog";
+import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { z } from "zod";
@@ -54,6 +56,23 @@ function HRPage() {
     queryKey: ["job-positions"],
     queryFn: () => getJobPositions() as Promise<any[]>,
   });
+
+  const { data: allCandidates } = useQuery({
+    queryKey: ["candidates-all"],
+    queryFn: () => getCandidates({ data: {} }) as Promise<any[]>,
+  });
+
+  const vacancyStatusMutation = useMutation({
+    mutationFn: (vars: { id: string; status: "open" | "closed" }) => updateVacancyStatus({ data: vars }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job-vacancies"] });
+      toast.success("Status da vaga atualizado.");
+    },
+    onError: (err: any) => toast.error("Erro ao atualizar vaga: " + err.message),
+  });
+
+  const countCandidates = (vacancyId: string) =>
+    allCandidates?.filter((c) => c.vacancy_id === vacancyId).length ?? 0;
 
   const { data: jobVacancies, isLoading: loadingVacancies } = useQuery({
     queryKey: ["job-vacancies"],
@@ -343,13 +362,33 @@ function HRPage() {
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Candidatos:</span>
-                            <span className="font-medium">0</span>
+                            <span className="font-medium">{countCandidates(vacancy.id)}</span>
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="bg-muted/30 pt-3 border-t">
-                        <Button variant="ghost" className="w-full gap-2 text-xs group-hover:text-primary transition-colors">
-                          Ver Candidatos <Plus className="h-3 w-3" />
+                      <CardFooter className="bg-muted/30 pt-3 border-t flex gap-2">
+                        <CandidatePipelineDialog
+                          vacancyId={vacancy.id}
+                          vacancyTitle={vacancy.title}
+                          trigger={
+                            <Button variant="ghost" className="flex-1 gap-2 text-xs group-hover:text-primary transition-colors">
+                              Ver Candidatos <Plus className="h-3 w-3" />
+                            </Button>
+                          }
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                          disabled={vacancyStatusMutation.isPending}
+                          onClick={() =>
+                            vacancyStatusMutation.mutate({
+                              id: vacancy.id,
+                              status: vacancy.status === "open" ? "closed" : "open",
+                            })
+                          }
+                        >
+                          {vacancy.status === "open" ? "Encerrar" : "Reabrir"}
                         </Button>
                       </CardFooter>
                     </Card>

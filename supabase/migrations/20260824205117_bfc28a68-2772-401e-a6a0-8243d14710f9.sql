@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.get_low_stock_count(uuid) FROM anon;

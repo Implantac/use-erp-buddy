@@ -1,7 +1,9 @@
 import React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getReportTemplates, getRecentExports, requestReportExport } from "@/lib/reports.functions";
+import { getReportTemplates, getRecentExports, requestReportExport, getReportDownloadUrl } from "@/lib/reports.functions";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -28,6 +30,12 @@ export const Route = createFileRoute("/_authenticated/reports/")({
 
 function ReportsDashboard() {
   const queryClient = useQueryClient();
+  const [from, setFrom] = React.useState("");
+  const [to, setTo] = React.useState("");
+
+  const openUrl = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const { data: templates, isLoading: loadingTemplates } = useQuery({
     queryKey: ["report-templates"],
@@ -42,13 +50,25 @@ function ReportsDashboard() {
   const exportMutation = useMutation({
     mutationFn: (data: { template_id: string, name: string, format: "csv" | "pdf", filters: any }) => 
       requestReportExport({ data }),
-    onSuccess: () => {
+    onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ["report-exports"] });
-      toast.success("Relatório gerado com sucesso!");
+      toast.success(`Relatório gerado com ${result.rows} registro(s).`);
+      if (result.url) openUrl(result.url);
     },
     onError: (err: any) => {
       toast.error("Erro ao gerar relatório: " + err.message);
     }
+  });
+
+  const downloadMutation = useMutation({
+    mutationFn: (export_id: string) => getReportDownloadUrl({ data: { export_id } }),
+    onSuccess: (result) => openUrl(result.url),
+    onError: (err: any) => toast.error("Erro ao baixar: " + err.message),
+  });
+
+  const buildFilters = () => ({
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
   });
 
   const getCategoryIcon = (category: string) => {
@@ -71,6 +91,29 @@ function ReportsDashboard() {
           </p>
         </div>
       </div>
+
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-base">Filtros do período</CardTitle>
+          </div>
+          <CardDescription>Aplique um intervalo de datas antes de gerar as exportações.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="space-y-1.5">
+            <Label htmlFor="report-from">De</Label>
+            <Input id="report-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="report-to">Até</Label>
+            <Input id="report-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          </div>
+          {(from || to) && (
+            <Button variant="ghost" onClick={() => { setFrom(""); setTo(""); }}>Limpar</Button>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {loadingTemplates ? (
@@ -100,11 +143,12 @@ function ReportsDashboard() {
                     variant="outline" 
                     size="sm" 
                     className="flex-1 gap-2"
+                    disabled={exportMutation.isPending}
                     onClick={() => exportMutation.mutate({
                       template_id: template.id,
                       name: template.name,
                       format: "csv",
-                      filters: {}
+                      filters: buildFilters()
                     })}
                   >
                     <FileSpreadsheet className="h-4 w-4" /> CSV
@@ -112,11 +156,12 @@ function ReportsDashboard() {
                   <Button 
                     size="sm" 
                     className="flex-1 gap-2"
+                    disabled={exportMutation.isPending}
                     onClick={() => exportMutation.mutate({
                       template_id: template.id,
                       name: template.name,
                       format: "pdf",
-                      filters: {}
+                      filters: buildFilters()
                     })}
                   >
                     <Download className="h-4 w-4" /> PDF
@@ -172,7 +217,13 @@ function ReportsDashboard() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" className="gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2"
+                        disabled={!exportItem.file_path || downloadMutation.isPending}
+                        onClick={() => downloadMutation.mutate(exportItem.id)}
+                      >
                         <Download className="h-4 w-4" /> Baixar
                       </Button>
                     </TableCell>
