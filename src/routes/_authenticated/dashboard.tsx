@@ -234,6 +234,7 @@ function Dashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Notificações do Sistema</CardTitle>
@@ -244,36 +245,38 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Próximos Passos</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {stats.stockAlerts > 0 && (
-              <div className="flex items-start gap-4 p-3 border rounded-lg bg-red-50 border-red-100 animate-pulse">
-                <div className="h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold">!</div>
+        <div className="col-span-3 space-y-4">
+          <RecruitmentWidget 
+            vacancies={stats.hr?.vacancies || 0} 
+            candidates={stats.hr?.candidates || 0} 
+          />
+          <ProductionWidget 
+            stats={stats.production || { planned: 0, in_production: 0, completed: 0, cancelled: 0 }} 
+          />
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">Próximos Passos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {stats.stockAlerts > 0 && (
+                <div className="flex items-start gap-4 p-3 border rounded-lg bg-red-50 border-red-100 animate-pulse">
+                  <div className="h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold">!</div>
+                  <div>
+                    <p className="text-sm font-medium text-red-900">Atenção ao Estoque</p>
+                    <p className="text-xs text-red-700">{stats.stockAlerts} produtos precisam de reposição.</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-start gap-3 p-2 border rounded-lg bg-primary/5 border-primary/10">
+                <div className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold">1</div>
                 <div>
-                  <p className="text-sm font-medium text-red-900">Atenção ao Estoque</p>
-                  <p className="text-xs text-red-700">{stats.stockAlerts} produtos precisam de reposição imediata.</p>
+                  <p className="text-xs font-medium">Complete seu perfil</p>
                 </div>
               </div>
-            )}
-            <div className="flex items-start gap-4 p-3 border rounded-lg bg-primary/5 border-primary/10">
-              <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">1</div>
-              <div>
-                <p className="text-sm font-medium">Complete seu perfil</p>
-                <p className="text-xs text-muted-foreground">Adicione seu nome e avatar nas configurações.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-3 border rounded-lg opacity-60">
-              <div className="h-6 w-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-bold">2</div>
-              <div>
-                <p className="text-sm font-medium">Cadastre uma unidade</p>
-                <p className="text-xs text-muted-foreground">Defina o local de operação da sua empresa.</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
